@@ -27,5 +27,5 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist/seu-projeto-name # SUBSTITUA pelo nome real!
+        publish_dir: ./dist/thalesmenegueco.github.io # SUBSTITUA pelo nome real!
         publish_branch: gh-pages
