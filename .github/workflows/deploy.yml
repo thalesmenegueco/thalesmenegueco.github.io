@@ -35,5 +35,5 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist/learning-gallery # Project's name
+        publish_dir: ./dist/learning-gallery/browser # Location of the folder to published
         publish_branch: gh-pages
