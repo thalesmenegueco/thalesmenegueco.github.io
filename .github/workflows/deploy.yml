@@ -2,11 +2,15 @@ name: Deploy Angular to GitHub Pages
 
 on:
   push:
-    branches: [ main ] # Ou 'master', dependendo da sua branch principal
+    branches: [ main ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permissão para escrever no repositório
+      pages: write    # Permissão para gerenciar o GitHub Pages
+      id-token: write # Necessário para autenticação OIDC (boas práticas)
 
     steps:
     - name: Checkout
@@ -15,7 +19,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '24' # Ou a versão do Node.js que você usa
+        node-version: '24'
 
     - name: Install dependencies
       run: npm install
@@ -31,5 +35,5 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist/learning-gallery # project's name
+        publish_dir: ./dist/learning-gallery # Project's name
         publish_branch: gh-pages
