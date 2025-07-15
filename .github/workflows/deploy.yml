@@ -20,6 +20,10 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Install Angular CLI
+      run: npm install -g @angular/cli
+
+
     - name: Build Angular App
       run: ng build --configuration production --base-href /
 
