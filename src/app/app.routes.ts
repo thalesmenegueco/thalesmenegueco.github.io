@@ -13,7 +13,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },              // Rota /home
   { path: 'learning-gallery', component: LearningGallery }, // Rota /learning-gallery
   { path: '', redirectTo: '/home', pathMatch: 'full' },   // Redirecionar raiz para /home
-  { path: '**', redirectTo: '/home' }                     // Redirecionar rotas inválidas
+  // { path: '**', redirectTo: '/home' }                     // Redirecionar rotas inválidas
 ];
 
 @NgModule({
