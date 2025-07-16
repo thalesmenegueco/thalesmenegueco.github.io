@@ -1,11 +1,21 @@
 <nav>
-  <h2>Minha Aplicação Angular</h2>
+  <h1>Thales Menegueço</h1>
   <ul>
-    <li><a routerLink="/home">🏠 Home</a></li>
-    <!-- Adicione mais links conforme criar novos componentes -->
+    <li>
+      <a routerLink="/home"
+        routerLinkActive="active">
+        🏠 Home
+      </a>
+    </li>
+    <li>
+      <a routerLink="/learning-gallery" routerLinkActive="active">
+        📚 Galeria de Interesses
+      </a>
+    </li>
+    <!-- more links as I create new components 😁 -->
   </ul>
 </nav>
 
 <main>
-  <router-outlet></router-outlet> <!-- AQUI é onde os componentes serão renderizados -->
+  <router-outlet></router-outlet> <!-- component will be rendered here -->
 </main>
