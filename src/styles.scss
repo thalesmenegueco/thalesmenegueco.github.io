@@ -12,6 +12,10 @@ html {
   color: $standart-text-color;
 }
 
+nav > ul {
+  list-style: none;
+}
+
 body {
   $font-stack: list.append($font-stack, sans-serif);
   font: $font-stack;
@@ -32,5 +36,15 @@ h2 {
     
     &:hover {
         color: color.scale($secondary-color, $lightness: 20%);
+    }
+}
+
+a {
+    color: $secondary-color;
+    text-decoration: none;
+
+    &:hover {
+        color: color.scale($secondary-color, $lightness: 40%);
+        text-decoration: underline;
     }
 }
