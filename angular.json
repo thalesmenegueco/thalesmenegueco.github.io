@@ -50,7 +50,7 @@
                 }
               ],
               "outputHashing": "all",
-              "baseHref": "/learning-gallery/"
+              "baseHref": "/thalesmenegueco.github.io/"
             },
             "development": {
               "optimization": false,
