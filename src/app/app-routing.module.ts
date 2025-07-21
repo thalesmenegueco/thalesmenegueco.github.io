@@ -13,7 +13,7 @@ import { Test } from './test/test'; // Importar o componente Test
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },              // Rota /home
   { path: 'learning-gallery', component: LearningGalleryComponent }, // Rota /learning-gallery
-  { path: 'test', component: Test }, // test component 
+  { path: 'test', component: Test }, // componente para testar as rotas 
   { path: '', redirectTo: '/home', pathMatch: 'full' },   // Redirecionar raiz para /home
   { path: '**', redirectTo: '/home' }                     // Redirecionar rotas inválidas - PROBLEMA???
 ];
