@@ -1,6 +1,7 @@
 # LearningGallery
 
-A gallery where I share my current and future learning projects.
+A website where I share my current and future learning projects.
+Website available [here](https://thalesmenegueco.github.io).
 
 ## Angular - useful information
 
