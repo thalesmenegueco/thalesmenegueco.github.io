@@ -2,14 +2,19 @@
 @use "sass:list";
 @use "sass:color";
 
-$font-stack: Helvetica, Arial;
-$primary-color: #2b05ff;
+/* Importing Fonts */
+@import 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap';
+
+$font-stack: 'Roboto', Helvetica;
+$primary-color: #ffa300;
 $secondary-color: #ec0dcf;
 $standart-text-color: whitesmoke;
+
 
 html {
   background-color: rgb(5, 5, 5);
   color: $standart-text-color;
+  font-family: $font-stack;
 }
 
 nav > ul {

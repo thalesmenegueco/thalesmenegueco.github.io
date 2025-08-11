@@ -1,0 +1,13 @@
+/* Global styles */
+@use "sass:list";
+@use "sass:color";
+
+
+$primary-color: #ffa300;
+$secondary-color: #ec0dcf;
+$standart-text-color: whitesmoke;
+
+
+.text-rgb-245-245-245 {
+    color: $standart-text-color;
+}

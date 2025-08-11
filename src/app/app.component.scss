@@ -1,0 +1,49 @@
+/* Global styles */
+@use "sass:list";
+@use "sass:color";
+
+
+$primary-color: #ffa300;
+$secondary-color: #ec0dcf;
+$standart-text-color: whitesmoke;
+
+
+/* CSS Reset */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333;
+    padding: 10px 0 10px 0;
+    margin-bottom: 20px;
+    border-radius: 20px;
+    padding: 20px 20px 20px 20px;
+}
+
+nav ul li {
+    list-style: none;
+    list-style-type: none;
+}
+
+.pages-links {
+    margin-left: 20px;
+}

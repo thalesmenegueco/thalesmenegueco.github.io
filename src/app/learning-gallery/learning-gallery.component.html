@@ -1,6 +1,13 @@
 <div>
   <h3>Bem-vindo(a) à minha</h3>
-  <h2>📚 Galeria de interesses!</h2>
-  <p>Este é o conteúdo do seu LearningGallery.</p>
-  <p>Você está na rota: /learning-gallery</p>
+  <h2>🤓 Galeria de interesses!</h2>
+
+  <div class="flex-interests">
+    @for (item of interests; track $index) {
+    <app-interest [image]="item.image" [name]="item.name" [description]="item.description">
+    </app-interest>
+    }
+  </div>
+
+
 </div>

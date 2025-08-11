@@ -1,6 +1,28 @@
-# LearningGallery
+# Personal Page
 
-A gallery where I share my current and future learning projects.
+A gallery where I share my current and future projects.
+
+## Info
+
+**Website available in this link:** https://thalesmenegueco.github.io/home
+
+Figma project: https://www.figma.com/design/znqxvoSCfB5o9nw7ZsatNU/Personal-Website?node-id=0-1&t=MEL5qexmwXE77shC-1
+
+## Good Practices and Patterns
+
+### Convenções de Nomenclatura
+- Classes: PascalCase (Ex: ContaBancaria)
+- Métodos e variáveis: camelCase (Ex: calcularIdade)
+- Constantes: UPPER_CASE (Ex: TAXA_JUROS)
+- Pacotes: lowercase (Ex: com.empresa.projeto)
+
+### Princípios SOLID
+- Single Responsibility: Uma classe deve ter apenas uma razão para mudar
+- Open/Closed: Aberto para extensão, fechado para modificação
+- Liskov Substitution: Objetos de uma classe derivada devem poder substituir objetos da classe base
+- Interface Segregation: Muitas interfaces específicas são melhores que uma interface geral
+- Dependency Inversion: Dependa de abstrações, não de implementações
+
 
 ## Angular - useful information
 
