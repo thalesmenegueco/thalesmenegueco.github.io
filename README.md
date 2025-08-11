@@ -23,6 +23,8 @@ Figma project: https://www.figma.com/design/znqxvoSCfB5o9nw7ZsatNU/Personal-Webs
 - Interface Segregation: Muitas interfaces específicas são melhores que uma interface geral
 - Dependency Inversion: Dependa de abstrações, não de implementações
 
+A website where I share my current and future learning projects.
+Website available [here](https://thalesmenegueco.github.io).
 
 ## Angular - useful information
 
