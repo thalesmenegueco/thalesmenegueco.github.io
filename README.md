@@ -1,6 +1,6 @@
 # Personal Page
 
-A gallery where I share my current and future projects.
+A gallery where I share my current projects.
 
 ## Info
 

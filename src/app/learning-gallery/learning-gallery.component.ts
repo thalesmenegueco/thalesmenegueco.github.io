@@ -25,5 +25,10 @@ export class LearningGalleryComponent {
     description: 'Sempre gostei de entender as motivos por trás das coisas, agora tenho ferramentas para isso.',
     image: 'https://media-public.canva.com/P_-Pc/MAFM7jP_-Pc/1/tl.png'
   },
+  {
+    name: "Autismo",
+    description: 'Canal no WhatsApp que fala sobre TEA (Transtorno do Espectro Autista) e suas vivências associadas.',
+    image: 'https://media-public.canva.com/kcveY/MAEUZkkcveY/1/tl.png'
+  }
 ];
 }
