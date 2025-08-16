@@ -11,3 +11,8 @@ $standart-text-color: whitesmoke;
 .text-rgb-245-245-245 {
     color: $standart-text-color;
 }
+
+ul li {
+    list-style: none;
+    list-style-type: none;
+}
