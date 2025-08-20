@@ -28,7 +28,8 @@ export class LearningGalleryComponent {
   {
     name: "Autismo",
     description: 'Canal no WhatsApp que fala sobre TEA (Transtorno do Espectro Autista) e suas vivências associadas.',
-    image: 'https://media-public.canva.com/kcveY/MAEUZkkcveY/1/tl.png'
+    image: 'https://media-public.canva.com/kcveY/MAEUZkkcveY/1/tl.png',
+    link: 'https://whatsapp.com/channel/0029Vb5wSyFL7UVOqnmurb1Z'
   }
 ];
 }
