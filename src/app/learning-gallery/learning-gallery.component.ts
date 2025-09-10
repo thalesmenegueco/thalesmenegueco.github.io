@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { InterestComponent } from './components/interest/interest';
 import { Interest } from '../../models/interest';
+import { SignLanguageTranslation } from '../shared/sign-language-translation/sign-language-translation';
 
 
 

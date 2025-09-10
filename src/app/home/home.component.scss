@@ -16,3 +16,15 @@ ul li {
     list-style: none;
     list-style-type: none;
 }
+
+.container-flex-page-title-translation {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.welcome{
+    margin-right: 60px;
+}

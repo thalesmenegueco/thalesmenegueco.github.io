@@ -1,6 +1,15 @@
 <div>
-  <h3>Bem-vindo(a) à minha</h3>
-  <h2>🏠 Página Inicial!</h2>
+  <div class="container-flex-page-title-translation">
+    <div class="item-flex-page-title-translation welcome">
+      <h3>Bem-vindo(a) à minha</h3>
+      <h2>🏠 Página Inicial!</h2>
+    </div>
+    <div class="item-flex-page-title-translation translation">
+      <app-sign-language-translation [linkForVideo]="homePageTranslation.linkForVideo"
+        [videoDescription]="homePageTranslation.videoDescription">
+      </app-sign-language-translation>
+    </div>
+  </div>
 
   <div><strong>Quer me conhecer um pouco mais?</strong></div>
   <ul>
