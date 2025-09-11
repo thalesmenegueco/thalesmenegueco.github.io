@@ -1,14 +1,17 @@
 import { Component } from '@angular/core';
 import { InterestComponent } from './components/interest/interest';
 import { Interest } from '../../models/interest';
+import { PageTranslation } from '../../models/pageTranslation';
 import { SignLanguageTranslation } from '../shared/sign-language-translation/sign-language-translation';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
 
 
 
 @Component({
   selector: 'app-learning-gallery',
   standalone: true,
-  imports: [InterestComponent],
+  imports: [InterestComponent, SignLanguageTranslation],
   templateUrl: './learning-gallery.component.html',
   styleUrl: './learning-gallery.component.scss'
 })
@@ -33,4 +36,19 @@ export class LearningGalleryComponent {
     link: 'https://whatsapp.com/channel/0029Vb5wSyFL7UVOqnmurb1Z'
   }
 ];
+
+  safeUrl: SafeResourceUrl;
+  galleryPageTranslation: PageTranslation;
+
+  constructor(private sanitizer: DomSanitizer) {
+    const googleDriveUrl = 'https://drive.google.com/file/d/1zmGmxSO6K9euinx1KVMHSNURTMmgeMVb/preview';
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(googleDriveUrl);
+
+    this.galleryPageTranslation = {
+    linkForVideo: this.safeUrl,
+    videoDescription: "Tradução em língua Brasileira de Sinais da galeria de interesses"
+  }
+
+  }
+
 }
