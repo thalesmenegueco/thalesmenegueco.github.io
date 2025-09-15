@@ -12,8 +12,8 @@ import { LearningGalleryComponent } from './learning-gallery/learning-gallery.co
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },              // Rota /home
   { path: 'learning-gallery', component: LearningGalleryComponent }, // Rota /learning-gallery 
-  { path: '', redirectTo: '/home', pathMatch: 'full' },   // Redirecionar raiz para /home
-  { path: '**', redirectTo: '/home' }                     // Redirecionar rotas inválidas - PROBLEMA???
+  { path: '', redirectTo: '/learning-gallery', pathMatch: 'full' },   // Redirecionar raiz para /home
+  { path: '**', redirectTo: '/learning-gallery' }                     // Redirecionar rotas inválidas - PROBLEMA???
 ];
 
 @NgModule({

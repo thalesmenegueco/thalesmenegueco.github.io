@@ -7,6 +7,10 @@ $primary-color: #ffa300;
 $secondary-color: #ec0dcf;
 $standart-text-color: whitesmoke;
 
+ul li {
+    list-style: none;
+    list-style-type: none;
+}
 
 .flex-interests {
     display: flex;
