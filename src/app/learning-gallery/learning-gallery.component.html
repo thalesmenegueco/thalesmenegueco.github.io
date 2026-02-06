@@ -13,7 +13,7 @@
 
   <div class="flex-interests">
     @for (item of interests; track $index) {
-    <app-interest [image]="item.image" [name]="item.name" [description]="item.description">
+    <app-interest [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''">
     </app-interest>
     }
   </div>

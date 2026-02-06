@@ -22,18 +22,26 @@ export class LearningGalleryComponent {
 
   interests: Interest[] = [
   { name: "Língua de sinais",
-    description: 'A comunidade surda tem me ensinado muito por meio da Libras - Língua Brasileira de Sinais',
-    image: 'https://media-public.canva.com/uwdzU/MAFQ9vuwdzU/1/tl.png' 
+    description: 'Perfil no Tiktok que fala sobre cultura surda e interpretação, em Libras + português',
+    image: 'https://media-public.canva.com/uwdzU/MAFQ9vuwdzU/1/tl.png',
+    link: 'https://www.tiktok.com/@sinais.sinapses'
   },
   { name: "Ciência de dados",
-    description: 'Sempre gostei de entender as motivos por trás das coisas, agora tenho ferramentas para isso.',
-    image: 'https://media-public.canva.com/P_-Pc/MAFM7jP_-Pc/1/tl.png'
+    description: 'Visualizar padrões de diagnóstico de autismo em adultos usando ciência de dados.',
+    image: 'https://media-public.canva.com/P_-Pc/MAFM7jP_-Pc/1/tl.png',
+    link:'https://github.com/thalesmenegueco/autism-screening-on-adults'
   },
   {
-    name: "Autismo",
-    description: 'Canal no WhatsApp que fala sobre TEA (Transtorno do Espectro Autista) e suas vivências associadas.',
+    name: "Neurodivergência",
+    description: 'Perfil no Tiktok que fala sobre neurodivergência, em Libras + português.',
     image: 'https://media-public.canva.com/kcveY/MAEUZkkcveY/1/tl.png',
-    link: 'https://whatsapp.com/channel/0029Vb5wSyFL7UVOqnmurb1Z'
+    link: 'https://www.tiktok.com/@sinais.sinapses'
+  },
+  {
+    name: "Dev + IA",
+    description: 'Laboratório público de desenvolvimento assistido por IA no Github, vem construir e aprender junto!',
+    image: 'https://media-public.canva.com/vWzo0/MAG0udvWzo0/1/tl.png',
+    link: 'https://github.com/thalesmenegueco/ai-assisted-dev-lab'
   }
 ];
 

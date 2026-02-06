@@ -52,4 +52,9 @@ a {
         color: color.scale($secondary-color, $lightness: 40%);
         text-decoration: underline;
     }
+
+}
+
+a span {
+    color: $standart-text-color;
 }
