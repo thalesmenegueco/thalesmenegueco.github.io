@@ -1,0 +1,33 @@
+/* Global styles */
+@use "sass:list";
+@use "sass:color";
+
+
+$primary-color: #ffa300;
+$secondary-color: #ec0dcf;
+$standart-text-color: whitesmoke;
+
+ul li {
+    list-style: none;
+    list-style-type: none;
+}
+
+.flex-interests {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.container-flex-page-title-translation {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.welcome{
+    margin-right: 60px;
+}

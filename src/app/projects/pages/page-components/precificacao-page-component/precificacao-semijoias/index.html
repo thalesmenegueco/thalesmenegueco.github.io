@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Precificação - Semijoias</title>
+</head>
+<body>
+
+  <header class="app-header">
+    <h1>Precificação de Semijoias</h1>
+    <p>Calcule os custos de banho, montagem e o preço final de venda.</p>
+  </header>
+
+  <main class="app-container">
+    
+    <div class="data-entry-panel">
+      
+      <section id="secao-banho" class="card component-mount">
+        <fieldset>
+          <legend>1. Custos de Galvanoplastia</legend>
+          
+          <div class="input-group">
+            <label for="peso-bruto">Peso Bruto (g)</label>
+            <input type="number" id="peso-bruto" name="peso-bruto" step="0.01" min="0" placeholder="Ex: 12.5" required>
+          </div>
+
+          <div class="input-group">
+            <label for="valor-banho">Tipo de Banho</label>
+            <select id="valor-banho" name="valor-banho" required>
+              <option value="" disabled selected>Selecione o banho...</option>
+              <option value="7.25">3 ml (BRINCOS) - R$ 7,25/g</option>
+              <option value="8.72">5 ml (COLARES E PULSEIRAS) - R$ 8,72/g</option>
+              <option value="4.80">Prata 40ml - R$ 4,80/g</option>
+              <option value="6.90">Ródio Branco - R$ 6,90/g</option>
+              <option value="custom">Outro (Informar manualmente)</option>
+            </select>
+          </div>
+          
+          <div class="input-group hidden" id="grupo-banho-custom">
+            <label for="valor-banho-custom">Valor do Banho por Grama (R$)</label>
+            <input type="number" id="valor-banho-custom" name="valor-banho-custom" step="0.01" min="0" placeholder="Ex: 5.50">
+          </div>
+        </fieldset>
+      </section>
+
+      <section id="secao-custos" class="card component-mount">
+        <fieldset>
+          <legend>2. Custos Totais da Peça</legend>
+          
+          <div class="input-group">
+            <label for="custo-bruto">Custo da Peça Bruta (R$)</label>
+            <input type="number" id="custo-bruto" name="custo-bruto" step="0.01" min="0" required>
+          </div>
+
+          <div class="input-group">
+            <label for="margem-perda">Margem de Perda (%)</label>
+            <input type="number" id="margem-perda" name="margem-perda" step="0.1" min="0" value="2.0">
+          </div>
+
+          <div class="input-group">
+            <label for="insumos">Insumos de Montagem (R$)</label>
+            <input type="number" id="insumos" name="insumos" step="0.01" min="0" value="0.00">
+          </div>
+
+          <div class="input-group">
+            <label for="embalagem">Embalagem (R$)</label>
+            <input type="number" id="embalagem" name="embalagem" step="0.01" min="0" value="0.00">
+          </div>
+
+          <div class="input-group">
+            <label for="frete">Frete Rateado (R$)</label>
+            <input type="number" id="frete" name="frete" step="0.01" min="0" value="0.00">
+          </div>
+        </fieldset>
+      </section>
+
+      <section id="secao-venda" class="card component-mount">
+        <fieldset>
+          <legend>3. Precificação Final</legend>
+          
+          <div class="input-group">
+            <label for="markup">Markup Multiplicador</label>
+            <input type="number" id="markup" name="markup" step="0.1" min="1" placeholder="Ex: 3.5" required>
+          </div>
+        </fieldset>
+      </section>
+
+    </div>
+
+    <aside id="secao-resultados" class="results-panel card component-mount" aria-live="polite">
+      <h2>Resumo de Custos</h2>
+      
+      <div class="result-row">
+        <span>Custo do Banho:</span>
+        <strong id="res-custo-banho">R$ 0,00</strong>
+      </div>
+      
+      <div class="result-row">
+        <span>Custo Total da Peça:</span>
+        <strong id="res-custo-total">R$ 0,00</strong>
+      </div>
+
+      <div class="result-row highlight">
+        <span>Preço de Venda Sugerido:</span>
+        <strong id="res-preco-venda">R$ 0,00</strong>
+      </div>
+    </aside>
+
+  </main>
+
+  <script type="module" src="./src/js/main.js"></script>
+</body>
+</html>
