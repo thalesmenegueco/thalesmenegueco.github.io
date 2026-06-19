@@ -38,23 +38,18 @@ export class PrecificacaoPageComponent implements AfterViewInit {
     try {
       console.log('Starting to load calculator modules...');
       
-      // @ts-expect-error - No declaration file available for dynamic import
       const storeModule = await import('./precificacao-semijoias/src/js/core/store.js') as unknown as StoreModule;
       console.log('Store module loaded:', storeModule);
       
-      // @ts-expect-error - No declaration file available for dynamic import
       const banhoModule = await import('./precificacao-semijoias/src/js/components/BanhoForm.js') as unknown as BanhoFormModule;
       console.log('BanhoForm module loaded:', banhoModule);
       
-      // @ts-expect-error - No declaration file available for dynamic import
       const custosModule = await import('./precificacao-semijoias/src/js/components/CustosForm.js') as unknown as CustosFormModule;
       console.log('CustosForm module loaded:', custosModule);
       
-      // @ts-expect-error - No declaration file available for dynamic import
       const vendaModule = await import('./precificacao-semijoias/src/js/components/VendaForm.js') as unknown as VendaFormModule;
       console.log('VendaForm module loaded:', vendaModule);
       
-      // @ts-expect-error - No declaration file available for dynamic import
       const resultadosModule = await import('./precificacao-semijoias/src/js/components/ResultadosCard.js') as unknown as ResultadosCardModule;
       console.log('ResultadosCard module loaded:', resultadosModule);
 
