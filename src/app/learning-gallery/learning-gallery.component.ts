@@ -24,7 +24,7 @@ export class LearningGalleryComponent {
   { name: "Língua de sinais",
     description: 'Perfil no Tiktok que fala sobre cultura surda e interpretação, em Libras + português',
     image: 'https://media-public.canva.com/uwdzU/MAFQ9vuwdzU/1/tl.png',
-    link: 'https://www.tiktok.com/@sinais.sinapses'
+    link: 'https://www.tiktok.com/@sinal.fala'
   },
   { name: "Ciência de dados",
     description: 'Visualizar padrões de diagnóstico de autismo em adultos usando ciência de dados.',
