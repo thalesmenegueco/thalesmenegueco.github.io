@@ -5,9 +5,8 @@ import { CustosForm } from './components/CustosForm.js';
 import { VendaForm } from './components/VendaForm.js';
 import { ResultadosCard } from './components/ResultadosCard.js';
 
-// Aguardamos o DOM estar completamente carregado para evitar erros de elementos nulos
-document.addEventListener('DOMContentLoaded', () => {
-  
+// Function to initialize the calculator
+function initializeCalculator() {
   // 1. Definimos a estrutura base do nosso estado
   const estadoInicial = {
     pesoBruto: '',
@@ -36,4 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
   new ResultadosCard(document.querySelector('#secao-resultados'), store);
 
   console.log('💎 Calculadora de Semijoias iniciada com sucesso!');
-});
+}
+
+// Check if DOM is already loaded (for Angular integration)
+if (document.readyState === 'loading') {
+  // Document is still loading, wait for DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', initializeCalculator);
+} else {
+  // Document is already loaded, run immediately
+  // Use setTimeout to ensure Angular has finished rendering the template
+  setTimeout(initializeCalculator, 0);
+}
