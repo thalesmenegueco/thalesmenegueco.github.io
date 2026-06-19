@@ -16,7 +16,7 @@ export class ProjectsComponent {
     { name: "Precificação",
       description: 'Cálculo para precificação de semijoias - SPA',
       image: 'https://investidorsardinha.r7.com/wp-content/uploads/2021/09/precificacao-o-que-e-metodos-e-como-fazer-3-1024x684.jpg',
-      link: './pages/precificacao-semijoias/index.html'
+      link: './projects/precificacao-semijoias'
     }
   ];
 
