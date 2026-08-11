@@ -19,12 +19,12 @@ export class ProjectsComponent {
     },
     { name: "Cálculos Simples",
       description: 'Ferramenta para calcular: hipotenusa e catetos de um triângulo retângulo',
-      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Right_triangle.svg/1200px-Right_triangle.svg.png',
+      image: 'https://cdn-icons-png.flaticon.com/512/4650/4650631.png',
       link: './tools/calcular-hipotenusa'
     },
     { name: "Project Manager",
       description: 'Minimalist project manager with nested task lists',
-      image: 'assets/project-manager-card.png',
+      image: 'https://cdn-icons-png.flaticon.com/512/1087/1087815.png',
       link: './tools/project-manager'
     },
     { name: "OCR & Tradução",
