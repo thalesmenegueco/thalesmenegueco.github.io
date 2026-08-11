@@ -1,0 +1,125 @@
+<div class="simple-math-container">
+  <div class="tab-bar">
+    @for (tab of tabs; track tab.id) {
+      <button
+        class="tab-button"
+        [class.active]="activeTabId === tab.id"
+        (click)="switchTab(tab.id)"
+      >
+        <span class="tab-icon">{{ tab.icon }}</span>
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <div class="calculator-area">
+    @if (activeTabId === 'right-triangle') {
+      <div class="calculator-card">
+        <h2>Calcular Triângulo Retângulo</h2>
+
+        <div class="mode-toggle">
+          <button
+            class="mode-button"
+            [class.active]="mode === 'hypotenuse'"
+            (click)="setMode('hypotenuse')"
+          >
+            Encontrar Hipotenusa
+          </button>
+          <button
+            class="mode-button"
+            [class.active]="mode === 'leg'"
+            (click)="setMode('leg')"
+          >
+            Encontrar Cateto
+          </button>
+        </div>
+
+        <form (ngSubmit)="calculate()">
+          @if (mode === 'hypotenuse') {
+            <label for="legA">Cateto A:</label>
+            <div class="input-group">
+              <span class="input-icon">📏</span>
+              <input
+                type="number"
+                id="legA"
+                [(ngModel)]="legA"
+                name="legA"
+                (input)="onInputChange()"
+                min="0.0001"
+                step="any"
+                required
+              />
+            </div>
+
+            <label for="legB">Cateto B:</label>
+            <div class="input-group">
+              <span class="input-icon">📏</span>
+              <input
+                type="number"
+                id="legB"
+                [(ngModel)]="legB"
+                name="legB"
+                (input)="onInputChange()"
+                min="0.0001"
+                step="any"
+                required
+              />
+            </div>
+          }
+
+          @if (mode === 'leg') {
+            <label for="leg">Cateto:</label>
+            <div class="input-group">
+              <span class="input-icon">📏</span>
+              <input
+                type="number"
+                id="leg"
+                [(ngModel)]="leg"
+                name="leg"
+                (input)="onInputChange()"
+                min="0.0001"
+                step="any"
+                required
+              />
+            </div>
+
+            <label for="hypotenuse">Hipotenusa:</label>
+            <div class="input-group">
+              <span class="input-icon">📐</span>
+              <input
+                type="number"
+                id="hypotenuse"
+                [(ngModel)]="hypotenuse"
+                name="hypotenuse"
+                (input)="onInputChange()"
+                min="0.0001"
+                step="any"
+                required
+              />
+            </div>
+          }
+
+          <button type="submit" class="submit-button">Calcular</button>
+        </form>
+
+        @if (result !== null) {
+          <div class="result">
+            <p class="result-label">Resultado:</p>
+            <p class="result-value">{{ result }}</p>
+          </div>
+        }
+
+        @if (errorMessage !== null) {
+          <div class="error">
+            <span class="error-icon">⚠️</span>
+            {{ errorMessage }}
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="calculator-card">
+        <p>Selecione uma calculadora para começar.</p>
+      </div>
+    }
+  </div>
+</div>
