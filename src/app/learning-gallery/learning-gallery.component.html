@@ -1,20 +1,16 @@
 <div>
-  <div class="container-flex-page-title-translation">
-    <div class="item-flex-page-title-translation welcome">
+  <div class="page-header">
+    <div class="welcome">
       <h3>Bem-vindo(a) à minha</h3>
-      <h2>🤓 Galeria de interesses!</h2>
-    </div>
-    <div class="item-flex-page-title-translation translation">
-      <app-sign-language-translation [linkForVideo]="galleryPageTranslation.linkForVideo"
-        [videoDescription]="galleryPageTranslation.videoDescription">
-      </app-sign-language-translation>
+      <br>
+      <h2>🤓 Galeria de Projetos!</h2>
     </div>
   </div>
 
-  <div class="flex-interests">
+  <div class="flex-cards">
     @for (item of interests; track $index) {
-    <app-interest [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''">
-    </app-interest>
+    <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''">
+    </app-card>
     }
   </div>
 

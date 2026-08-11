@@ -1,60 +1,97 @@
-/* You can add global styles to this file, and also import other style files */
-@use "sass:list";
-@use "sass:color";
-
-/* Importing Fonts */
 @import 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap';
 
-$font-stack: 'Roboto', Helvetica;
-$primary-color: #ffa300;
-$secondary-color: #ec0dcf;
-$standart-text-color: whitesmoke;
-
+:root {
+  --color-bg: rgb(5, 5, 5);
+  --color-surface: rgb(75, 71, 71);
+  --color-nav-bg: #333;
+  --color-text: whitesmoke;
+  --color-text-accent: #ffa300;
+  --color-text-secondary: #ec0dcf;
+  --color-border: rgba(255, 255, 255, 1);
+  --radius-card: 40px;
+  --shadow-card-hover: 14px 14px;
+}
 
 html {
-  background-color: rgb(5, 5, 5);
-  color: $standart-text-color;
-  font-family: $font-stack;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Roboto', Helvetica, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 nav > ul {
   list-style: none;
 }
 
-body {
-  $font-stack: list.append($font-stack, sans-serif);
-  font: $font-stack;
-  margin-left: 40px;
-  margin-right: 40px;
-}
-
 h1 {
-  color: $primary-color;
+  color: var(--color-text-accent);
 
-  &:hover{
-    color: color.scale($primary-color, $lightness: 20%);
+  &:hover {
+    color: color-mix(in srgb, var(--color-text-accent), white 20%);
   }
 }
 
 h2 {
-    color: $secondary-color;
-    
-    &:hover {
-        color: color.scale($secondary-color, $lightness: 20%);
-    }
+  color: var(--color-text-secondary);
+
+  &:hover {
+    color: color-mix(in srgb, var(--color-text-secondary), white 20%);
+  }
 }
 
 a {
-    color: $secondary-color;
-    text-decoration: none;
+  color: var(--color-text-secondary);
+  text-decoration: none;
 
-    &:hover {
-        color: color.scale($secondary-color, $lightness: 40%);
-        text-decoration: underline;
-    }
-
+  &:hover {
+    color: color-mix(in srgb, var(--color-text-secondary), white 40%);
+    text-decoration: underline;
+  }
 }
 
 a span {
-    color: $standart-text-color;
+  color: var(--color-text);
+}
+
+ul li {
+  list-style: none;
+  list-style-type: none;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.welcome {
+  margin-right: 60px;
+}
+
+.flex-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
 }

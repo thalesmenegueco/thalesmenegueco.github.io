@@ -1,16 +1,16 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-card-project',
+  selector: 'app-card',
   standalone: true,
-  styleUrl: './card-project.scss',
+  styleUrl: './card.scss',
   imports: [],
   template: `
-    <div class= "group-interest">
-      <div class="button-hover-shadow">
+    <div class="group-card">
+      <div class="card-hover-shadow">
         <a [href]="link">
           <img [src]="image" alt="{{ name }}" class="image">
-          <h2>{{ name }}</h2>  
+          <h2>{{ name }}</h2>
           <div class="content">
             <div><span>{{ description }}</span></div>
           </div>
@@ -18,8 +18,7 @@ import { Component, Input } from '@angular/core';
       </div>
     </div>`,
 })
-
-export class CardProject {
+export class CardComponent {
   @Input() image!: string;
   @Input() name!: string;
   @Input() description!: string;

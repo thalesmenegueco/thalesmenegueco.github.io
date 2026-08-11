@@ -6,7 +6,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SignLanguageTranslation],
+  imports: [],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

@@ -14,11 +14,11 @@ import { PrecificacaoPageComponent } from './projects/pages/page-components/prec
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },              // Rota /home
-  { path: 'learning-gallery', component: LearningGalleryComponent }, // Rota /learning-gallery
+  { path: 'project-gallery', component: LearningGalleryComponent }, // Rota /learning-gallery
   { path: 'projects', component: ProjectsComponent }, // Rota /projects 
   { path: 'projects/precificacao-semijoias', component: PrecificacaoPageComponent }, // Rota /projects/precificacao-semijoias
-  { path: '', redirectTo: '/learning-gallery', pathMatch: 'full' },   // Redirecionar raiz para /home
-  { path: '**', redirectTo: '/learning-gallery' }                     // Redirecionar rotas inválidas - PROBLEMA???
+  { path: '', redirectTo: '/project-gallery', pathMatch: 'full' },   // Redirecionar raiz para /home
+  { path: '**', redirectTo: '/project-gallery' }                     // Redirecionar rotas inválidas - PROBLEMA???
 ];
 
 @NgModule({
