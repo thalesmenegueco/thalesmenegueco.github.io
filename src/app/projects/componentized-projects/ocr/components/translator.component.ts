@@ -15,7 +15,7 @@ export class TranslatorComponent {
   @Input() progress: TranslateProgress | null = null;
   @Input() errorMessage: string | null = null;
 
-  @Output() translate = new EventEmitter<void>();
+  @Output() translate = new EventEmitter<'pt-en' | 'en-pt'>();
   @Output() copyTranslated = new EventEmitter<void>();
 
   direction: 'pt-en' | 'en-pt' = 'pt-en';
@@ -27,7 +27,7 @@ export class TranslatorComponent {
   }
 
   onTranslate(): void {
-    this.translate.emit();
+    this.translate.emit(this.direction);
   }
 
   async onCopyTranslated(): Promise<void> {

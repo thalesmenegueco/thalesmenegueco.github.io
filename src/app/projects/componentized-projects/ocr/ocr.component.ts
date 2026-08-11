@@ -100,7 +100,7 @@ export class OcrComponent implements OnInit, OnDestroy {
       });
   }
 
-  handleTranslate(): void {
+  handleTranslate(direction: 'pt-en' | 'en-pt'): void {
     if (!this.recognizedText.trim()) {
       return;
     }
@@ -109,14 +109,16 @@ export class OcrComponent implements OnInit, OnDestroy {
     this.translateError = null;
     this.translatedText = '';
 
-    const direction: 'pt-en' | 'en-pt' = 'pt-en';
+    // NLLB-200: single bidirectional model supporting both en↔pt.
+    // FLORES-200 language codes: por_Latn (Portuguese), eng_Latn (English)
+    const modelName = 'Xenova/nllb-200-distilled-600M';
     const srcLang = direction === 'pt-en' ? 'por_Latn' : 'eng_Latn';
     const tgtLang = direction === 'pt-en' ? 'eng_Latn' : 'por_Latn';
 
     this.translator
       .translate(
         this.recognizedText,
-        'Xenova/opus-mt-en-pt',
+        modelName,
         srcLang,
         tgtLang,
         (p) => (this.translateProgress = p)
@@ -124,7 +126,8 @@ export class OcrComponent implements OnInit, OnDestroy {
       .then((text) => {
         this.translatedText = text;
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('Translation error:', err);
         this.translateError = 'Falha na tradução. Verifique sua conexão (o modelo precisa ser baixado na primeira execução).';
       })
       .finally(() => {

@@ -82,11 +82,30 @@
   transition: width 0.3s ease;
 }
 
-.model-size-hint {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.8rem;
+.download-message {
+  background: rgba(236, 13, 207, 0.08);
+  border: 1px solid rgba(236, 13, 207, 0.25);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.download-message-title {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  margin: 0 0 8px;
+  line-height: 1.5;
+
+  strong {
+    color: var(--color-text-secondary);
+  }
+}
+
+.download-message-hint {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.82rem;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .error {

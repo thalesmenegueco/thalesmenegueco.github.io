@@ -26,7 +26,7 @@
       } @else if (isProcessing && progress?.status === 'translating') {
         <span>Traduzindo...</span>
       } @else {
-        <span>&#x1F310; Traduzir</span>
+        <span>🌐 Traduzir</span>
       }
     </button>
   </div>
@@ -35,8 +35,11 @@
     <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progressPercent">
       <div class="progress-fill" [style.width.%]="progressPercent"></div>
     </div>
-    @if (progress.modelSize) {
-      <p class="model-size-hint">Primeira execução: baixando modelo de {{ progress.modelSize }}. O download é feito uma única vez e armazenado em cache.</p>
+    @if (progress.status === 'downloading' && progress.modelSize) {
+      <div class="download-message">
+        <p class="download-message-title">Trabalhando para deixar <strong>SUA TRADUÇÃO {{ progressPercent }}% mais segura</strong> 💬🛡️</p>
+        <p class="download-message-hint">Obs: Esse download só acontece 1 vez a cada língua, pode usar seu navegador normalmente, apenas não feche essa aba por enquanto 😉</p>
+      </div>
     }
   }
 
@@ -55,11 +58,11 @@
         [disabled]="isProcessing"
       >
         @if (copyStatus === 'copied') {
-          <span>&#x2714; Copiado!</span>
+          <span>✔ Copiado!</span>
         } @else if (copyStatus === 'error') {
           <span>Erro ao copiar</span>
         } @else {
-          <span>&#x1F4CB; Copiar tradução</span>
+          <span>📋 Copiar tradução</span>
         }
       </button>
     </div>

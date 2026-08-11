@@ -21,11 +21,11 @@
       [attr.aria-label]="'Copiar texto reconhecido'"
     >
       @if (copyStatus === 'copied') {
-        <span>&#x2714; Copiado!</span>
+        <span>✔ Copiado!</span>
       } @else if (copyStatus === 'error') {
         <span>Erro ao copiar</span>
       } @else {
-        <span>&#x1F4CB; Copiar</span>
+        <span>📋 Copiar</span>
       }
     </button>
   </div>

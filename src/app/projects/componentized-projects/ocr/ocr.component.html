@@ -59,7 +59,7 @@
         [isProcessing]="isTranslating"
         [progress]="translateProgress"
         [errorMessage]="translateError"
-        (translate)="handleTranslate()"
+        (translate)="handleTranslate($event)"
       />
     </div>
   </div>

@@ -24,10 +24,10 @@ export class TranslationService {
       onProgress?.({ status: 'downloading', progress: 0, modelSize: modelName.includes('nllb') ? '~300 MB' : '~30 MB' });
 
       translator = await pipeline('translation', modelName, {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        progress_callback: (info: any) => {
-          if (info.status === 'progress' && info.progress !== undefined) {
-            onProgress?.({ status: 'downloading', progress: info.progress });
+        progress_callback: (info: unknown) => {
+          const p = info as { status?: string; progress?: number };
+          if (p.status === 'progress' && p.progress !== undefined) {
+            onProgress?.({ status: 'downloading', progress: p.progress });
           }
         },
       }) as unknown as TranslationPipeline;
@@ -37,8 +37,13 @@ export class TranslationService {
 
     onProgress?.({ status: 'translating', progress: 0 });
 
+    // Opus-MT models are single-direction: they don't accept src_lang/tgt_lang.
+    // Multilingual models (NLLB, m2m100, mbart) require these params.
+    const isOpus = modelName.includes('opus');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const output = await translator(text, { src_lang: srcLang, tgt_lang: tgtLang } as any);
+    const output = isOpus
+      ? await translator(text)
+      : await translator(text, { src_lang: srcLang, tgt_lang: tgtLang } as any);
 
     onProgress?.({ status: 'translating', progress: 1 });
 
