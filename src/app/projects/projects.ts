@@ -15,7 +15,17 @@ export class ProjectsComponent {
     { name: "Precificação",
       description: 'Cálculo para precificação de semijoias - SPA',
       image: 'https://investidorsardinha.r7.com/wp-content/uploads/2021/09/precificacao-o-que-e-metodos-e-como-fazer-3-1024x684.jpg',
-      link: './projects/precificacao-semijoias'
+      link: './tools/precificacao-semijoias'
+    },
+    { name: "Cálculos Simples",
+      description: 'Ferramenta para calcular: hipotenusa e catetos de um triângulo retângulo',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Right_triangle.svg/1200px-Right_triangle.svg.png',
+      link: './tools/calcular-hipotenusa'
+    },
+    { name: "Project Manager",
+      description: 'Minimalist project manager with nested task lists',
+      image: 'assets/project-manager-card.png',
+      link: './tools/project-manager'
     }
   ];
 

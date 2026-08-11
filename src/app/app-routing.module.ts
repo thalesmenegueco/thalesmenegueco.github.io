@@ -11,14 +11,18 @@ import { LearningGalleryComponent } from './learning-gallery/learning-gallery.co
 import { ProjectsComponent } from './projects/projects'; // Importar o componente
 
 import { PrecificacaoPageComponent } from './projects/pages/page-components/precificacao-page-component/precificacao-page-component';
+import { SimpleMath } from './projects/componentized-projects/simple-math/simple-math';
+import { ProjectManager } from './projects/componentized-projects/project-manager/project-manager';
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },              // Rota /home
   { path: 'project-gallery', component: LearningGalleryComponent }, // Rota /learning-gallery
-  { path: 'projects', component: ProjectsComponent }, // Rota /projects 
-  { path: 'projects/precificacao-semijoias', component: PrecificacaoPageComponent }, // Rota /projects/precificacao-semijoias
+  { path: 'tools', component: ProjectsComponent }, // Rota /projects 
+  { path: 'tools/precificacao-semijoias', component: PrecificacaoPageComponent }, // Rota /projects/precificacao-semijoias
+  { path: 'tools/calcular-hipotenusa', component: SimpleMath }, // Rota /tools/calcular-hipotenusa
+  { path: 'tools/project-manager', component: ProjectManager },
   { path: '', redirectTo: '/project-gallery', pathMatch: 'full' },   // Redirecionar raiz para /home
-  { path: '**', redirectTo: '/project-gallery' }                     // Redirecionar rotas inválidas - PROBLEMA???
+  { path: '**', redirectTo: '/project-gallery' }                     // Redirecionar rotas inválidas
 ];
 
 @NgModule({
