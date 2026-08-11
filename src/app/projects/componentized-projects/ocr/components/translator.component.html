@@ -1,0 +1,67 @@
+<div class="translator">
+  <div class="translator-header">
+    <h3>Tradução</h3>
+    <button
+      class="direction-toggle"
+      (click)="toggleDirection()"
+      [disabled]="isProcessing"
+      [attr.aria-label]="'Alternar direção da tradução'"
+    >
+      @if (direction === 'pt-en') {
+        <span>PT &#x2192; EN</span>
+      } @else {
+        <span>EN &#x2192; PT</span>
+      }
+    </button>
+  </div>
+
+  <div class="translate-actions">
+    <button
+      class="translate-button"
+      (click)="onTranslate()"
+      [disabled]="!canTranslate"
+    >
+      @if (isProcessing && progress?.status === 'downloading') {
+        <span>Baixando modelo... {{ progressPercent }}%</span>
+      } @else if (isProcessing && progress?.status === 'translating') {
+        <span>Traduzindo...</span>
+      } @else {
+        <span>&#x1F310; Traduzir</span>
+      }
+    </button>
+  </div>
+
+  @if (isProcessing && progress) {
+    <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progressPercent">
+      <div class="progress-fill" [style.width.%]="progressPercent"></div>
+    </div>
+    @if (progress.modelSize) {
+      <p class="model-size-hint">Primeira execução: baixando modelo de {{ progress.modelSize }}. O download é feito uma única vez e armazenado em cache.</p>
+    }
+  }
+
+  @if (errorMessage) {
+    <div class="error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (translatedText && !errorMessage) {
+    <div class="translation-result">
+      <div class="translation-text">{{ translatedText }}</div>
+      <button
+        class="copy-button"
+        (click)="onCopyTranslated()"
+        [disabled]="isProcessing"
+      >
+        @if (copyStatus === 'copied') {
+          <span>&#x2714; Copiado!</span>
+        } @else if (copyStatus === 'error') {
+          <span>Erro ao copiar</span>
+        } @else {
+          <span>&#x1F4CB; Copiar tradução</span>
+        }
+      </button>
+    </div>
+  }
+</div>

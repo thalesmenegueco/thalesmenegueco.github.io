@@ -1,0 +1,66 @@
+<div class="ocr-page">
+  <h1>OCR &amp; Tradução</h1>
+  <p class="ocr-subtitle">
+    Extraia e traduza textos de imagens — 100% offline, direto no navegador
+  </p>
+
+  @if (wasmSupported === false) {
+    <div class="wasm-warning">
+      Seu navegador não suporta WebAssembly. Use Chrome, Firefox, ou Edge.
+    </div>
+  }
+
+  <div class="ocr-layout">
+    <div class="ocr-column ocr-column--input">
+      <app-image-input
+        [disabled]="isProcessing"
+        (imageSelected)="handleImage($event)"
+      />
+
+      @if (isProcessing && ocrProgress) {
+        <div class="ocr-progress" role="progressbar" [attr.aria-valuenow]="round(ocrProgress.progress * 100)">
+          <div class="progress-label">
+            @if (ocrProgress.status === 'loading') {
+              Carregando motor OCR...
+            } @else {
+              Reconhecendo texto...
+            }
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="round(ocrProgress.progress * 100)"></div>
+          </div>
+          <button class="cancel-button" (click)="cancelOcr()">Cancelar</button>
+        </div>
+      }
+    </div>
+
+    <div class="ocr-column ocr-column--preview">
+      <app-image-preview [imageSrc]="imageSrc" />
+    </div>
+
+    <div class="ocr-column ocr-column--text">
+      <app-text-editor
+        [text]="recognizedText"
+        [disabled]="isProcessing"
+        (textChange)="onTextChange($event)"
+      />
+
+      @if (errorMessage) {
+        <div class="ocr-error">
+          {{ errorMessage }}
+        </div>
+      }
+    </div>
+
+    <div class="ocr-column ocr-column--translate">
+      <app-translator
+        [sourceText]="recognizedText"
+        [translatedText]="translatedText"
+        [isProcessing]="isTranslating"
+        [progress]="translateProgress"
+        [errorMessage]="translateError"
+        (translate)="handleTranslate()"
+      />
+    </div>
+  </div>
+</div>

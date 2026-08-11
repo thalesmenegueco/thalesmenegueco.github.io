@@ -1,0 +1,29 @@
+<div class="image-input-container">
+  <div
+    class="drop-zone"
+    [class.dragging]="isDragging"
+    [class.disabled]="disabled"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <label for="file-input" class="file-label">
+      <span class="upload-icon">&#x1F4C1;</span>
+      <span>Arraste uma imagem aqui ou clique para selecionar</span>
+      <input
+        id="file-input"
+        type="file"
+        accept="image/*"
+        [disabled]="disabled"
+        (change)="onFileSelected($event)"
+      />
+    </label>
+    <p class="paste-hint">Dica: cole uma imagem com Ctrl+V</p>
+  </div>
+
+  @if (errorMessage) {
+    <div class="error">
+      {{ errorMessage }}
+    </div>
+  }
+</div>

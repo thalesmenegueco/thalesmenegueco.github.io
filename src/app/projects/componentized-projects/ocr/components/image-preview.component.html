@@ -1,0 +1,10 @@
+@if (imageSrc) {
+  <div class="preview-container">
+    <img [src]="imageSrc" alt="Preview da imagem" class="preview-image" />
+  </div>
+} @else {
+  <div class="preview-placeholder">
+    <span class="placeholder-icon">&#x1F5BC;</span>
+    <p>Nenhuma imagem carregada</p>
+  </div>
+}

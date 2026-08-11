@@ -1,0 +1,32 @@
+<div class="text-editor">
+  <div class="text-editor-header">
+    <h3>Texto reconhecido</h3>
+    <span class="char-count">{{ charCount }} caracteres</span>
+  </div>
+
+  <textarea
+    [ngModel]="text"
+    (ngModelChange)="onTextChange($event)"
+    [disabled]="disabled"
+    rows="8"
+    placeholder="O texto reconhecido aparecerá aqui..."
+    aria-label="Texto reconhecido editável"
+  ></textarea>
+
+  <div class="text-editor-actions">
+    <button
+      class="copy-button"
+      (click)="copyText()"
+      [disabled]="!text || disabled"
+      [attr.aria-label]="'Copiar texto reconhecido'"
+    >
+      @if (copyStatus === 'copied') {
+        <span>&#x2714; Copiado!</span>
+      } @else if (copyStatus === 'error') {
+        <span>Erro ao copiar</span>
+      } @else {
+        <span>&#x1F4CB; Copiar</span>
+      }
+    </button>
+  </div>
+</div>

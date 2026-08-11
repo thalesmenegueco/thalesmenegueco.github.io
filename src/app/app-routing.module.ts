@@ -15,14 +15,15 @@ import { SimpleMath } from './projects/componentized-projects/simple-math/simple
 import { ProjectManager } from './projects/componentized-projects/project-manager/project-manager';
 
 export const routes: Routes = [
-  { path: 'home', component: HomeComponent },              // Rota /home
-  { path: 'project-gallery', component: LearningGalleryComponent }, // Rota /learning-gallery
-  { path: 'tools', component: ProjectsComponent }, // Rota /projects 
-  { path: 'tools/precificacao-semijoias', component: PrecificacaoPageComponent }, // Rota /projects/precificacao-semijoias
-  { path: 'tools/calcular-hipotenusa', component: SimpleMath }, // Rota /tools/calcular-hipotenusa
+  { path: 'home', component: HomeComponent },
+  { path: 'project-gallery', component: LearningGalleryComponent },
+  { path: 'tools', component: ProjectsComponent },
+  { path: 'tools/precificacao-semijoias', component: PrecificacaoPageComponent },
+  { path: 'tools/calcular-hipotenusa', component: SimpleMath },
   { path: 'tools/project-manager', component: ProjectManager },
-  { path: '', redirectTo: '/project-gallery', pathMatch: 'full' },   // Redirecionar raiz para /home
-  { path: '**', redirectTo: '/project-gallery' }                     // Redirecionar rotas inválidas
+  { path: 'tools/ocr', loadComponent: () => import('./projects/componentized-projects/ocr/ocr.component').then(m => m.OcrComponent) },
+  { path: '', redirectTo: '/project-gallery', pathMatch: 'full' },
+  { path: '**', redirectTo: '/project-gallery' }
 ];
 
 @NgModule({

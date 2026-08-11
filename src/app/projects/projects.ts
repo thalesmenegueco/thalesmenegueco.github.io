@@ -26,6 +26,11 @@ export class ProjectsComponent {
       description: 'Minimalist project manager with nested task lists',
       image: 'assets/project-manager-card.png',
       link: './tools/project-manager'
+    },
+    { name: "OCR & Tradução",
+      description: 'Extraia e traduza textos de imagens — 100% offline, direto no navegador',
+      image: 'assets/ocr-card.png',
+      link: './tools/ocr'
     }
   ];
 
