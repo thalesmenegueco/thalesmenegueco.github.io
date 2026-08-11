@@ -1,1 +1,266 @@
-<p>project-manager works!</p>
+<div class="pm-container">
+  <header class="pm-header">
+    <button class="pm-hamburger" (click)="showSidebar = !showSidebar" aria-label="Toggle sidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <h1 class="pm-title">Project Manager</h1>
+  </header>
+
+  <div class="pm-layout" [class.sidebar-visible]="showSidebar">
+    <aside class="pm-sidebar">
+      <div class="pm-sidebar-section">
+        <button
+          class="pm-nav-item"
+          [class.active]="selectedProjectId === null"
+          (click)="selectProject(null)">
+          <span class="pm-nav-icon">📋</span>
+          <span class="pm-nav-label">General Tasks</span>
+          <span class="pm-nav-badge">{{ generalTasksCount }}</span>
+        </button>
+      </div>
+
+      <div class="pm-sidebar-section">
+        <div class="pm-status-tabs">
+          <button
+            [class.active]="statusFilter === 'all'"
+            (click)="statusFilter = 'all'">All</button>
+          <button
+            [class.active]="statusFilter === 'Pendente'"
+            (click)="statusFilter = 'Pendente'">Pending</button>
+          <button
+            [class.active]="statusFilter === 'Em andamento'"
+            (click)="statusFilter = 'Em andamento'">Progress</button>
+          <button
+            [class.active]="statusFilter === 'Concluído'"
+            (click)="statusFilter = 'Concluído'">Done</button>
+        </div>
+
+        <div class="pm-project-list">
+          @for (project of filteredProjects; track project.id) {
+            <div
+              class="pm-project-card"
+              [class.active]="selectedProjectId === project.id"
+              (click)="selectProject(project.id)">
+              <div class="pm-project-card-header">
+                <span class="pm-project-name">{{ truncateText(project.name, 30) }}</span>
+                <span class="pm-status-pill" [attr.data-status]="project.status">
+                  {{ getStatusLabel(project.status) }}
+                </span>
+              </div>
+              @if (project.description) {
+                <p class="pm-project-desc">{{ truncateText(project.description, 60) }}</p>
+              }
+              <div class="pm-project-card-footer">
+                <span class="pm-project-task-count">
+                  {{ project.tasks.length }} tasks
+                </span>
+                @if (project.deadline) {
+                  <span class="pm-project-deadline">{{ formatDeadline(project.deadline) }}</span>
+                }
+              </div>
+            </div>
+          }
+          @if (filteredProjects.length === 0) {
+            <p class="pm-empty-hint">No projects found</p>
+          }
+        </div>
+      </div>
+
+      <div class="pm-sidebar-section">
+        @if (!showNewProjectForm) {
+          <button class="pm-btn pm-btn-secondary pm-btn-full" (click)="showNewProjectForm = true">
+            + New Project
+          </button>
+        } @else {
+          <div class="pm-new-project-form">
+            <input
+              type="text"
+              class="pm-input"
+              placeholder="Project name"
+              [(ngModel)]="newProjectName"
+              (keydown.enter)="addProject()"
+            />
+            <textarea
+              class="pm-input pm-textarea"
+              placeholder="Description (optional)"
+              [(ngModel)]="newProjectDescription"
+              rows="2"
+            ></textarea>
+            <div class="pm-form-actions">
+              <button class="pm-btn pm-btn-primary" (click)="addProject()">Create</button>
+              <button class="pm-btn pm-btn-ghost" (click)="showNewProjectForm = false; newProjectName = ''; newProjectDescription = ''">Cancel</button>
+            </div>
+          </div>
+        }
+      </div>
+    </aside>
+
+    <main class="pm-main">
+      @if (selectedProjectId === null) {
+        <div class="pm-content">
+          <div class="pm-content-header">
+            <h2 class="pm-content-title">📋 General Tasks</h2>
+          </div>
+
+          <div class="pm-add-task-row">
+            <input
+              type="text"
+              class="pm-input pm-task-input"
+              placeholder="Add a task..."
+              [(ngModel)]="addTaskText"
+              (keydown)="addTaskOnEnter(standaloneTasks, $event)"
+            />
+            <button class="pm-btn pm-btn-primary" (click)="addTask(standaloneTasks)">Add</button>
+          </div>
+
+          <div class="pm-task-list">
+            @for (task of standaloneTasks; track task.id) {
+              <ng-container
+                *ngTemplateOutlet="taskItem; context: { task: task, parentList: standaloneTasks, depth: 0 }"
+              ></ng-container>
+            }
+            @if (standaloneTasks.length === 0) {
+              <p class="pm-empty-hint">No tasks yet. Add one above!</p>
+            }
+          </div>
+        </div>
+      } @else if (selectedProject) {
+        <div class="pm-content">
+          <div class="pm-content-header">
+            @if (editFieldProjectId === selectedProject.id && editFieldName === 'name') {
+              <input
+                type="text"
+                class="pm-input pm-inline-edit"
+                [(ngModel)]="selectedProject.name"
+                (keydown)="onFieldKeydown($event)"
+                (blur)="saveEditField()"
+                autofocus
+              />
+            } @else {
+              <h2
+                class="pm-content-title pm-editable"
+                (click)="startEditField(selectedProject.id, 'name')"
+                title="Click para editar">{{ selectedProject.name }}</h2>
+            }
+            <div class="pm-content-actions">
+              <button class="pm-btn pm-btn-danger" (click)="deleteProject(selectedProject.id)">🗑</button>
+            </div>
+          </div>
+
+          <div class="pm-project-meta">
+            @if (editFieldProjectId === selectedProject.id && editFieldName === 'description') {
+              <textarea
+                class="pm-input pm-inline-edit pm-textarea"
+                [(ngModel)]="selectedProject.description"
+                (keydown)="onFieldKeydown($event)"
+                (blur)="saveEditField()"
+                rows="2"
+                autofocus
+              ></textarea>
+            } @else {
+              <p
+                class="pm-project-desc pm-editable"
+                (click)="startEditField(selectedProject.id, 'description')"
+                title="Click para editar">{{ selectedProject.description || 'Click to add description...' }}</p>
+            }
+
+            <div class="pm-meta-row">
+              <div class="pm-meta-field">
+                <label>Status</label>
+                <select
+                  class="pm-select"
+                  [ngModel]="selectedProject.status"
+                  (ngModelChange)="updateProjectStatus(selectedProject, $event)">
+                  @for (status of statuses; track status) {
+                    <option [value]="status">{{ status }}</option>
+                  }
+                </select>
+              </div>
+              <div class="pm-meta-field">
+                <label>Deadline</label>
+                <div class="pm-deadline-row">
+                  <input
+                    type="date"
+                    class="pm-input"
+                    [ngModel]="selectedProject.deadline || ''"
+                    (ngModelChange)="updateProjectDeadline(selectedProject, $event)"
+                  />
+                  @if (selectedProject.deadline) {
+                    <button
+                      class="pm-btn pm-btn-ghost pm-btn-clear"
+                      (click)="updateProjectDeadline(selectedProject, '')">✕</button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pm-add-task-row">
+            <input
+              type="text"
+              class="pm-input pm-task-input"
+              placeholder="Add a task..."
+              [(ngModel)]="addTaskText"
+              (keydown)="addTaskOnEnter(selectedProject.tasks, $event)"
+            />
+            <button class="pm-btn pm-btn-primary" (click)="addTask(selectedProject.tasks)">Add</button>
+          </div>
+
+          <div class="pm-task-list">
+            @for (task of selectedProject.tasks; track task.id) {
+              <ng-container
+                *ngTemplateOutlet="taskItem; context: { task: task, parentList: selectedProject.tasks, depth: 0 }"
+              ></ng-container>
+            }
+            @if (selectedProject.tasks.length === 0) {
+              <p class="pm-empty-hint">No tasks yet. Add one above!</p>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="pm-empty-state">
+          <div class="pm-empty-icon">📁</div>
+          <h2>No Project Selected</h2>
+          <p>Select a project from the sidebar or create a new one.</p>
+        </div>
+      }
+    </main>
+  </div>
+
+  <div class="pm-overlay" [class.visible]="showSidebar" (click)="showSidebar = false"></div>
+</div>
+
+<ng-template #taskItem let-task="task" let-parentList="parentList" let-depth="depth">
+  <div class="pm-task-item" [class.done]="task.done">
+    <div class="pm-task-row">
+      <input
+        type="checkbox"
+        class="pm-checkbox"
+        [ngModel]="task.done"
+        (ngModelChange)="toggleTaskById(parentList, task.id)"
+      />
+      <span class="pm-task-text">{{ task.text }}</span>
+      <div class="pm-task-actions">
+        @if (depth < 2) {
+          <button
+            class="pm-btn pm-btn-ghost pm-btn-small"
+            (click)="addSubtaskAtLevel(task, $event)"
+            title="Add subtask">+</button>
+        }
+        <button
+          class="pm-btn pm-btn-ghost pm-btn-small pm-btn-danger"
+          (click)="deleteTaskById(parentList, task.id, $event)"
+          title="Delete task">🗑</button>
+      </div>
+    </div>
+    @if (task.subtasks.length > 0) {
+      <div class="pm-subtasks">
+        @for (subtask of task.subtasks; track subtask.id) {
+          <ng-container
+            *ngTemplateOutlet="taskItem; context: { task: subtask, parentList: task.subtasks, depth: depth + 1 }"
+          ></ng-container>
+        }
+      </div>
+    }
+  </div>
+</ng-template>
