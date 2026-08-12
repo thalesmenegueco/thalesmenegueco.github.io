@@ -18,14 +18,14 @@ export class LearningGalleryComponent {
   interests: CardItem[] = [
   { name: "Sinalize!",
     description: 'Plataforma para Aprender de Libras DE GRAÇA!',
-    image: 'https://media-public.canva.com/uwdzU/MAFQ9vuwdzU/1/tl.png',
-    link: 'https://www.tiktok.com/@sinal.fala'
+    image: 'https://www.svgrepo.com/svg/489247/global',
+    link: 'https://www.sinalize.org'
   },
   {
     name: "Sinal Fala",
     description: 'Idiomas, cultura surda, tradução e neurodivergências (no tiktok)',
-    image: 'https://media-public.canva.com/kcveY/MAEUZkkcveY/1/tl.png',
-    link: 'https://www.tiktok.com/@sinais.sinapses'
+    image: 'https://www.svgrepo.com/svg/489256/puzzle',
+    link: 'https://www.tiktok.com/@sinal.fala'
   }
 ];
 
