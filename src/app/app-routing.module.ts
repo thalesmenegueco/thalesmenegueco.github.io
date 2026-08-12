@@ -6,7 +6,7 @@ export const routes: Routes = [];
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component'; // Importar o componente
+// import { HomeComponent } from './home/home.component'; // Importar o componente
 import { LearningGalleryComponent } from './learning-gallery/learning-gallery.component'; // Importar o componente LearningGallery
 import { ProjectsComponent } from './projects/projects'; // Importar o componente
 
@@ -15,7 +15,6 @@ import { SimpleMath } from './projects/componentized-projects/simple-math/simple
 import { ProjectManager } from './projects/componentized-projects/project-manager/project-manager';
 
 export const routes: Routes = [
-  { path: 'home', component: HomeComponent },
   { path: 'project-gallery', component: LearningGalleryComponent },
   { path: 'tools', component: ProjectsComponent },
   { path: 'tools/precificacao-semijoias', component: PrecificacaoPageComponent },
