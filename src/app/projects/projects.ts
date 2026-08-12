@@ -14,22 +14,22 @@ export class ProjectsComponent {
   interests: CardItem[] = [
     { name: "Cálculos Simples",
       description: 'Ferramenta para calcular: hipotenusa e catetos de um triângulo retângulo',
-      image: 'https://www.svgrepo.com/svg/489257/piechart',
+      image: 'https://www.svgrepo.com/show/489257/piechart.svg',
       link: './tools/calcular-hipotenusa'
     },
     { name: "Project Manager",
       description: 'Minimalist project manager with nested task lists',
-      image: 'https://www.svgrepo.com/svg/489271/style',
+      image: 'https://www.svgrepo.com/show/489271/style.svg',
       link: './tools/project-manager'
     },
     { name: "OCR & Tradução",
       description: 'Extraia e traduza textos de imagens — 100% offline, direto no navegador',
-      image: 'https://www.svgrepo.com/svg/489265/search-document',
+      image: 'https://www.svgrepo.com/show/489265/search-document.svg',
       link: './tools/ocr'
     },
 { name: "Precificação",
       description: 'Cálculo para precificação de semijoias - SPA',
-      image: 'https://www.svgrepo.com/svg/489278/add-wallet',
+      image: 'https://www.svgrepo.com/show/489278/add-wallet.svg',
       link: './tools/precificacao-semijoias'
     },
   ];
