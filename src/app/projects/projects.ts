@@ -12,26 +12,26 @@ import { CardItem } from '../../models/card-item';
 export class ProjectsComponent {
 
   interests: CardItem[] = [
-    { name: "Precificação",
-      description: 'Cálculo para precificação de semijoias - SPA',
-      image: 'https://www.svgrepo.com/show/508297/gem.svg',
-      link: './tools/precificacao-semijoias'
-    },
     { name: "Cálculos Simples",
       description: 'Ferramenta para calcular: hipotenusa e catetos de um triângulo retângulo',
-      image: 'https://www.svgrepo.com/show/508308/pie.svg',
+      image: 'https://www.svgrepo.com/svg/489257/piechart',
       link: './tools/calcular-hipotenusa'
     },
     { name: "Project Manager",
       description: 'Minimalist project manager with nested task lists',
-      image: 'https://www.svgrepo.com/show/508281/book.svg',
+      image: 'https://www.svgrepo.com/svg/489271/style',
       link: './tools/project-manager'
     },
     { name: "OCR & Tradução",
       description: 'Extraia e traduza textos de imagens — 100% offline, direto no navegador',
-      image: 'https://www.svgrepo.com/show/508325/video-camera.svg',
+      image: 'https://www.svgrepo.com/svg/489265/search-document',
       link: './tools/ocr'
-    }
+    },
+{ name: "Precificação",
+      description: 'Cálculo para precificação de semijoias - SPA',
+      image: 'https://www.svgrepo.com/svg/489278/add-wallet',
+      link: './tools/precificacao-semijoias'
+    },
   ];
 
 }
