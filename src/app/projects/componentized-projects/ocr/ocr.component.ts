@@ -6,7 +6,7 @@ import { TranslatorComponent } from './components/translator.component';
 import { OcrService } from './services/ocr.service';
 import { TranslationService } from './services/translation.service';
 import { ImageClipboardService } from './services/image-clipboard.service';
-import { OcrProgress, TranslateProgress } from './types';
+import { OcrProgress, TranslateRequest } from './types';
 
 @Component({
   selector: 'app-ocr',
@@ -27,10 +27,11 @@ export class OcrComponent implements OnInit, OnDestroy {
   isProcessing = false;
   isTranslating = false;
   ocrProgress: OcrProgress | null = null;
-  translateProgress: TranslateProgress | null = null;
   errorMessage: string | null = null;
   translateError: string | null = null;
   wasmSupported: boolean | null = null;
+  translatorSupported = false;
+  translatorCanDetect = false;
 
   private objectUrls: string[] = [];
   private ocrAbortController: AbortController | null = null;
@@ -43,13 +44,15 @@ export class OcrComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.wasmSupported = typeof WebAssembly !== 'undefined';
+    this.translatorSupported = this.translator.isSupported;
+    this.translatorCanDetect = this.translator.canDetect;
     this.clipboard.attach(document);
     this.clipboard.imagePasted.subscribe((blob) => this.handleImage(blob));
   }
 
   ngOnDestroy(): void {
     this.ocr.terminate();
-    this.translator.terminate();
+    this.translator.destroy();
     this.ocrAbortController?.abort();
     for (const url of this.objectUrls) {
       URL.revokeObjectURL(url);
@@ -100,7 +103,7 @@ export class OcrComponent implements OnInit, OnDestroy {
       });
   }
 
-  handleTranslate(direction: 'pt-en' | 'en-pt'): void {
+  handleTranslate(request: TranslateRequest): void {
     if (!this.recognizedText.trim()) {
       return;
     }
@@ -109,26 +112,17 @@ export class OcrComponent implements OnInit, OnDestroy {
     this.translateError = null;
     this.translatedText = '';
 
-    // NLLB-200: single bidirectional model supporting both en↔pt.
-    // FLORES-200 language codes: por_Latn (Portuguese), eng_Latn (English)
-    const modelName = 'Xenova/nllb-200-distilled-600M';
-    const srcLang = direction === 'pt-en' ? 'por_Latn' : 'eng_Latn';
-    const tgtLang = direction === 'pt-en' ? 'eng_Latn' : 'por_Latn';
-
     this.translator
-      .translate(
-        this.recognizedText,
-        modelName,
-        srcLang,
-        tgtLang,
-        (p) => (this.translateProgress = p)
-      )
+      .translate(this.recognizedText, request)
       .then((text) => {
         this.translatedText = text;
       })
       .catch((err) => {
         console.error('Translation error:', err);
-        this.translateError = 'Falha na tradução. Verifique sua conexão (o modelo precisa ser baixado na primeira execução).';
+        this.translateError =
+          err instanceof Error
+            ? err.message
+            : 'Falha na tradução. Tente novamente.';
       })
       .finally(() => {
         this.isTranslating = false;
@@ -155,6 +149,5 @@ export class OcrComponent implements OnInit, OnDestroy {
     this.translatedText = '';
     this.errorMessage = null;
     this.translateError = null;
-    this.translateProgress = null;
   }
 }

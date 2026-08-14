@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { TranslateProgress } from '../types';
+import { FormsModule } from '@angular/forms';
+import { LanguageOption, SUPPORTED_LANGUAGES, TranslateRequest } from '../types';
 
 @Component({
   selector: 'app-translator',
   standalone: true,
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './translator.component.html',
   styleUrl: './translator.component.scss',
 })
@@ -12,22 +13,33 @@ export class TranslatorComponent {
   @Input() sourceText = '';
   @Input() translatedText = '';
   @Input() isProcessing = false;
-  @Input() progress: TranslateProgress | null = null;
   @Input() errorMessage: string | null = null;
+  @Input() supported = true;
+  @Input() canDetect = false;
 
-  @Output() translate = new EventEmitter<'pt-en' | 'en-pt'>();
+  @Output() translate = new EventEmitter<TranslateRequest>();
   @Output() copyTranslated = new EventEmitter<void>();
 
-  direction: 'pt-en' | 'en-pt' = 'pt-en';
+  languages: LanguageOption[] = [...SUPPORTED_LANGUAGES];
+
+  private _source = 'auto';
+  target = 'en';
 
   copyStatus: 'idle' | 'copied' | 'error' = 'idle';
 
-  toggleDirection(): void {
-    this.direction = this.direction === 'pt-en' ? 'en-pt' : 'pt-en';
+  get source(): string {
+    if (!this.canDetect && this._source === 'auto') {
+      return 'pt';
+    }
+    return this._source;
+  }
+
+  set source(value: string) {
+    this._source = value;
   }
 
   onTranslate(): void {
-    this.translate.emit(this.direction);
+    this.translate.emit({ source: this.source, target: this.target });
   }
 
   async onCopyTranslated(): Promise<void> {
@@ -43,9 +55,5 @@ export class TranslatorComponent {
 
   get canTranslate(): boolean {
     return !!this.sourceText?.trim() && !this.isProcessing;
-  }
-
-  get progressPercent(): number {
-    return Math.round((this.progress?.progress ?? 0) * 100);
   }
 }

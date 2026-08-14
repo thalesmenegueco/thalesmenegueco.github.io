@@ -1,7 +1,8 @@
 <div class="ocr-page">
   <h1>OCR &amp; Tradução</h1>
   <p class="ocr-subtitle">
-    Extraia e traduza textos de imagens — 100% offline, direto no navegador
+    Extraia textos de imagens direto no navegador e traduza com o Chrome
+    (PT/EN/FR/IT/DE)
   </p>
 
   @if (wasmSupported === false) {
@@ -57,8 +58,9 @@
         [sourceText]="recognizedText"
         [translatedText]="translatedText"
         [isProcessing]="isTranslating"
-        [progress]="translateProgress"
         [errorMessage]="translateError"
+        [supported]="translatorSupported"
+        [canDetect]="translatorCanDetect"
         (translate)="handleTranslate($event)"
       />
     </div>

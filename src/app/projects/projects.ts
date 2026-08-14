@@ -12,13 +12,13 @@ import { CardItem } from '../../models/card-item';
 export class ProjectsComponent {
 
   interests: CardItem[] = [
-    { name: "Project Manager",
-      description: 'Gerenciador de Projetos minimalista com listas de tarefas (em níveis!)',
+    { name: "Projetos",
+      description: 'Gerenciador de Projetos minimalista com listas de tarefas, ficam salvas no seu navegador 😉',
       image: 'https://www.svgrepo.com/show/489271/style.svg',
       link: './tools/project-manager'
     },
     { name: "OCR & Tradução",
-      description: 'Extraia e traduza textos de imagens — 100% offline, direto no navegador',
+      description: 'Extraia textos de imagens e traduza com o Chrome (PT/EN/FR/IT/DE)',
       image: 'https://www.svgrepo.com/show/489265/search-document.svg',
       link: './tools/ocr'
     },

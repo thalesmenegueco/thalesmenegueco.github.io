@@ -14,7 +14,7 @@
           [class.active]="selectedProjectId === null"
           (click)="selectProject(null)">
           <span class="pm-nav-icon">📋</span>
-          <span class="pm-nav-label">General Tasks</span>
+          <span class="pm-nav-label">Tarefas Gerais</span>
           <span class="pm-nav-badge">{{ generalTasksCount }}</span>
         </button>
       </div>
@@ -23,16 +23,16 @@
         <div class="pm-status-tabs">
           <button
             [class.active]="statusFilter === 'all'"
-            (click)="statusFilter = 'all'">All</button>
+            (click)="statusFilter = 'all'">Tudo</button>
           <button
             [class.active]="statusFilter === 'Pendente'"
-            (click)="statusFilter = 'Pendente'">Pending</button>
+            (click)="statusFilter = 'Pendente'">Pendente</button>
           <button
             [class.active]="statusFilter === 'Em andamento'"
-            (click)="statusFilter = 'Em andamento'">Progress</button>
+            (click)="statusFilter = 'Em andamento'">Em andamento</button>
           <button
             [class.active]="statusFilter === 'Concluído'"
-            (click)="statusFilter = 'Concluído'">Done</button>
+            (click)="statusFilter = 'Concluído'">Concluído</button>
         </div>
 
         <div class="pm-project-list">
@@ -52,7 +52,7 @@
               }
               <div class="pm-project-card-footer">
                 <span class="pm-project-task-count">
-                  {{ project.tasks.length }} tasks
+                  {{ project.tasks.length }} tarefas
                 </span>
                 @if (project.deadline) {
                   <span class="pm-project-deadline">{{ formatDeadline(project.deadline) }}</span>
@@ -61,7 +61,7 @@
             </div>
           }
           @if (filteredProjects.length === 0) {
-            <p class="pm-empty-hint">No projects found</p>
+            <p class="pm-empty-hint">Nenhum projeto encontrado</p>
           }
         </div>
       </div>
@@ -76,13 +76,13 @@
             <input
               type="text"
               class="pm-input"
-              placeholder="Project name"
+              placeholder="Nome do projeto"
               [(ngModel)]="newProjectName"
               (keydown.enter)="addProject()"
             />
             <textarea
               class="pm-input pm-textarea"
-              placeholder="Description (optional)"
+              placeholder="Descrição (opcional)"
               [(ngModel)]="newProjectDescription"
               rows="2"
             ></textarea>
@@ -106,11 +106,11 @@
             <input
               type="text"
               class="pm-input pm-task-input"
-              placeholder="Add a task..."
+              placeholder="Adicionar uma tarefa..."
               [(ngModel)]="addTaskText"
               (keydown)="addTaskOnEnter(standaloneTasks, $event)"
             />
-            <button class="pm-btn pm-btn-primary" (click)="addTask(standaloneTasks)">Add</button>
+            <button class="pm-btn pm-btn-primary" (click)="addTask(standaloneTasks)">Adicionar</button>
           </div>
 
           <div class="pm-task-list">
@@ -120,7 +120,7 @@
               ></ng-container>
             }
             @if (standaloneTasks.length === 0) {
-              <p class="pm-empty-hint">No tasks yet. Add one above!</p>
+              <p class="pm-empty-hint">Nenhuma tarefa ainda. Adicione uma acima!</p>
             }
           </div>
         </div>
@@ -161,7 +161,7 @@
               <p
                 class="pm-project-desc pm-editable"
                 (click)="startEditField(selectedProject.id, 'description')"
-                title="Click para editar">{{ selectedProject.description || 'Click to add description...' }}</p>
+                title="Click para editar">{{ selectedProject.description || 'Clique para adicionar uma descrição...' }}</p>
             }
 
             <div class="pm-meta-row">
@@ -199,7 +199,7 @@
             <input
               type="text"
               class="pm-input pm-task-input"
-              placeholder="Add a task..."
+              placeholder="Adicionar uma tarefa..."
               [(ngModel)]="addTaskText"
               (keydown)="addTaskOnEnter(selectedProject.tasks, $event)"
             />

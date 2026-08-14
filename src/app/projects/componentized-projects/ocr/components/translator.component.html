@@ -1,46 +1,50 @@
 <div class="translator">
   <div class="translator-header">
     <h3>Tradução</h3>
-    <button
-      class="direction-toggle"
-      (click)="toggleDirection()"
-      [disabled]="isProcessing"
-      [attr.aria-label]="'Alternar direção da tradução'"
-    >
-      @if (direction === 'pt-en') {
-        <span>PT &#x2192; EN</span>
-      } @else {
-        <span>EN &#x2192; PT</span>
-      }
-    </button>
   </div>
 
-  <div class="translate-actions">
-    <button
-      class="translate-button"
-      (click)="onTranslate()"
-      [disabled]="!canTranslate"
-    >
-      @if (isProcessing && progress?.status === 'downloading') {
-        <span>Baixando modelo... {{ progressPercent }}%</span>
-      } @else if (isProcessing && progress?.status === 'translating') {
-        <span>Traduzindo...</span>
-      } @else {
-        <span>🌐 Traduzir</span>
-      }
-    </button>
-  </div>
-
-  @if (isProcessing && progress) {
-    <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progressPercent">
-      <div class="progress-fill" [style.width.%]="progressPercent"></div>
+  @if (!supported) {
+    <div class="translator-fallback">
+      Seu navegador não oferece suporte à tradução nativa. Use o Chrome 138 ou
+      superior (com a Translator API habilitada) para traduzir textos.
     </div>
-    @if (progress.status === 'downloading' && progress.modelSize) {
-      <div class="download-message">
-        <p class="download-message-title">Trabalhando para deixar <strong>SUA TRADUÇÃO {{ progressPercent }}% mais segura</strong> 💬🛡️</p>
-        <p class="download-message-hint">Obs: Esse download só acontece 1 vez a cada língua, pode usar seu navegador normalmente, apenas não feche essa aba por enquanto 😉</p>
-      </div>
-    }
+  } @else {
+    <div class="language-selects">
+      <label class="select-label">
+        De
+        <select [(ngModel)]="source" [disabled]="isProcessing">
+          @if (canDetect) {
+            <option value="auto">Auto</option>
+          }
+          @for (lang of languages; track lang.code) {
+            <option [value]="lang.code">{{ lang.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="select-label">
+        Para
+        <select [(ngModel)]="target" [disabled]="isProcessing">
+          @for (lang of languages; track lang.code) {
+            <option [value]="lang.code">{{ lang.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="translate-actions">
+      <button
+        class="translate-button"
+        (click)="onTranslate()"
+        [disabled]="!canTranslate"
+      >
+        @if (isProcessing) {
+          <span>Traduzindo...</span>
+        } @else {
+          <span>🌐 Traduzir</span>
+        }
+      </button>
+    </div>
   }
 
   @if (errorMessage) {

@@ -3,14 +3,20 @@ export interface OcrProgress {
   progress: number;
 }
 
-export interface TranslateProgress {
-  status: 'downloading' | 'translating';
-  progress: number;
-  modelSize?: string;
-}
-
-export interface LanguagePair {
-  src: string;
-  tgt: string;
+export interface LanguageOption {
+  code: string;
   label: string;
 }
+
+export interface TranslateRequest {
+  source: string;
+  target: string;
+}
+
+export const SUPPORTED_LANGUAGES: readonly LanguageOption[] = [
+  { code: 'pt', label: 'Português' },
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'de', label: 'Deutsch' },
+];

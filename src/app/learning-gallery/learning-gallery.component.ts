@@ -26,6 +26,12 @@ export class LearningGalleryComponent {
     description: 'Idiomas, cultura surda, tradução e neurodivergências (no tiktok)',
     image: 'https://www.svgrepo.com/show/489256/puzzle.svg',
     link: 'https://www.tiktok.com/@sinal.fala'
+  },
+  {
+    name: "Lab de Apps",
+    description: 'Laboratório de ferramentas (aleatórios)',
+    image: 'https://www.svgrepo.com/show/489243/creativity-1.svg',
+    link: 'https://thalesmenegueco.github.io/tools'
   }
 ];
 
