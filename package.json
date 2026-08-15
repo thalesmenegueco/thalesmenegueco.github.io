@@ -26,6 +26,7 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@mlc-ai/web-llm": "^0.2.84",
     "rxjs": "~7.8.0",
     "tesseract.js": "^6.0.1",
     "tslib": "^2.3.0",
@@ -44,5 +45,9 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.2"
+  },
+  "allowScripts": {
+    "msgpackr-extract@3.0.3": true,
+    "tesseract.js@6.0.1": true
   }
 }

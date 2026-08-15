@@ -21,6 +21,7 @@ export const routes: Routes = [
   { path: 'tools/calcular-hipotenusa', component: SimpleMath },
   { path: 'tools/project-manager', component: ProjectManager },
   { path: 'tools/ocr', loadComponent: () => import('./projects/componentized-projects/ocr/ocr.component').then(m => m.OcrComponent) },
+  { path: 'tools/test-llms', loadComponent: () => import('./projects/componentized-projects/test-llms/test-llms').then(m => m.TestLlms) },
   { path: '', redirectTo: '/project-gallery', pathMatch: 'full' },
   { path: '**', redirectTo: '/project-gallery' }
 ];

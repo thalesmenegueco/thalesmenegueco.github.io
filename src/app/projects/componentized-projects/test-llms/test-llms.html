@@ -1,0 +1,93 @@
+<div class="llm-page">
+  <h1>LLM Local</h1>
+  <p class="llm-subtitle">
+    Baixe e rode um LLM (Qwen 0.5B) direto no seu navegador, sem servidor.
+  </p>
+
+  @if (webGpuSupported === false) {
+    <div class="webgpu-warning">
+      Seu navegador não suporta WebGPU. Use a versão mais recente do Chrome,
+      Edge ou Firefox para rodar a IA local.
+    </div>
+  }
+
+  <div class="llm-card">
+    @if (!llm.isReady) {
+      <div class="llm-setup">
+        <p class="llm-hint">
+          O modelo tem cerca de 350–500 MB e fica salvo no seu navegador — só é
+          baixado na primeira vez.
+        </p>
+
+        <button
+          class="download-button"
+          [disabled]="webGpuSupported !== true"
+          (click)="downloadModel()"
+        >
+          Baixar e Ativar IA
+        </button>
+
+        @if (llm.status || llm.progressPercent > 0) {
+          <div
+            class="progress-block"
+            role="progressbar"
+            [attr.aria-valuenow]="llm.progressPercent"
+          >
+            <div class="progress-label">{{ llm.status }}</div>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="llm.progressPercent"></div>
+            </div>
+          </div>
+        }
+
+        @if (llm.errorMessage) {
+          <div class="llm-error">{{ llm.errorMessage }}</div>
+        }
+      </div>
+    } @else {
+      <div class="llm-chat">
+        <div class="chat-messages">
+          @if (messages.length === 0) {
+            <p class="chat-empty">Comece a conversa escrevendo uma mensagem abaixo.</p>
+          }
+
+          @for (message of messages; track $index) {
+            <div class="chat-message" [class.chat-message--user]="message.role === 'user'">
+              <div class="chat-bubble">{{ message.content }}</div>
+            </div>
+          }
+        </div>
+
+        <form class="chat-input" (ngSubmit)="send()">
+          <input
+            type="text"
+            [(ngModel)]="userInput"
+            name="userInput"
+            placeholder="Escreva sua mensagem..."
+            [disabled]="isGenerating"
+            autocomplete="off"
+          />
+          <button type="submit" class="send-button" [disabled]="isGenerating">
+            @if (isGenerating) {
+              Gerando...
+            } @else {
+              Enviar
+            }
+          </button>
+        </form>
+
+        <button
+          class="clear-button"
+          (click)="clearChat()"
+          [disabled]="messages.length === 0"
+        >
+          Limpar conversa
+        </button>
+
+        @if (llm.errorMessage) {
+          <div class="llm-error">{{ llm.errorMessage }}</div>
+        }
+      </div>
+    }
+  </div>
+</div>
