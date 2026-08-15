@@ -567,6 +567,36 @@
   }
 }
 
+.pm-sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--pm-border);
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pm-io-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--pm-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+
+  &:hover {
+    background: var(--pm-surface-hover);
+    color: var(--pm-text);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+}
+
 @media (max-width: 767px) {
   .pm-hamburger {
     display: flex;

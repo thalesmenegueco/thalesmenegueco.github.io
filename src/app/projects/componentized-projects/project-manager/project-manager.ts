@@ -267,4 +267,122 @@ export class ProjectManager implements OnInit {
     }
     return dateStr;
   }
+
+  exportFilename(): string {
+    return `project-manager-${new Date().toISOString().slice(0, 10)}.json`;
+  }
+
+  exportData(): string {
+    return JSON.stringify(
+      { projects: this.projects, standaloneTasks: this.standaloneTasks },
+      null,
+      2
+    );
+  }
+
+  downloadExport(): void {
+    const blob = new Blob([this.exportData()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = this.exportFilename();
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
+  importData(json: string): boolean {
+    let raw: unknown;
+    try {
+      raw = JSON.parse(json);
+    } catch {
+      alert('Arquivo inválido. Selecione um .json exportado por esta ferramenta.');
+      return false;
+    }
+
+    const data = this.normalizeData(raw);
+    this.projects = data.projects;
+    this.standaloneTasks = data.standaloneTasks;
+    this.selectedProjectId = null;
+    this.saveToStorage();
+    return true;
+  }
+
+  async onImportFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!confirm('Substituir os dados atuais pelas notas importadas?')) {
+      input.value = '';
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      this.importData(text);
+    } catch {
+      alert('Não foi possível ler o arquivo.');
+    } finally {
+      input.value = '';
+    }
+  }
+
+  normalizeData(raw: unknown): StoredData {
+    const obj = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
+    return {
+      projects: this.normalizeProjects(obj['projects']),
+      standaloneTasks: this.normalizeTasks(obj['standaloneTasks']),
+    };
+  }
+
+  private normalizeProjects(raw: unknown): Project[] {
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+    return raw
+      .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+      .map((item) => ({
+        id: this.toId(item['id']),
+        name: this.toString(item['name']),
+        description: this.toString(item['description']),
+        status: this.toStatus(item['status']),
+        deadline: this.toDeadline(item['deadline']),
+        tasks: this.normalizeTasks(item['tasks']),
+      }));
+  }
+
+  private normalizeTasks(raw: unknown): Task[] {
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+    return raw
+      .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+      .map((item) => ({
+        id: this.toId(item['id']),
+        text: this.toString(item['text']),
+        done: item['done'] === true,
+        subtasks: this.normalizeTasks(item['subtasks']),
+      }));
+  }
+
+  private toString(value: unknown): string {
+    return typeof value === 'string' ? value : value == null ? '' : String(value);
+  }
+
+  private toId(value: unknown): string {
+    const id = this.toString(value);
+    return id ? id : crypto.randomUUID();
+  }
+
+  private toDeadline(value: unknown): string | null {
+    return typeof value === 'string' && value ? value : null;
+  }
+
+  private toStatus(value: unknown): Project['status'] {
+    return this.statuses.includes(value as Project['status'])
+      ? (value as Project['status'])
+      : 'Pendente';
+  }
 }

@@ -29,9 +29,9 @@ export class LearningGalleryComponent {
   },
   {
     name: "Lab de Apps",
-    description: 'Laboratório de ferramentas (aleatórios)',
+    description: 'Laboratório de ferramentas (aleatórias)',
     image: 'https://www.svgrepo.com/show/489243/creativity-1.svg',
-    link: 'https://thalesmenegueco.github.io/tools'
+    link: '/tools'
   }
 ];
 
