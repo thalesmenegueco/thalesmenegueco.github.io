@@ -1,13 +1,20 @@
 <div class="llm-page">
   <h1>LLM Local</h1>
   <p class="llm-subtitle">
-    Baixe e rode um LLM (Qwen 0.5B) direto no seu navegador, sem servidor.
+    Baixe e rode um LLM direto no seu navegador, sem servidor.
   </p>
 
-  @if (webGpuSupported === false) {
+  @if (webGpuSupported === false && wasmSupported) {
+    <div class="llm-info-note">
+      WebGPU não detectado — o modelo rodará via WebAssembly (CPU), mais lento,
+      mas funciona.
+    </div>
+  }
+
+  @if (webGpuSupported === false && !wasmSupported) {
     <div class="webgpu-warning">
-      Seu navegador não suporta WebGPU. Use a versão mais recente do Chrome,
-      Edge ou Firefox para rodar a IA local.
+      Seu navegador não suporta WebGPU nem WebAssembly. Use a versão mais
+      recente do Chrome, Edge ou Firefox para rodar a IA local.
     </div>
   }
 
@@ -15,13 +22,13 @@
     @if (!llm.isReady) {
       <div class="llm-setup">
         <p class="llm-hint">
-          O modelo tem cerca de 350–500 MB e fica salvo no seu navegador — só é
-          baixado na primeira vez.
+          O modelo tem cerca de 180–500 MB (depende do dispositivo) e fica salvo
+          no seu navegador — só é baixado na primeira vez.
         </p>
 
         <button
           class="download-button"
-          [disabled]="webGpuSupported !== true"
+          [disabled]="!canRun"
           (click)="downloadModel()"
         >
           Baixar e Ativar IA
@@ -42,6 +49,10 @@
 
         @if (llm.errorMessage) {
           <div class="llm-error">{{ llm.errorMessage }}</div>
+        }
+
+        @if (wasmHint) {
+          <p class="llm-model-hint">{{ wasmHint }}</p>
         }
       </div>
     } @else {
@@ -86,6 +97,10 @@
 
         @if (llm.errorMessage) {
           <div class="llm-error">{{ llm.errorMessage }}</div>
+        }
+
+        @if (wasmHint) {
+          <p class="llm-model-hint">{{ wasmHint }}</p>
         }
       </div>
     }

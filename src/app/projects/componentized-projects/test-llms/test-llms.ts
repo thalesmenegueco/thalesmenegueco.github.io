@@ -15,8 +15,22 @@ export class TestLlms implements OnInit, OnDestroy {
   userInput = '';
   isGenerating = false;
   webGpuSupported: boolean | null = null;
+  wasmSupported = typeof WebAssembly !== 'undefined';
 
   constructor(public llm: LlmService) {}
+
+  get canRun(): boolean {
+    return this.webGpuSupported === true || this.wasmSupported;
+  }
+
+  get wasmHint(): string | null {
+    if (this.llm.activeBackend !== 'wasm' || !this.llm.activeModel) {
+      return null;
+    }
+    return this.llm.activeModel.includes('135M')
+      ? 'Usando o modelo menor (135M) por causa de memória limitada.'
+      : 'Rodando via WebAssembly (CPU) — mais lento que WebGPU.';
+  }
 
   async ngOnInit(): Promise<void> {
     this.webGpuSupported = await this.llm.detectWebGpuSupport();

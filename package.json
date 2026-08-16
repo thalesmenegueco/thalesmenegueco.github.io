@@ -26,6 +26,7 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@huggingface/transformers": "^3.8.1",
     "@mlc-ai/web-llm": "^0.2.84",
     "rxjs": "~7.8.0",
     "tesseract.js": "^6.0.1",

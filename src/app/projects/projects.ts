@@ -27,7 +27,7 @@ export class ProjectsComponent {
     {
       name: "LLM Local",
       description: 'Baixe e rode um LLM (Qwen 0.5B) direto no seu navegador',
-      image: 'https://www.svgrepo.com/show/489259/robot.svg',
+      image: 'https://www.svgrepo.com/show/489246/code-mobile.svg',
       link: './tools/test-llms'
     },
     {

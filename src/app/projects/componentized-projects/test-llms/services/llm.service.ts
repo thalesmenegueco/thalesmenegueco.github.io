@@ -1,33 +1,8 @@
 import { Injectable, Inject, InjectionToken } from '@angular/core';
-import {
-  ChatCompletionMessageParam,
-  CreateWebWorkerMLCEngine,
-  InitProgressReport,
-  MLCEngineInterface,
-} from '@mlc-ai/web-llm';
 import { ChatMessage } from '../types';
-
-export const MODEL_ID = 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC';
-
-const SYSTEM_PROMPT =
-  'Você é um assistente útil, educado e conciso. Responda sempre em português do Brasil.';
-
-export type LlmEngineFactory = (
-  modelId: string,
-  initProgressCallback: (report: InitProgressReport) => void
-) => Promise<MLCEngineInterface>;
-
-export const LLM_ENGINE_FACTORY = new InjectionToken<LlmEngineFactory>('LLM_ENGINE_FACTORY', {
-  factory: () => createWorkerEngine,
-});
-
-function createWorkerEngine(
-  modelId: string,
-  initProgressCallback: (report: InitProgressReport) => void
-): Promise<MLCEngineInterface> {
-  const worker = new Worker(new URL('../llm.worker', import.meta.url), { type: 'module' });
-  return CreateWebWorkerMLCEngine(worker, modelId, { initProgressCallback });
-}
+import { LlmBackend, LlmBackendKind } from './llm-backend';
+import { WebGpuBackend } from './webgpu-backend';
+import { WasmBackend } from './wasm-backend';
 
 export type WebGpuDetector = () => Promise<boolean>;
 
@@ -55,18 +30,28 @@ export const WEBGPU_DETECTOR = new InjectionToken<WebGpuDetector>('WEBGPU_DETECT
   factory: () => detectWebGpuAdapter,
 });
 
+function isWebGpuUnavailableError(err: unknown): boolean {
+  const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+  return (
+    message.includes('WebGPUNotAvailableError') || message.includes('WebGPUNotFoundError')
+  );
+}
+
 @Injectable({ providedIn: 'root' })
 export class LlmService {
   status = '';
   progressPercent = 0;
   isReady = false;
   errorMessage: string | null = null;
+  activeBackend: LlmBackendKind | null = null;
+  activeModel: string | null = null;
 
-  private engine: MLCEngineInterface | null = null;
+  private backend: LlmBackend | null = null;
 
   constructor(
-    @Inject(LLM_ENGINE_FACTORY) private engineFactory: LlmEngineFactory,
-    @Inject(WEBGPU_DETECTOR) private webGpuDetector: WebGpuDetector
+    @Inject(WEBGPU_DETECTOR) private webGpuDetector: WebGpuDetector,
+    private webGpuBackend: WebGpuBackend,
+    private wasmBackend: WasmBackend
   ) {}
 
   detectWebGpuSupport(): Promise<boolean> {
@@ -81,12 +66,27 @@ export class LlmService {
     this.errorMessage = null;
     this.progressPercent = 0;
     this.status = 'Iniciando...';
+    this.activeModel = null;
+
+    const useWebGpu = await this.webGpuDetector();
 
     try {
-      this.engine = await this.engineFactory(MODEL_ID, (report) => {
-        this.progressPercent = Math.round(report.progress * 100);
-        this.status = this.toStatusText(report.text);
-      });
+      if (useWebGpu) {
+        try {
+          await this.initializeBackend(this.webGpuBackend);
+        } catch (err) {
+          if (!isWebGpuUnavailableError(err)) {
+            throw err;
+          }
+
+          await this.webGpuBackend.dispose();
+          this.status = 'WebGPU indisponível. Alternando para WebAssembly (CPU)...';
+          await this.initializeBackend(this.wasmBackend);
+        }
+      } else {
+        await this.initializeBackend(this.wasmBackend);
+      }
+
       this.isReady = true;
       this.progressPercent = 100;
       this.status = 'Modelo carregado. Pode conversar!';
@@ -98,65 +98,40 @@ export class LlmService {
   }
 
   async generate(messages: ChatMessage[]): Promise<string> {
-    if (!this.isReady || !this.engine) {
+    if (!this.isReady || !this.backend) {
       throw new Error(
         'O modelo ainda não foi carregado. Clique em "Baixar e Ativar IA" primeiro.'
       );
     }
 
-    const chatMessages: ChatCompletionMessageParam[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...messages.map(
-        (message) => ({ role: message.role, content: message.content }) as ChatCompletionMessageParam
-      ),
-    ];
-
-    const reply = await this.engine.chat.completions.create({ messages: chatMessages });
-    const content = reply.choices[0]?.message?.content ?? '';
-
-    if (!content) {
-      throw new Error('O modelo retornou uma resposta vazia. Tente novamente.');
-    }
-
-    return content;
+    return this.backend.generate(messages);
   }
 
   async dispose(): Promise<void> {
-    if (this.engine) {
-      try {
-        await this.engine.unload();
-      } catch {
-        // ignore failures while tearing down
-      }
-    }
+    await this.webGpuBackend.dispose();
+    await this.wasmBackend.dispose();
 
-    this.engine = null;
+    this.backend = null;
+    this.activeBackend = null;
+    this.activeModel = null;
     this.isReady = false;
     this.progressPercent = 0;
     this.status = '';
     this.errorMessage = null;
   }
 
-  private toStatusText(text: string): string {
-    if (text.startsWith('Loading model from url')) {
-      return 'Baixando modelo...';
+  private async initializeBackend(backend: LlmBackend): Promise<void> {
+    this.backend = backend;
+    this.activeBackend = backend.kind;
+
+    await backend.initialize((progress) => {
+      this.progressPercent = progress.progressPercent;
+      this.status = progress.status;
+    });
+
+    if (backend.kind === 'wasm') {
+      this.activeModel = this.wasmBackend.selectedModel;
     }
-    if (text.startsWith('Loading model from cache')) {
-      return 'Carregando modelo do cache...';
-    }
-    if (text.startsWith('Loading GPU shader modules')) {
-      return 'Carregando shaders da GPU...';
-    }
-    if (text.startsWith('Fetching param cache')) {
-      return 'Buscando cache de parâmetros...';
-    }
-    if (text.startsWith('Creating WebGPU device')) {
-      return 'Inicializando WebGPU...';
-    }
-    if (text.startsWith('Initializing the model')) {
-      return 'Inicializando o modelo...';
-    }
-    return text;
   }
 
   private toFriendlyError(err: unknown): string {
