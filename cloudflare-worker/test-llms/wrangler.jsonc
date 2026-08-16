@@ -1,0 +1,6 @@
+{
+  "name": "test-llms",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-16",
+  "ai": { "binding": "AI" }
+}

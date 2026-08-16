@@ -52,6 +52,7 @@ function toStatusText(text: string): string {
 @Injectable({ providedIn: 'root' })
 export class WebGpuBackend implements LlmBackend {
   readonly kind: LlmBackendKind = 'webgpu';
+  readonly activeModelLabel = MODEL_ID;
 
   private engine: MLCEngineInterface | null = null;
 
@@ -66,7 +67,7 @@ export class WebGpuBackend implements LlmBackend {
     });
   }
 
-  async generate(messages: ChatMessage[]): Promise<string> {
+  async generate(messages: ChatMessage[], onToken: (token: string) => void): Promise<string> {
     if (!this.engine) {
       throw new Error(
         'O modelo ainda não foi carregado. Clique em "Baixar e Ativar IA" primeiro.'
@@ -80,8 +81,19 @@ export class WebGpuBackend implements LlmBackend {
       ),
     ];
 
-    const reply = await this.engine.chat.completions.create({ messages: chatMessages });
-    const content = reply.choices[0]?.message?.content ?? '';
+    const stream = await this.engine.chat.completions.create({
+      messages: chatMessages,
+      stream: true,
+    });
+
+    let content = '';
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content ?? '';
+      if (delta) {
+        content += delta;
+        onToken(delta);
+      }
+    }
 
     if (!content) {
       throw new Error('O modelo retornou uma resposta vazia. Tente novamente.');

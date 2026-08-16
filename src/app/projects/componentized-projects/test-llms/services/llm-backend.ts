@@ -1,16 +1,21 @@
 import { ChatMessage } from '../types';
 
-export type LlmBackendKind = 'webgpu' | 'wasm';
+export type LlmBackendKind = 'webgpu' | 'wasm' | 'cloud';
+
+export type LlmMode = 'local' | 'online';
 
 export interface BackendProgress {
   progressPercent: number;
   status: string;
 }
 
+export type TokenCallback = (token: string) => void;
+
 export interface LlmBackend {
   readonly kind: LlmBackendKind;
+  readonly activeModelLabel: string;
   initialize(onProgress: (progress: BackendProgress) => void): Promise<void>;
-  generate(messages: ChatMessage[]): Promise<string>;
+  generate(messages: ChatMessage[], onToken: TokenCallback): Promise<string>;
   dispose(): Promise<void>;
 }
 

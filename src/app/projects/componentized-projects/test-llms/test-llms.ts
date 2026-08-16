@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LlmService } from './services/llm.service';
+import { LlmMode } from './services/llm-backend';
 import { ChatMessage } from './types';
 
 @Component({
@@ -16,11 +17,22 @@ export class TestLlms implements OnInit, OnDestroy {
   isGenerating = false;
   webGpuSupported: boolean | null = null;
   wasmSupported = typeof WebAssembly !== 'undefined';
+  mode: LlmMode;
 
-  constructor(public llm: LlmService) {}
+  constructor(public llm: LlmService) {
+    this.mode = this.llm.defaultMode;
+  }
+
+  get isOnline(): boolean {
+    return this.mode === 'online';
+  }
+
+  get actionLabel(): string {
+    return this.isOnline ? 'Conectar' : 'Baixar e Ativar IA';
+  }
 
   get canRun(): boolean {
-    return this.webGpuSupported === true || this.wasmSupported;
+    return this.isOnline ? true : this.webGpuSupported === true || this.wasmSupported;
   }
 
   get wasmHint(): string | null {
@@ -40,7 +52,13 @@ export class TestLlms implements OnInit, OnDestroy {
     this.llm.dispose();
   }
 
-  async downloadModel(): Promise<void> {
+  async setMode(mode: LlmMode): Promise<void> {
+    await this.llm.setMode(mode);
+    this.mode = mode;
+    this.clearChat();
+  }
+
+  async activate(): Promise<void> {
     try {
       await this.llm.initialize();
     } catch {
@@ -58,14 +76,18 @@ export class TestLlms implements OnInit, OnDestroy {
     this.userInput = '';
     this.isGenerating = true;
 
+    const history = [...this.messages];
+    const assistantMessage: ChatMessage = { role: 'assistant', content: '' };
+    this.messages.push(assistantMessage);
+
     try {
-      const reply = await this.llm.generate([...this.messages]);
-      this.messages.push({ role: 'assistant', content: reply });
-    } catch (err) {
-      this.messages.push({
-        role: 'assistant',
-        content: err instanceof Error ? err.message : 'Falha ao gerar resposta. Tente novamente.',
+      const reply = await this.llm.generate(history, (token) => {
+        assistantMessage.content += token;
       });
+      assistantMessage.content = reply;
+    } catch (err) {
+      assistantMessage.content =
+        err instanceof Error ? err.message : 'Falha ao gerar resposta. Tente novamente.';
     } finally {
       this.isGenerating = false;
     }

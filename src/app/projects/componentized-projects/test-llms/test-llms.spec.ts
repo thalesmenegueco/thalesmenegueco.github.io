@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TestLlms } from './test-llms';
 import { LlmService } from './services/llm.service';
+import { LlmMode } from './services/llm-backend';
 
 describe('TestLlms', () => {
   let component: TestLlms;
@@ -11,12 +12,16 @@ describe('TestLlms', () => {
     status: string;
     progressPercent: number;
     errorMessage: string | null;
-    activeBackend: 'webgpu' | 'wasm' | null;
+    activeBackend: 'webgpu' | 'wasm' | 'cloud' | null;
     activeModel: string | null;
+    isMobile: boolean;
+    mode: LlmMode;
+    defaultMode: LlmMode;
     detectWebGpuSupport: jasmine.Spy;
     initialize: jasmine.Spy;
     generate: jasmine.Spy;
     dispose: jasmine.Spy;
+    setMode: jasmine.Spy;
   };
 
   beforeEach(async () => {
@@ -27,10 +32,14 @@ describe('TestLlms', () => {
       errorMessage: null,
       activeBackend: null,
       activeModel: null,
+      isMobile: false,
+      mode: 'local',
+      defaultMode: 'local',
       detectWebGpuSupport: jasmine.createSpy('detectWebGpuSupport').and.resolveTo(true),
       initialize: jasmine.createSpy('initialize').and.resolveTo(undefined),
       generate: jasmine.createSpy('generate').and.resolveTo('Olá!'),
       dispose: jasmine.createSpy('dispose').and.resolveTo(undefined),
+      setMode: jasmine.createSpy('setMode').and.resolveTo(undefined),
     };
 
     await TestBed.configureTestingModule({
@@ -103,6 +112,53 @@ describe('TestLlms', () => {
     expect(incompatibleFixture.nativeElement.querySelector('.llm-info-note')).toBeNull();
   });
 
+  it('should enable the connect button in online mode even without WebGPU/WASM', async () => {
+    llmMock.defaultMode = 'online';
+    llmMock.isReady = false;
+
+    const onlineFixture = TestBed.createComponent(TestLlms);
+    onlineFixture.detectChanges();
+    await onlineFixture.whenStable();
+    onlineFixture.detectChanges();
+
+    const onlineComponent = onlineFixture.componentInstance;
+
+    expect(onlineComponent.isOnline).toBeTrue();
+    expect(onlineComponent.canRun).toBeTrue();
+
+    const button = onlineFixture.nativeElement.querySelector(
+      '.download-button'
+    ) as HTMLButtonElement;
+    expect(button.disabled).toBeFalse();
+    expect(button.textContent).toContain('Conectar');
+  });
+
+  it('should show the online privacy warning in online mode', async () => {
+    llmMock.defaultMode = 'online';
+    llmMock.isReady = false;
+
+    const onlineFixture = TestBed.createComponent(TestLlms);
+    onlineFixture.detectChanges();
+    await onlineFixture.whenStable();
+    onlineFixture.detectChanges();
+
+    expect(onlineFixture.nativeElement.textContent).toContain('Cloudflare');
+    expect(
+      onlineFixture.nativeElement.querySelector('.mode-button--active')?.textContent
+    ).toContain('Online');
+    expect(onlineFixture.nativeElement.querySelector('.llm-info-note')).toBeTruthy();
+  });
+
+  it('should call setMode when a mode button is clicked', async () => {
+    const buttons = fixture.nativeElement.querySelectorAll('.mode-button');
+    const onlineButton = buttons[1] as HTMLButtonElement;
+
+    onlineButton.click();
+    await fixture.whenStable();
+
+    expect(llmMock.setMode).toHaveBeenCalledWith('online');
+  });
+
   it('should show the WASM model hint when the active backend is wasm', async () => {
     llmMock.activeBackend = 'wasm';
     llmMock.activeModel = 'onnx-community/SmolLM2-135M-Instruct';
@@ -121,9 +177,30 @@ describe('TestLlms', () => {
       { role: 'user', content: 'Olá' },
       { role: 'assistant', content: 'Olá!' },
     ]);
-    expect(llmMock.generate).toHaveBeenCalledWith([{ role: 'user', content: 'Olá' }]);
+    expect(llmMock.generate).toHaveBeenCalledWith(
+      [{ role: 'user', content: 'Olá' }],
+      jasmine.any(Function)
+    );
     expect(component.isGenerating).toBeFalse();
     expect(component.userInput).toBe('');
+  });
+
+  it('should append streamed tokens to the assistant placeholder', async () => {
+    llmMock.generate.and.callFake(
+      async (_messages: unknown, onToken: (token: string) => void) => {
+        onToken('Ol');
+        onToken('á!');
+        return 'Olá!';
+      }
+    );
+    component.userInput = 'Olá';
+
+    await component.send();
+
+    expect(component.messages).toEqual([
+      { role: 'user', content: 'Olá' },
+      { role: 'assistant', content: 'Olá!' },
+    ]);
   });
 
   it('should not send an empty message', async () => {

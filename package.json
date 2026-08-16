@@ -37,6 +37,7 @@
     "@angular/build": "^20.1.0",
     "@angular/cli": "^20.1.0",
     "@angular/compiler-cli": "^20.1.0",
+    "@cloudflare/workers-types": "^5.20260816.1",
     "@ljharb/tsconfig": "^0.3.2",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.8.0",
@@ -45,10 +46,25 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "wrangler": "^4.123.0"
   },
   "allowScripts": {
     "msgpackr-extract@3.0.3": true,
     "tesseract.js@6.0.1": true
-  }
+  },
+  "description": "A website where I share my current and future learning projects. Website available [here](https://thalesmenegueco.github.io).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thalesmenegueco/thalesmenegueco.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/thalesmenegueco/thalesmenegueco.github.io/issues"
+  },
+  "homepage": "https://github.com/thalesmenegueco/thalesmenegueco.github.io#readme"
 }

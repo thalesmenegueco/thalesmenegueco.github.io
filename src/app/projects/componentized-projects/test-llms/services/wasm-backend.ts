@@ -1,6 +1,7 @@
 import { Injectable, Inject, InjectionToken } from '@angular/core';
 import { ChatMessage } from '../types';
 import { BackendProgress, LlmBackend, LlmBackendKind, SYSTEM_PROMPT } from './llm-backend';
+import { detectDevice } from './device';
 
 export const WASM_MODEL_STANDARD = 'onnx-community/SmolLM2-360M-Instruct-ONNX';
 export const WASM_MODEL_SMALL = 'onnx-community/SmolLM2-135M-Instruct-ONNX';
@@ -22,29 +23,8 @@ export const WASM_MODEL_DETECTOR = new InjectionToken<WasmModelDetector>('WASM_M
 });
 
 function detectWasmModel(): string {
-  return isLowCapacityDevice() ? WASM_MODEL_SMALL : WASM_MODEL_STANDARD;
-}
-
-function isLowCapacityDevice(): boolean {
-  if (typeof navigator === 'undefined') {
-    return false;
-  }
-
-  const userAgent = navigator.userAgent ?? '';
-  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent);
-
-  const maxTouchPoints =
-    typeof navigator.maxTouchPoints === 'number' ? navigator.maxTouchPoints : 0;
-  const isTouchTablet =
-    maxTouchPoints > 0 && typeof screen !== 'undefined' && screen.width < 1024;
-
-  const platform = (navigator as { platform?: string }).platform ?? '';
-  const isIpadInDesktopMode = /MacIntel/i.test(platform) && maxTouchPoints > 1;
-
-  const deviceMemory = (navigator as { deviceMemory?: number }).deviceMemory;
-  const isLowMemory = typeof deviceMemory === 'number' && deviceMemory <= 4;
-
-  return isMobile || isTouchTablet || isIpadInDesktopMode || isLowMemory;
+  const device = detectDevice();
+  return device.isMobile || device.isLowMemory ? WASM_MODEL_SMALL : WASM_MODEL_STANDARD;
 }
 
 type WasmRequest =
@@ -63,6 +43,10 @@ export class WasmBackend implements LlmBackend {
   readonly kind: LlmBackendKind = 'wasm';
 
   selectedModel: string | null = null;
+
+  get activeModelLabel(): string {
+    return this.selectedModel ?? '';
+  }
 
   private worker: Worker | null = null;
   private ready = false;
@@ -97,7 +81,7 @@ export class WasmBackend implements LlmBackend {
     this.ready = true;
   }
 
-  async generate(messages: ChatMessage[]): Promise<string> {
+  async generate(messages: ChatMessage[], onToken: (token: string) => void): Promise<string> {
     this.assertReady();
 
     const conversation: ChatMessage[] = [{ role: 'system', content: SYSTEM_PROMPT }, ...messages];
@@ -107,6 +91,7 @@ export class WasmBackend implements LlmBackend {
       throw new Error('Resposta inesperada do worker WASM.');
     }
 
+    onToken(response.text);
     return response.text;
   }
 

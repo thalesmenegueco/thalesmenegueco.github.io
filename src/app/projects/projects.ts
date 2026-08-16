@@ -26,7 +26,7 @@ export class ProjectsComponent {
     },
     {
       name: "LLM Local",
-      description: 'Baixe e rode um LLM (Qwen 0.5B) direto no seu navegador',
+      description: 'Rode um LLM no navegador (local/privado) ou online via Cloudflare',
       image: 'https://www.svgrepo.com/show/489246/code-mobile.svg',
       link: './tools/test-llms'
     },

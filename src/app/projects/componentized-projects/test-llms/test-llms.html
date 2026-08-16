@@ -1,40 +1,73 @@
 <div class="llm-page">
   <h1>LLM Local</h1>
   <p class="llm-subtitle">
-    Baixe e rode um LLM direto no seu navegador, sem servidor.
+    Rode um LLM local no seu navegador ou use a nuvem (Cloudflare) no celular.
   </p>
 
-  @if (webGpuSupported === false && wasmSupported) {
+  @if (!isOnline && webGpuSupported === false && wasmSupported) {
     <div class="llm-info-note">
       WebGPU não detectado — o modelo rodará via WebAssembly (CPU), mais lento,
       mas funciona.
     </div>
   }
 
-  @if (webGpuSupported === false && !wasmSupported) {
+  @if (!isOnline && webGpuSupported === false && !wasmSupported) {
     <div class="webgpu-warning">
       Seu navegador não suporta WebGPU nem WebAssembly. Use a versão mais
-      recente do Chrome, Edge ou Firefox para rodar a IA local.
+      recente do Chrome, Edge ou Firefox para rodar a IA local — ou ative o modo Online.
     </div>
   }
 
   <div class="llm-card">
+    <div class="mode-toggle">
+      <button
+        type="button"
+        class="mode-button"
+        [class.mode-button--active]="!isOnline"
+        (click)="setMode('local')"
+      >
+        Local (privado)
+      </button>
+      <button
+        type="button"
+        class="mode-button"
+        [class.mode-button--active]="isOnline"
+        (click)="setMode('online')"
+      >
+        Online (nuvem)
+      </button>
+    </div>
+
+    @if (isOnline) {
+      <div class="llm-info-note">
+        Modo online: suas mensagens são enviadas à Cloudflare para processamento e
+        não ficam apenas no seu dispositivo.
+      </div>
+    }
+
     @if (!llm.isReady) {
       <div class="llm-setup">
-        <p class="llm-hint">
-          O modelo tem cerca de 180–500 MB (depende do dispositivo) e fica salvo
-          no seu navegador — só é baixado na primeira vez.
-        </p>
+        @if (isOnline) {
+          <p class="llm-hint">
+            Conecte-se ao serviço online (Cloudflare Workers AI) para conversar. Suas
+            mensagens saem do dispositivo durante o uso.
+          </p>
+        } @else {
+          <p class="llm-hint">
+            O modelo tem cerca de 180–500 MB (depende do dispositivo) e fica salvo
+            no seu navegador — só é baixado na primeira vez.
+          </p>
+        }
 
         <button
           class="download-button"
           [disabled]="!canRun"
-          (click)="downloadModel()"
+          (click)="activate()"
         >
-          Baixar e Ativar IA
+          {{ actionLabel }}
         </button>
 
-        @if (llm.status || llm.progressPercent > 0) {
+        @if (!isOnline && (llm.status || llm.progressPercent > 0)) {
           <div
             class="progress-block"
             role="progressbar"
@@ -45,6 +78,10 @@
               <div class="progress-fill" [style.width.%]="llm.progressPercent"></div>
             </div>
           </div>
+        }
+
+        @if (isOnline && llm.status) {
+          <div class="progress-label">{{ llm.status }}</div>
         }
 
         @if (llm.errorMessage) {
