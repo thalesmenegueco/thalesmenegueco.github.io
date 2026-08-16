@@ -1,1 +1,0 @@
-var p=(o,t)=>{let r=Number(o)||0,e=Number(t)||0;return r<0||e<0?0:r*e},d=(o=0,t=0,r=0,e=0,u=0,c=0)=>{let s=Number(o)||0,n=Number(t)||0,a=Number(r)||0,m=Number(e)||0,b=Number(u)||0,N=Number(c)||0;return(s+n)*(1+a)+m+b+N},i=(o,t)=>{let r=Number(o)||0,e=Number(t)||0;return r<=0||e<=0?0:r*e};export{p as a,d as b,i as c};
