@@ -1,0 +1,22 @@
+<section class="lesson-list">
+  <h3 class="lesson-list-title">🎓 Mini-cursos</h3>
+  <p class="lesson-list-hint">
+    Aprenda fazendo: cada aula guia você por uma análise com um dataset de exemplo.
+  </p>
+  <div class="lesson-grid">
+    @for (lesson of lessons; track lesson.id) {
+      <article class="lesson-card">
+        <div class="lesson-card-header">
+          <h4 class="lesson-card-title">{{ lesson.title }}</h4>
+          <span class="lesson-badge">{{ difficultyLabel(lesson.difficulty) }}</span>
+        </div>
+        <p class="lesson-desc">{{ lesson.description }}</p>
+        <div class="lesson-meta">
+          <span>⏱ {{ lesson.estimatedTime }}</span>
+          <span>🎯 {{ lesson.objectives.length }} objetivos</span>
+        </div>
+        <button class="btn btn--primary" (click)="service.startLesson(lesson.id)">Começar</button>
+      </article>
+    }
+  </div>
+</section>

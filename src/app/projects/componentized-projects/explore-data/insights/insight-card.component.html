@@ -1,0 +1,18 @@
+<div
+  class="insight-card"
+  [class.severity-critical]="insight.severity === 'critical'"
+  [class.severity-warning]="insight.severity === 'warning'"
+  [class.severity-info]="insight.severity === 'info'"
+>
+  <span class="insight-icon">{{ insight.icon }}</span>
+  <div class="insight-body">
+    <div class="insight-header">
+      <strong class="insight-title">{{ insight.title }}</strong>
+      <span class="insight-badge">{{ severityLabel(insight.severity) }}</span>
+    </div>
+    <p class="insight-description">{{ insight.description }}</p>
+    @if (insight.recommendation) {
+      <p class="insight-recommendation">{{ insight.recommendation }}</p>
+    }
+  </div>
+</div>

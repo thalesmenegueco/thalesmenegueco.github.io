@@ -28,9 +28,15 @@
     "@angular/router": "^20.1.0",
     "@huggingface/transformers": "^3.8.1",
     "@mlc-ai/web-llm": "^0.2.84",
+    "arquero": "^8.0.3",
+    "echarts": "^6.1.0",
+    "ngx-echarts": "^20.0.2",
+    "papaparse": "^5.6.0",
     "rxjs": "~7.8.0",
+    "simple-statistics": "^7.10.2",
     "tesseract.js": "^6.0.1",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -40,6 +46,7 @@
     "@cloudflare/workers-types": "^5.20260816.1",
     "@ljharb/tsconfig": "^0.3.2",
     "@types/jasmine": "~5.1.0",
+    "@types/papaparse": "^5.5.2",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

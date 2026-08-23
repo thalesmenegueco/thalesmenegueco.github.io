@@ -1,0 +1,146 @@
+<div class="explore-data">
+  <div class="page-header">
+    <div class="welcome">
+      <h3>Análise Exploratória de Dados</h3>
+      <br>
+      <h2>🔍 Explore Dados</h2>
+    </div>
+  </div>
+
+  <p class="subtitle">
+    Envie um arquivo (CSV ou XLSX), confirme o tipo de cada coluna e descubra quais
+    gráficos fazem sentido para os seus dados — tudo processado no seu navegador.
+  </p>
+
+  @if (state.error()) {
+    <div class="error">{{ state.error() }}</div>
+  }
+
+  <app-lessons />
+
+  @if (!state.dataset()) {
+    <section class="panel">
+      <label class="dropzone" for="file-input">
+        <span class="dropzone-icon">📁</span>
+        <span class="dropzone-text">
+          {{ state.loading() ? 'Lendo arquivo…' : 'Clique para enviar um arquivo (CSV ou XLSX)' }}
+        </span>
+        <input
+          id="file-input"
+          type="file"
+          accept=".csv,.tsv,.txt,.xlsx,.xls"
+          (change)="onFileSelected($event)"
+          [disabled]="state.loading()"
+          hidden
+        />
+      </label>
+    </section>
+
+    @if (state.profiles().length > 0) {
+      <section class="panel">
+        <h3 class="panel-title">Confirme o tipo de cada coluna</h3>
+        <p class="hint">
+          A sugestão é só um ponto de partida — o tipo que você confirmar é o que a
+          ferramenta vai usar nas análises.
+        </p>
+        <div class="columns-table">
+          @for (p of state.profiles(); track p.name) {
+            <div class="column-row">
+              <div class="column-info">
+                <strong class="column-name">{{ p.name }}</strong>
+                <span class="column-meta">
+                  {{ p.nonNullCount }}/{{ p.totalCount }} valores · {{ p.distinctCount }} distintos
+                </span>
+                <span class="column-meta">ex.: {{ p.sampleValues.join(', ') || '—' }}</span>
+              </div>
+              <select class="type-select" [value]="state.typeOf(p.name)" (change)="updateType(p.name, $event)">
+                @for (ft of state.fieldTypes; track ft.value) {
+                  <option [value]="ft.value">{{ ft.label }}</option>
+                }
+              </select>
+              <span class="column-rates">
+                num {{ state.formatRate(p.numericRate) }} · data {{ state.formatRate(p.dateRate) }} ·
+                bool {{ state.formatRate(p.booleanRate) }}
+              </span>
+            </div>
+          }
+        </div>
+        <button class="btn btn--primary" (click)="state.confirmDataset()">Confirmar e continuar</button>
+      </section>
+    }
+  } @else {
+    <div class="explore-layout">
+      <section class="panel panel--fields">
+        <div class="panel-header">
+          <h3 class="panel-title">1 · Escolha os campos</h3>
+          <button class="btn btn--ghost" (click)="state.reset()">↺ Trocar arquivo</button>
+        </div>
+        @for (f of state.confirmedFields(); track f.name) {
+          <label class="field-option" [class.selected]="state.isSelected(f.name)">
+            <input
+              type="checkbox"
+              [checked]="state.isSelected(f.name)"
+              (change)="state.toggleField(f.name)"
+            />
+            <span class="field-name">{{ f.name }}</span>
+            <span class="field-type">{{ state.typeLabel(f.type) }}</span>
+          </label>
+        }
+      </section>
+
+      <section class="panel panel--suggestions">
+        <h3 class="panel-title">2 · Escolha uma análise</h3>
+        @if (state.suggestions().length === 0) {
+          <p class="hint">
+            @if (state.selectedFields().length === 0) {
+              Selecione ao menos um campo para ver sugestões.
+            } @else {
+              Nenhuma análise disponível para essa combinação de tipos.
+            }
+          </p>
+        }
+        @for (s of state.suggestions(); track s.id) {
+          <button
+            class="suggestion"
+            [class.active]="state.activeSuggestionId() === s.id"
+            (click)="state.selectSuggestion(s.id)"
+          >
+            <strong>{{ s.label }}</strong>
+            <span class="suggestion-explanation">{{ s.explanation }}</span>
+          </button>
+        }
+      </section>
+    </div>
+
+    <section class="panel panel--chart">
+      <div class="panel-header">
+        <h3 class="panel-title">3 · Gráfico</h3>
+        <div class="customize">
+          <label class="custom-field">
+            Título
+            <input [value]="state.customization().title" (input)="updateCustom('title', $event)" />
+          </label>
+          <label class="custom-field">
+            Eixo X
+            <input [value]="state.customization().xAxisLabel" (input)="updateCustom('xAxisLabel', $event)" />
+          </label>
+          <label class="custom-field">
+            Eixo Y
+            <input [value]="state.customization().yAxisLabel" (input)="updateCustom('yAxisLabel', $event)" />
+          </label>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        @if (state.chartOption()) {
+          <div echarts [options]="state.chartOption()!" [autoResize]="true" class="chart-canvas"></div>
+        } @else {
+          <p class="hint">Selecione uma análise para gerar o gráfico.</p>
+        }
+      </div>
+    </section>
+  }
+
+  @if (state.dataset()) {
+    <app-insights-panel />
+  }
+</div>

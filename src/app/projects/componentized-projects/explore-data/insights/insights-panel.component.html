@@ -1,0 +1,12 @@
+<section class="insights-panel">
+  <h3 class="insights-title">💡 Dicas do seu dataset</h3>
+  @if (insights().length === 0) {
+    <p class="insights-empty">Nenhuma dica relevante por enquanto. Continue explorando!</p>
+  } @else {
+    <div class="insights-list">
+      @for (insight of insights(); track $index) {
+        <app-insight-card [insight]="insight" />
+      }
+    </div>
+  }
+</section>

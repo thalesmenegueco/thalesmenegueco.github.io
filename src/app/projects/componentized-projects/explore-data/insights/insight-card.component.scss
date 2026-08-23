@@ -1,0 +1,70 @@
+.insight-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left-width: 4px;
+  border-radius: 10px;
+  background-color: rgba(5, 5, 5, 0.35);
+
+  &.severity-critical {
+    border-left-color: #ef476f;
+  }
+
+  &.severity-warning {
+    border-left-color: var(--color-text-accent);
+  }
+
+  &.severity-info {
+    border-left-color: #118ab2;
+  }
+}
+
+.insight-icon {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.insight-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.insight-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.insight-title {
+  color: var(--color-text);
+}
+
+.insight-badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  color: var(--color-text);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.insight-description {
+  color: var(--color-text);
+  opacity: 0.85;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.insight-recommendation {
+  color: var(--color-text);
+  opacity: 0.7;
+  font-size: 13px;
+  line-height: 1.5;
+  font-style: italic;
+}

@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.insights-panel {
+  background-color: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.insights-title {
+  margin: 0 0 14px;
+  color: var(--color-text-accent);
+}
+
+.insights-empty {
+  color: var(--color-text);
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+.insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

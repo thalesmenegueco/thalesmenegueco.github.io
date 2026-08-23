@@ -13,6 +13,12 @@ export class ProjectsComponent {
 
   interests: CardItem[] = [
     {
+      name: "Explore Dados",
+      description: 'Análise exploratória: envie um CSV/XLSX e veja quais gráficos fazem sentido',
+      image: 'https://www.svgrepo.com/show/489257/piechart.svg',
+      link: './tools/explore-data'
+    },
+    {
       name: "Projetos",
       description: 'Gerenciador de Projetos com lista de tarefas, ficam salvas no seu navegador 😉',
       image: 'https://www.svgrepo.com/show/489271/style.svg',
