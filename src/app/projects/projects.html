@@ -7,6 +7,16 @@
     </div>
   </div>
 
+  <section class="top-projects">
+    <h3 class="top-projects__title">⭐ Top Projetos</h3>
+    <div class="flex-cards">
+      @for (item of topProjects; track $index) {
+      <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''">
+      </app-card>
+      }
+    </div>
+  </section>
+
   <div class="flex-cards">
     @for (item of interests; track $index) {
     <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''">

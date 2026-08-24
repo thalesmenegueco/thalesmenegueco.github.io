@@ -11,25 +11,28 @@ import { CardItem } from '../../models/card-item';
 })
 export class ProjectsComponent {
 
-  interests: CardItem[] = [
+  topProjects: CardItem[] = [
     {
       name: "Explore Dados",
-      description: 'Análise exploratória: envie um CSV/XLSX e veja quais gráficos fazem sentido',
+      description: 'Análise exploratória: envie um CSV/XLSX e veja quais gráficos fazem sentido 📊',
       image: 'https://www.svgrepo.com/show/489257/piechart.svg',
       link: './tools/explore-data'
     },
     {
-      name: "Projetos",
+      name: "Gerencie Projetos",
       description: 'Gerenciador de Projetos com lista de tarefas, ficam salvas no seu navegador 😉',
       image: 'https://www.svgrepo.com/show/489271/style.svg',
       link: './tools/project-manager'
     },
     {
       name: "OCR & Tradução",
-      description: 'Extraia textos de imagens e traduza com o Chrome (PT/EN/FR/IT/DE)',
+      description: 'Extraia textos de imagens e traduza com o Chrome (PT/EN/FR/IT/DE) 🌐💬',
       image: 'https://www.svgrepo.com/show/489265/search-document.svg',
       link: './tools/ocr'
-    },
+    }
+  ];
+
+  interests: CardItem[] = [
     {
       name: "LLM Local",
       description: 'Rode um LLM no navegador (local/privado) ou online via Cloudflare',

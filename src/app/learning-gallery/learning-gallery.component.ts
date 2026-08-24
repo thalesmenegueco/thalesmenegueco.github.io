@@ -17,19 +17,19 @@ export class LearningGalleryComponent {
 
   interests: CardItem[] = [
   { name: "Sinalize!",
-    description: 'Plataforma para Aprender de Libras DE GRAÇA!',
+    description: 'Plataforma para Aprender de Libras DE GRAÇA! 📚',
     image: 'https://www.svgrepo.com/show/489247/global.svg',
     link: 'https://www.sinalize.org'
   },
   {
     name: "Sinal Fala",
-    description: 'Idiomas, cultura surda, tradução e neurodivergências (no tiktok)',
+    description: 'Idiomas, cultura surda, tradução e neurodivergências (no tiktok) 👋',
     image: 'https://www.svgrepo.com/show/489256/puzzle.svg',
     link: 'https://www.tiktok.com/@sinal.fala'
   },
   {
-    name: "Lab de Apps",
-    description: 'Laboratório de ferramentas (aleatórias)',
+    name: "Lab de Ferramentas",
+    description: 'Laboratório de ferramentas (aleatórias) 🧪',
     image: 'https://www.svgrepo.com/show/489243/creativity-1.svg',
     link: '/tools'
   }

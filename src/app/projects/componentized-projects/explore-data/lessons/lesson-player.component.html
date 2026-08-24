@@ -94,11 +94,11 @@
 
           <div class="actions">
             @if (validated() && feedback()?.valid) {
-              <button class="btn btn--primary" (click)="next()">
+              <button class="btn btn--primary" (click)="next()" style="margin-top: 10px;">
                 {{ isLastStep() ? 'Concluir' : 'Próxima etapa' }}
               </button>
             } @else {
-              <button class="btn btn--primary" (click)="check()">Verificar</button>
+              <button class="btn btn--primary" (click)="check()" style="margin-top: 10px;">Verificar</button>
             }
           </div>
         </div>
