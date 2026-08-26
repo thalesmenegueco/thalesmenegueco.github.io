@@ -46,6 +46,12 @@ export class ProjectsComponent {
       link: './tools/calcular-hipotenusa'
     },
     {
+      name: "Meça isto!",
+      description: 'Meça desenhos técnicos: cole uma imagem, calibre a régua e tire medidas no canvas',
+      image: 'icons/measure-it.svg',
+      link: './tools/measure-it'
+    },
+    {
       name: "Precificação",
       description: 'Cálculo para precificação de semijoias - Markup (em JS Vanilla)',
       image: 'https://www.svgrepo.com/show/489278/add-wallet.svg',

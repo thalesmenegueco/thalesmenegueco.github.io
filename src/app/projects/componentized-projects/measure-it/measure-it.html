@@ -1,0 +1,141 @@
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="brand-mark">📐</div>
+      <div>
+        <h1>Meça isto!</h1>
+        <p class="subtitle">Cole, calibre e meça desenhos técnicos no canvas.</p>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="button" (click)="undo()" title="Ctrl+Z">↩️ Desfazer</button>
+      <button class="button" (click)="resetView()">🎯 Centralizar</button>
+      <button class="button orange" (click)="clearCanvas()">🧹 Limpar canvas</button>
+    </div>
+  </header>
+
+  <section class="layout">
+    <aside class="panel">
+      <div class="panel-section">
+        <div class="section-title">🛠️ Ferramentas</div>
+
+        <div class="tool-list">
+          @for (toolOption of tools; track toolOption.id) {
+            <button
+              class="tool"
+              [class.active]="tool === toolOption.id"
+              (click)="setTool(toolOption.id)"
+            >
+              <span class="tool-emoji">{{ toolOption.emoji }}</span>
+              <span>{{ toolOption.label }}</span>
+            </button>
+          }
+        </div>
+
+        <div class="field">
+          <label for="knownDistance">Distância conhecida</label>
+          <input
+            id="knownDistance"
+            name="knownDistance"
+            type="number"
+            min="0.0001"
+            step="any"
+            [(ngModel)]="knownDistance"
+          />
+        </div>
+
+        <div class="field">
+          <label for="unit">Unidade</label>
+          <input
+            id="unit"
+            name="unit"
+            type="text"
+            maxlength="8"
+            [(ngModel)]="unit"
+          />
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-title">🔍 Visualização</div>
+
+        <div class="top-actions">
+          <button class="button" (click)="zoomOut()">➖</button>
+          <button class="button" (click)="resetView()">100%</button>
+          <button class="button" (click)="zoomIn()">➕</button>
+        </div>
+
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="showGrid"
+            (change)="onGridToggle($event)"
+          />
+          Mostrar grade
+        </label>
+
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="showGuides"
+            (change)="onGuidesToggle($event)"
+          />
+          Linhas-guia
+        </label>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-title">📌 Status</div>
+
+        <div class="status-card">
+          <strong>{{ statusTitle }}</strong>
+          {{ statusDescription }}
+        </div>
+
+        <div class="measure-output" [hidden]="!hasMeasure">
+          <span>Última medida</span>
+          <strong>{{ measureValue }}</strong>
+          <small>{{ measurePixels }}</small>
+        </div>
+      </div>
+
+      <div class="help">
+        <strong>Como usar:</strong><br />
+        1. Copie uma captura de tela ou imagem.<br />
+        2. Pressione <strong>Ctrl+V</strong> nesta página.<br />
+        3. Selecione “Calibrar régua” e marque dois pontos com distância conhecida.<br />
+        4. Use “Medir desenho” para medir qualquer trecho.
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <div class="workspace-bar">
+        <div class="workspace-info">
+          <span class="badge">{{ zoomBadge }}</span>
+          <span class="badge">{{ scaleBadge }}</span>
+          <span class="badge">{{ imageBadge }}</span>
+        </div>
+      </div>
+
+      <div class="canvas-shell" #shell>
+        <canvas
+          #canvas
+          (pointerdown)="onPointerDown($event)"
+          (pointermove)="onPointerMove($event)"
+          (pointerup)="onPointerUp()"
+          (pointercancel)="onPointerUp()"
+          (pointerleave)="onPointerUp()"
+        ></canvas>
+
+        <div class="empty-state" [hidden]="hasImages">
+          <div class="big-emoji">🖼️</div>
+          <div>
+            <strong>Cole uma imagem para começar</strong>
+            Use Ctrl+V para adicionar capturas de tela ou desenhos técnicos.
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+</div>
