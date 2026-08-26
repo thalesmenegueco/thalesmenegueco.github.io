@@ -1,0 +1,18 @@
+<div class="widget">
+  <div class="widget-header">
+    <div class="widget-title">DiscontinuityExplorer</div>
+    <div class="widget-note">Compare comportamentos perto de x = 2</div>
+  </div>
+
+  <app-plot-canvas [drawFn]="drawFn" />
+
+  <div class="control-row">
+    <div class="control-group">
+      <label><span>Tipo de comportamento</span></label>
+      <select [value]="mode()" (change)="onMode($event)">
+        <option value="jump">Salto</option>
+        <option value="asymptote">Assíntota vertical</option>
+      </select>
+    </div>
+  </div>
+</div>

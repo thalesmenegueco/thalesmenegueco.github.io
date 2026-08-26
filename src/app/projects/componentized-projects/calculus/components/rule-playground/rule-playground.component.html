@@ -1,0 +1,22 @@
+<div class="widget">
+  <div class="widget-header">
+    <div class="widget-title">ParameterSliderPlayground</div>
+    <div class="widget-note">Observe a estrutura antes de escolher a regra</div>
+  </div>
+
+  <div class="control-row">
+    <div class="control-group">
+      <label><span>Estrutura do problema</span></label>
+      <select [value]="rule()" (change)="onRule($event)">
+        <option value="power">Potência: x³</option>
+        <option value="product">Produto: p(t)q(t)</option>
+        <option value="chain">Cadeia: V(r(t))</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="explanation">{{ content().text }}</div>
+  <div class="formula">
+    <app-katex [latex]="content().latex" />
+  </div>
+</div>

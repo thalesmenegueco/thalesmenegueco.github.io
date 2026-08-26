@@ -1,0 +1,442 @@
+@use './shared' as *;
+
+:host {
+  display: block;
+  min-height: 100vh;
+
+  /* Dark, matte, teal-tinted palette — scoped to the calculus app. */
+  --color-bg: #0a0f10;
+  --color-surface: #182023;
+  --color-surface-hover: #223033;
+  --color-text: #e7ece9;
+  --color-text-muted: #97a6a1;
+  --color-border: #33433f;
+  --color-accent-warm: #ffa300;
+  --color-accent-warm-soft: #e0a94f;
+  --color-study-sage: #8fae9b;
+  --color-study-teal: #4fb3a6;
+  --color-study-sky: #7fb4d4;
+  --color-accent-secondary: #b06aa3;
+  --color-danger: #d87878;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+  --radius: 16px;
+
+  background:
+    radial-gradient(circle at 15% 0%, rgba(79, 179, 166, 0.08), transparent 35%),
+    var(--color-bg);
+  color: var(--color-text);
+}
+
+// Neutralize the site's global heading hover colors within this feature.
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 310px 1fr;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 28px 20px;
+  border-right: 1px solid var(--color-border);
+  background: rgba(10, 15, 16, 0.88);
+  backdrop-filter: blur(14px);
+}
+
+.brand {
+  margin-bottom: 30px;
+}
+
+.brand-kicker {
+  color: var(--color-accent-warm);
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.brand h1 {
+  margin: 7px 0 6px;
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+
+.brand p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.progress-summary {
+  margin-bottom: 28px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.progress-summary strong {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 0.86rem;
+}
+
+.progress-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #2b3736;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-study-teal), var(--color-study-sky));
+  transition: width 300ms ease;
+}
+
+.progress-label {
+  display: block;
+  margin-top: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.unit-title {
+  margin: 24px 9px 9px;
+  color: var(--color-accent-warm-soft);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lesson-list {
+  display: grid;
+  gap: 6px;
+}
+
+.lesson-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 10px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  color: var(--color-text-muted);
+  background: transparent;
+  text-align: left;
+  transition: 180ms ease;
+}
+
+.lesson-button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.lesson-button.active {
+  border-color: rgba(79, 179, 166, 0.5);
+  background: rgba(79, 179, 166, 0.1);
+  color: var(--color-text);
+}
+
+.lesson-button.completed .lesson-number {
+  color: var(--color-accent-warm);
+}
+
+.lesson-number {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-study-sage);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.lesson-button-title {
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.main {
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 40px clamp(20px, 5vw, 68px) 80px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--color-study-teal);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.topbar h2 {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2.25rem);
+  line-height: 1.12;
+}
+
+.reset-button {
+  padding: 9px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-muted);
+  background: transparent;
+}
+
+.reset-button:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.scenario-card {
+  margin-bottom: 24px;
+  padding: clamp(20px, 4vw, 31px);
+  border: 1px solid rgba(255, 163, 0, 0.28);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(255, 163, 0, 0.08), transparent 55%),
+    var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.scenario-label {
+  margin-bottom: 10px;
+  color: var(--color-accent-warm);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.scenario-card p {
+  max-width: 850px;
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.02rem, 2vw, 1.22rem);
+  line-height: 1.65;
+}
+
+.lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 17px;
+}
+
+.tag {
+  padding: 5px 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.objective-list {
+  margin: 21px 0 0;
+  padding-left: 19px;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  list-style: disc;
+}
+
+.lesson-card {
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: rgba(24, 32, 35, 0.75);
+  box-shadow: var(--shadow);
+}
+
+.step-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.step-counter {
+  color: var(--color-study-teal);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.step-heading h3 {
+  margin: 5px 0 0;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+}
+
+.instruction {
+  margin: 0 0 22px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.feedback {
+  display: none;
+  margin-top: 18px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.feedback.show {
+  display: block;
+}
+
+.feedback.success {
+  border: 1px solid rgba(143, 174, 155, 0.45);
+  color: var(--color-study-sage);
+  background: rgba(143, 174, 155, 0.08);
+}
+
+.feedback.error {
+  border: 1px solid rgba(216, 120, 120, 0.45);
+  color: var(--color-danger);
+  background: rgba(216, 120, 120, 0.08);
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.primary-button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  color: #16100a;
+  background: var(--color-accent-warm);
+  font-weight: 900;
+}
+
+.primary-button:hover {
+  background: #ffb329;
+}
+
+.secondary-button {
+  padding: 12px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text);
+  background: transparent;
+}
+
+.secondary-button:hover {
+  background: var(--color-surface-hover);
+}
+
+.secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.summary-card {
+  margin-top: 24px;
+  padding: 25px;
+  border: 1px solid rgba(176, 106, 163, 0.42);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(176, 106, 163, 0.1), transparent 60%),
+    var(--color-surface);
+}
+
+.summary-card h3 {
+  margin-top: 0;
+}
+
+.summary-content {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.summary-key {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 10px;
+  color: var(--color-text);
+  background: rgba(176, 106, 163, 0.1);
+  line-height: 1.6;
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .lesson-list {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .main {
+    padding-top: 28px;
+  }
+}
+
+@media (max-width: 540px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footer-actions {
+    flex-direction: column-reverse;
+  }
+
+  .footer-actions button {
+    width: 100%;
+  }
+}

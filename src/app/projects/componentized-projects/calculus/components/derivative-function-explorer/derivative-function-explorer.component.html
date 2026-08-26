@@ -1,0 +1,40 @@
+<div class="widget">
+  <div class="widget-header">
+    <div class="widget-title">DerivativeFunctionExplorer</div>
+    <div class="widget-note">s(t) = t² e s'(t) = 2t</div>
+  </div>
+
+  <app-plot-canvas [drawFn]="drawFn" />
+
+  <div class="control-row">
+    <div class="control-group">
+      <label>
+        <span>Instante x</span>
+        <span class="value">{{ formatNumber(x(), 2) }}</span>
+      </label>
+      <input
+        type="range"
+        min="0"
+        max="4"
+        step="0.05"
+        [value]="x()"
+        (input)="onX($event)"
+      />
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric">
+      <span class="metric-label">posição s(x)</span>
+      <span class="metric-value">{{ formatNumber(metrics().position) }}</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">velocidade s'(x)</span>
+      <span class="metric-value">{{ formatNumber(metrics().velocity) }}</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">sinal da derivada</span>
+      <span class="metric-value">{{ metrics().sign }}</span>
+    </div>
+  </div>
+</div>

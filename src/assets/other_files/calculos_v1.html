@@ -1,0 +1,2641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculus I — Entender antes de memorizar</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+  />
+
+  <style>
+    :root {
+      --color-bg: #0a0f10;
+      --color-surface: #182023;
+      --color-surface-hover: #223033;
+      --color-text: #e7ece9;
+      --color-text-muted: #97a6a1;
+      --color-border: #33433f;
+      --color-accent-warm: #ffa300;
+      --color-accent-warm-soft: #e0a94f;
+      --color-study-sage: #8fae9b;
+      --color-study-teal: #4fb3a6;
+      --color-study-sky: #7fb4d4;
+      --color-accent-secondary: #b06aa3;
+      --color-danger: #d87878;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(79, 179, 166, 0.08), transparent 35%),
+        var(--color-bg);
+      color: var(--color-text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 310px 1fr;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 28px 20px;
+      border-right: 1px solid var(--color-border);
+      background: rgba(10, 15, 16, 0.88);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      margin-bottom: 30px;
+    }
+
+    .brand-kicker {
+      color: var(--color-accent-warm);
+      font-size: 0.73rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .brand h1 {
+      margin: 7px 0 6px;
+      font-size: 1.45rem;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .progress-summary {
+      margin-bottom: 28px;
+      padding: 16px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-surface);
+    }
+
+    .progress-summary strong {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 0.86rem;
+    }
+
+    .progress-track {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: #2b3736;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(
+        90deg,
+        var(--color-study-teal),
+        var(--color-study-sky)
+      );
+      transition: width 300ms ease;
+    }
+
+    .progress-label {
+      display: block;
+      margin-top: 8px;
+      color: var(--color-text-muted);
+      font-size: 0.78rem;
+    }
+
+    .unit-title {
+      margin: 24px 9px 9px;
+      color: var(--color-accent-warm-soft);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .lesson-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .lesson-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 10px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      color: var(--color-text-muted);
+      background: transparent;
+      text-align: left;
+      transition: 180ms ease;
+    }
+
+    .lesson-button:hover {
+      background: var(--color-surface-hover);
+      color: var(--color-text);
+    }
+
+    .lesson-button.active {
+      border-color: rgba(79, 179, 166, 0.5);
+      background: rgba(79, 179, 166, 0.1);
+      color: var(--color-text);
+    }
+
+    .lesson-button.completed .lesson-number {
+      color: var(--color-accent-warm);
+    }
+
+    .lesson-number {
+      width: 27px;
+      height: 27px;
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      color: var(--color-study-sage);
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .lesson-button-title {
+      font-size: 0.82rem;
+      line-height: 1.25;
+    }
+
+    .main {
+      width: 100%;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 40px clamp(20px, 5vw, 68px) 80px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--color-study-teal);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: clamp(1.4rem, 3vw, 2.25rem);
+      line-height: 1.12;
+    }
+
+    .reset-button {
+      padding: 9px 13px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      color: var(--color-text-muted);
+      background: transparent;
+    }
+
+    .reset-button:hover {
+      color: var(--color-text);
+      background: var(--color-surface);
+    }
+
+    .scenario-card {
+      margin-bottom: 24px;
+      padding: clamp(20px, 4vw, 31px);
+      border: 1px solid rgba(255, 163, 0, 0.28);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255, 163, 0, 0.08), transparent 55%),
+        var(--color-surface);
+      box-shadow: var(--shadow);
+    }
+
+    .scenario-label {
+      margin-bottom: 10px;
+      color: var(--color-accent-warm);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .scenario-card p {
+      max-width: 850px;
+      margin: 0;
+      color: var(--color-text);
+      font-size: clamp(1.02rem, 2vw, 1.22rem);
+      line-height: 1.65;
+    }
+
+    .lesson-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 17px;
+    }
+
+    .tag {
+      padding: 5px 9px;
+      border: 1px solid var(--color-border);
+      border-radius: 99px;
+      color: var(--color-text-muted);
+      font-size: 0.72rem;
+    }
+
+    .objective-list {
+      margin: 21px 0 0;
+      padding-left: 19px;
+      color: var(--color-text-muted);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+
+    .lesson-card {
+      padding: clamp(20px, 4vw, 32px);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: rgba(24, 32, 35, 0.75);
+      box-shadow: var(--shadow);
+    }
+
+    .step-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 12px;
+    }
+
+    .step-counter {
+      color: var(--color-study-teal);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .step-heading h3 {
+      margin: 5px 0 0;
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    }
+
+    .instruction {
+      margin: 0 0 22px;
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+
+    .widget {
+      min-height: 260px;
+      margin: 19px 0;
+      padding: 17px;
+      border: 1px solid var(--color-border);
+      border-radius: 13px;
+      background: #101719;
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 13px;
+    }
+
+    .widget-title {
+      color: var(--color-study-sage);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .widget-note {
+      color: var(--color-text-muted);
+      font-size: 0.77rem;
+    }
+
+    .plot-wrap {
+      position: relative;
+      width: 100%;
+      height: 315px;
+      overflow: hidden;
+      border: 1px solid #263432;
+      border-radius: 10px;
+      background: #0c1213;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .control-group {
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 7px;
+      color: var(--color-text-muted);
+      font-size: 0.78rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--color-study-teal);
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      outline: none;
+      color: var(--color-text);
+      background: #101719;
+    }
+
+    .value {
+      color: var(--color-accent-warm);
+      font-weight: 800;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .metric {
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      background: rgba(34, 48, 51, 0.5);
+    }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--color-text-muted);
+      font-size: 0.72rem;
+    }
+
+    .metric-value {
+      color: var(--color-text);
+      font-size: 1.12rem;
+      font-weight: 800;
+    }
+
+    .table-like {
+      overflow-x: auto;
+      margin-top: 15px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+    }
+
+    .approach-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    .approach-table th,
+    .approach-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(51, 67, 63, 0.6);
+      text-align: right;
+    }
+
+    .approach-table th:first-child,
+    .approach-table td:first-child {
+      text-align: left;
+    }
+
+    .approach-table th {
+      color: var(--color-study-sage);
+      font-weight: 800;
+    }
+
+    .formula-options {
+      display: grid;
+      gap: 10px;
+      margin-top: 17px;
+    }
+
+    .formula-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      color: var(--color-text);
+      background: #101719;
+      text-align: left;
+    }
+
+    .formula-option:hover {
+      border-color: var(--color-study-teal);
+      background: var(--color-surface-hover);
+    }
+
+    .formula-option.selected {
+      border-color: var(--color-accent-warm);
+      background: rgba(255, 163, 0, 0.08);
+    }
+
+    .formula-option input {
+      accent-color: var(--color-accent-warm);
+    }
+
+    .explanation {
+      margin: 22px 0 0;
+      padding: 16px;
+      border-left: 3px solid var(--color-study-teal);
+      color: var(--color-text-muted);
+      background: rgba(79, 179, 166, 0.06);
+      line-height: 1.7;
+    }
+
+    .feedback {
+      display: none;
+      margin-top: 18px;
+      padding: 13px 15px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.success {
+      border: 1px solid rgba(143, 174, 155, 0.45);
+      color: var(--color-study-sage);
+      background: rgba(143, 174, 155, 0.08);
+    }
+
+    .feedback.error {
+      border: 1px solid rgba(216, 120, 120, 0.45);
+      color: var(--color-danger);
+      background: rgba(216, 120, 120, 0.08);
+    }
+
+    .footer-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .primary-button {
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 10px;
+      color: #16100a;
+      background: var(--color-accent-warm);
+      font-weight: 900;
+    }
+
+    .primary-button:hover {
+      background: #ffb329;
+    }
+
+    .secondary-button {
+      padding: 12px 18px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      color: var(--color-text);
+      background: transparent;
+    }
+
+    .secondary-button:hover {
+      background: var(--color-surface-hover);
+    }
+
+    .summary-card {
+      margin-top: 24px;
+      padding: 25px;
+      border: 1px solid rgba(176, 106, 163, 0.42);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(176, 106, 163, 0.1), transparent 60%),
+        var(--color-surface);
+    }
+
+    .summary-card h3 {
+      margin-top: 0;
+    }
+
+    .summary-card p {
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+
+    .summary-key {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 10px;
+      color: var(--color-text);
+      background: rgba(176, 106, 163, 0.1);
+      line-height: 1.6;
+    }
+
+    .empty-state {
+      padding: 50px 20px;
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .app-shell {
+        display: block;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .lesson-list {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .main {
+        padding-top: 28px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .plot-wrap {
+        height: 260px;
+      }
+
+      .footer-actions {
+        flex-direction: column-reverse;
+      }
+
+      .footer-actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-kicker">Calculus I</div>
+        <h1>Entender antes de memorizar</h1>
+        <p>
+          Explore o problema, observe as variáveis mudarem e só então nomeie
+          a ideia matemática.
+        </p>
+      </div>
+
+      <div class="progress-summary">
+        <strong>Seu progresso</strong>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="progress-label" id="progressLabel">
+          0 de 7 lições concluídas
+        </span>
+      </div>
+
+      <nav id="lessonNavigation"></nav>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <p class="eyebrow" id="unitLabel">Unidade 1</p>
+          <h2 id="lessonTitle">Carregando lição...</h2>
+        </div>
+
+        <button class="reset-button" id="resetProgressButton">
+          Reiniciar progresso
+        </button>
+      </div>
+
+      <section class="scenario-card">
+        <div class="scenario-label">O problema primeiro</div>
+        <p id="scenarioText"></p>
+        <div class="lesson-meta" id="lessonMeta"></div>
+        <ul class="objective-list" id="objectiveList"></ul>
+      </section>
+
+      <section class="lesson-card" id="lessonContent"></section>
+
+      <section class="summary-card" id="summaryCard" hidden>
+        <h3></h3>
+        <p class="summary-content"></p>
+        <div class="summary-key"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@14.0.1/lib/browser/math.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <script>
+    /*
+     * ============================================================
+     * Modelo de dados
+     * ============================================================
+     *
+     * Cada lição começa com um cenário concreto.
+     * Os passos referenciam as variáveis desse cenário antes de
+     * apresentar a formulação geral.
+     */
+
+    const lessons = [
+      {
+        id: "what-is-a-limit",
+        unit: "Unidade 1 — Limites e continuidade",
+        title: "O que é um limite?",
+        description:
+          "Estime a velocidade de um carro quando o velocímetro falha exatamente no ponto de interesse.",
+        estimatedTime: "8 min",
+        scenario:
+          "Você está analisando os dados de um carro entre os marcos 2 e 3 de uma estrada. O velocímetro falhou exatamente no marco 2, mas os dados de distância ao redor desse ponto ainda estão disponíveis. Como estimar o comportamento do carro quando ele se aproxima do marco 2?",
+        objectives: [
+          "Interpretar aproximação como um padrão de valores.",
+          "Comparar aproximações pela esquerda e pela direita.",
+          "Relacionar esse padrão à notação de limite."
+        ],
+        steps: [
+          {
+            title: "Observe a aproximação",
+            instruction:
+              "Veja os valores da posição do carro conforme o tempo se aproxima de 2 segundos. Você não precisa saber o valor exatamente em t = 2 para observar para onde os valores estão indo.",
+            widget: "limitExplorer",
+            validation: {
+              type: "limitTableCompletion",
+              target: 4
+            },
+            explanation:
+              "O limite descreve o valor que uma função se aproxima quando a variável se aproxima de determinado ponto. O foco não é necessariamente o valor da função no ponto, mas o comportamento ao redor dele."
+          },
+          {
+            title: "Compare os dois lados",
+            instruction:
+              "Ajuste a distância da observação. Quando usamos valores menores que 2 e valores maiores que 2, os dois lados parecem se aproximar do mesmo número?",
+            widget: "limitExplorer",
+            validation: {
+              type: "limitTableCompletion",
+              target: 0.2
+            },
+            explanation:
+              "Quando as aproximações pela esquerda e pela direita chegam ao mesmo valor, temos evidência de que o limite existe. Esse raciocínio será útil mesmo quando a função não estiver definida exatamente no ponto."
+          },
+          {
+            title: "Dê nome ao padrão",
+            instruction:
+              "Agora conecte o que você observou ao símbolo matemático que representa a aproximação da posição do carro.",
+            widget: "formulaMatch",
+            options: [
+              {
+                id: "a",
+                latex: String.raw`\lim_{t \to 2} s(t) = 4`,
+                feedback:
+                  "Correto. A posição s(t) se aproxima de 4 quando t se aproxima de 2."
+              },
+              {
+                id: "b",
+                latex: String.raw`s(2) = \lim_{t \to 4} s(t)`,
+                feedback:
+                  "Observe o ponto do tempo que está se aproximando: estamos indo em direção a t = 2."
+              }
+            ],
+            validation: {
+              type: "formulaMatch",
+              correctAnswer: "a"
+            },
+            explanation:
+              "A notação geral é $$\lim_{x \to a} f(x) = L$$. Ela significa que f(x) se aproxima de L quando x se aproxima de a."
+          }
+        ],
+        summary: {
+          title: "O que você aprendeu",
+          content:
+            "Um limite é uma forma de descrever o comportamento de uma função perto de um ponto. Ele transforma uma pergunta sobre aproximação em uma ideia matemática precisa.",
+          keyTakeaway:
+            "Antes de calcular um limite, pergunte: para qual valor a situação está caminhando?"
+        }
+      },
+
+      {
+        id: "limits-do-not-exist",
+        unit: "Unidade 1 — Limites e continuidade",
+        title: "Quando os limites não existem",
+        description:
+          "Analise um sinal que apresenta uma falha, um salto ou um crescimento sem limite.",
+        estimatedTime: "8 min",
+        scenario:
+          "Uma estação de monitoramento recebe um sinal cuja leitura apresenta uma falha perto de t = 2. Dependendo do tipo de falha, os valores podem chegar a números diferentes pelos dois lados, ou crescer indefinidamente. Como distinguir esses casos?",
+        objectives: [
+          "Identificar limites laterais diferentes.",
+          "Reconhecer uma assíntota vertical.",
+          "Entender por que alguns limites não existem."
+        ],
+        steps: [
+          {
+            title: "Um salto no sinal",
+            instruction:
+              "Escolha o modo de salto e observe o que acontece quando t se aproxima de 2 pela esquerda e pela direita.",
+            widget: "discontinuityExplorer",
+            validation: {
+              type: "modeSelection",
+              target: "jump"
+            },
+            explanation:
+              "Se o valor aproximado pela esquerda é diferente do valor aproximado pela direita, o limite bilateral não existe."
+          },
+          {
+            title: "Uma explosão de valores",
+            instruction:
+              "Mude para o modo de assíntota. Observe como os valores crescem sem se aproximar de um número finito.",
+            widget: "discontinuityExplorer",
+            validation: {
+              type: "modeSelection",
+              target: "asymptote"
+            },
+            explanation:
+              "Em uma assíntota vertical, a função pode crescer indefinidamente quando x se aproxima de um determinado valor. Dizemos que o limite diverge ou que não existe como número finito."
+          },
+          {
+            title: "Classifique o comportamento",
+            instruction:
+              "Escolha a afirmação que melhor descreve o sinal no modo atualmente selecionado.",
+            widget: "formulaMatch",
+            options: [
+              {
+                id: "a",
+                latex: String.raw`\lim_{x \to a^-} f(x) = \lim_{x \to a^+} f(x)`,
+                feedback:
+                  "Essa igualdade descreve um limite bilateral existente, não um salto."
+              },
+              {
+                id: "b",
+                latex: String.raw`\lim_{x \to a^-} f(x) \ne \lim_{x \to a^+} f(x)`,
+                feedback:
+                  "Correto para o salto: os dois lados se aproximam de valores diferentes."
+              }
+            ],
+            validation: {
+              type: "formulaMatch",
+              correctAnswer: "b"
+            },
+            explanation:
+              "Os limites laterais são ferramentas para investigar o que ocorre de cada lado. O limite bilateral só existe quando os dois lados concordam."
+          }
+        ],
+        summary: {
+          title: "O que você aprendeu",
+          content:
+            "Um limite pode falhar porque os lados não concordam ou porque os valores crescem sem se aproximar de um número finito.",
+          keyTakeaway:
+            "Sempre investigue separadamente o que acontece pela esquerda e pela direita."
+        }
+      },
+
+      {
+        id: "continuity",
+        unit: "Unidade 1 — Limites e continuidade",
+        title: "Continuidade",
+        description:
+          "Descubra quando o caminho de uma função é suave e quando existe uma quebra.",
+        estimatedTime: "7 min",
+        scenario:
+          "O sistema de controle de uma rampa ajusta sua altura continuamente. Se a posição calculada dá um salto repentino ou se há um buraco no caminho, o equipamento pode falhar. Como verificar matematicamente se a função representa uma transição contínua?",
+        objectives: [
+          "Conectar limite e valor da função.",
+          "Diferenciar um buraco de uma quebra.",
+          "Usar as três condições de continuidade."
+        ],
+        steps: [
+          {
+            title: "A função chega ao mesmo lugar?",
+            instruction:
+              "Use o controle para escolher entre uma transição contínua e uma função com buraco. Observe o limite e o valor da função no ponto.",
+            widget: "continuityExplorer",
+            validation: {
+              type: "continuityToggle",
+              target: "continuous"
+            },
+            explanation:
+              "Uma função é contínua em x = a quando está definida em a, o limite existe e o limite é igual ao valor da função."
+          },
+          {
+            title: "Crie uma quebra",
+            instruction:
+              "Alterne para o modo com buraco. O gráfico se aproxima de um valor, mas a função não entrega esse valor no ponto.",
+            widget: "continuityExplorer",
+            validation: {
+              type: "continuityToggle",
+              target: "hole"
+            },
+            explanation:
+              "Um buraco ocorre quando o limite existe, mas a função não está definida no ponto ou possui outro valor nesse ponto."
+          },
+          {
+            title: "Nomeie as condições",
+            instruction:
+              "Selecione a combinação que caracteriza continuidade em x = a.",
+            widget: "formulaMatch",
+            options: [
+              {
+                id: "a",
+                latex: String.raw`f(a)\text{ existe},\quad \lim_{x \to a}f(x)\text{ existe},\quad \lim_{x \to a}f(x)=f(a)`,
+                feedback:
+                  "Correto. As três condições precisam ser satisfeitas."
+              },
+              {
+                id: "b",
+                latex: String.raw`\lim_{x \to a}f(x)=0\text{ sempre}`,
+                feedback:
+                  "Continuidade não exige que o limite seja zero; exige que ele coincida com f(a)."
+              }
+            ],
+            validation: {
+              type: "formulaMatch",
+              correctAnswer: "a"
+            },
+            explanation:
+              "A continuidade formaliza a ideia de poder percorrer o gráfico sem saltos, buracos ou interrupções naquele ponto."
+          }
+        ],
+        summary: {
+          title: "O que você aprendeu",
+          content:
+            "Continuidade significa que o valor da função, o limite e o ponto observado estão alinhados.",
+          keyTakeaway:
+            "Para testar continuidade, verifique: a função existe? o limite existe? os dois valores são iguais?"
+        }
+      },
+
+      {
+        id: "slope-of-curve",
+        unit: "Unidade 2 — Derivadas",
+        title: "A inclinação de uma curva",
+        description:
+          "Compare a velocidade média de um carro com sua velocidade instantânea.",
+        estimatedTime: "9 min",
+        scenario:
+          "Um carro percorre uma estrada. O computador informa a distância em diferentes instantes, mas você precisa saber a velocidade exatamente no instante t = 3 segundos. A velocidade média entre dois momentos é suficiente para responder?",
+        objectives: [
+          "Calcular uma taxa média de variação.",
+          "Perceber por que um único intervalo é insuficiente.",
+          "Motivar a ideia de taxa instantânea."
+        ],
+        steps: [
+          {
+            title: "Calcule a velocidade média",
+            instruction:
+              "Ajuste o segundo instante e observe a velocidade média entre t = 3 e o instante escolhido.",
+            widget: "averageSlopeExplorer",
+            validation: {
+              type: "range",
+              targetParam: "b",
+              targetRange: [4, 5]
+            },
+            explanation:
+              "A velocidade média é a variação da distância dividida pela variação do tempo: $$\frac{s(b)-s(a)}{b-a}$$."
+          },
+          {
+            title: "Diminua o intervalo",
+            instruction:
+              "Aproxime o segundo instante de t = 3. O que acontece com a estimativa da velocidade?",
+            widget: "averageSlopeExplorer",
+            validation: {
+              type: "range",
+              targetParam: "b",
+              targetRange: [3.05, 3.3]
+            },
+            explanation:
+              "Ao diminuir o intervalo, a taxa média passa a representar melhor o comportamento do carro perto do instante de interesse."
+          },
+          {
+            title: "A pergunta instantânea",
+            instruction:
+              "Selecione a fórmula que transforma a velocidade média em uma velocidade no instante exato.",
+            widget: "formulaMatch",
+            options: [
+              {
+                id: "a",
+                latex: String.raw`v(3)=\lim_{b\to 3}\frac{s(b)-s(3)}{b-3}`,
+                feedback:
+                  "Correto. A velocidade instantânea surge como um limite de velocidades médias."
+              },
+              {
+                id: "b",
+                latex: String.raw`v(3)=s(3)\cdot 3`,
+                feedback:
+                  "Isso não compara variação de distância com variação de tempo."
+              }
+            ],
+            validation: {
+              type: "formulaMatch",
+              correctAnswer: "a"
+            },
+            explanation:
+              "A derivada nasce de uma pergunta prática: qual é a taxa de mudança agora, e não apenas ao longo de um intervalo?"
+          }
+        ],
+        summary: {
+          title: "O que você aprendeu",
+          content:
+            "A velocidade instantânea pode ser construída observando velocidades médias em intervalos cada vez menores.",
+          keyTakeaway:
+            "A derivada mede uma taxa de mudança local: o que está acontecendo exatamente aqui?"
+        }
+      },
+
+      {
+        id: "secant-to-tangent",
+        unit: "Unidade 2 — Derivadas",
+        title: "Da secante à tangente",
+        description:
+          "Veja a linha de velocidade média se transformar na velocidade instantânea.",
+        estimatedTime: "10 min",
+        scenario:
+          "Você está investigando o movimento de um carro cuja distância segue uma curva. Uma linha entre dois pontos mostra a velocidade média. Para descobrir a velocidade exatamente no instante t = 2, você fará o segundo ponto se aproximar do primeiro.",
+        objectives: [
+          "Interpretar a reta secante.",
+          "Observar a secante se aproximar da tangente.",
+          "Conectar a visualização à definição da derivada."
+        ],
+        steps: [
+          {
+            title: "Dois pontos, uma média",
+            instruction:
+              "Mova o ponto B para perto do ponto A. A reta que liga os dois pontos é a secante.",
+            widget: "tangentLineExplorer",
+            validation: {
+              type: "range",
+              targetParam: "h",
+              targetRange: [0.6, 1.4]
+            },
+            explanation:
+              "A inclinação da secante representa a taxa média de mudança entre dois instantes."
+          },
+          {
+            title: "Faça h diminuir",
+            instruction:
+              "Continue aproximando B de A até que h fique pequeno. Observe a inclinação da reta.",
+            widget: "tangentLineExplorer",
+            validation: {
+              type: "range",
+              targetParam: "h",
+              targetRange: [0.03, 0.25]
+            },
+            explanation:
+              "Quando h se aproxima de zero, a secante se aproxima da tangente. A inclinação da tangente é a derivada naquele ponto."
+          },
+          {
+            title: "Nomeie o que você viu",
+            instruction:
+              "Escolha a fórmula que descreve exatamente esse processo.",
+            widget: "formulaMatch",
+            options: [
+              {
+                id: "a",
+                latex: String.raw`f'(a)=\lim_{h\to 0}\frac{f(a+h)-f(a)}{h}`,
+                feedback:
+                  "Exatamente. A derivada é a inclinação limite das retas secantes."
+              },
+              {
+                id: "b",
+                latex: String.raw`f'(a)=f(a)\cdot h`,
+                feedback:
+                  "O processo observado usa uma razão entre variações, não uma multiplicação."
+              }
+            ],
+            validation: {
+              type: "formulaMatch",
+              correctAnswer: "a"
+            },
+            explanation:
+              "A fórmula da derivada não é uma regra arbitrária: ela registra simbolicamente a transformação visual da secante em tangente."
+          }
+        ],
+        summary: {
+          title: "O que você aprendeu",
+          content:
+            "A derivada pode ser entendida como a taxa média de mudança quando o intervalo entre os pontos tende a zero.",
+          keyTakeaway:
+            "As regras de derivação são atalhos para calcular esse mesmo processo em famílias inteiras de funções."
+        }
+      },
+
+      {
+        id: "derivative-as-function",
+        unit: "Unidade 2 — Derivadas",
+        title: "A derivada como função",
+        description:
+          "Mapeie a velocidade do carro em todos os pontos da viagem.",
+        estimatedTime: "9 min",
+        scenario:
+          "Em vez de perguntar apenas a velocidade do carro em t = 2, você quer construir um painel que informe a velocidade instantânea ao longo de toda a viagem. Isso significa transformar uma única inclinação em uma nova função.",
+        objectives: [
+          "Distinguir função original e função derivada.",
+          "Relacionar crescimento à derivada positiva.",
+          "Visualizar duas funções simultaneamente."
+        ],
+        steps: [
+          {
+            title: "Observe distância e velocidade",
+            instruction:
+              "Compare o gráfico da distância s(t) com o gráfico da velocidade v(t). Arraste o instante da viagem.",
+            widget: "derivativeFunctionExplorer",
+            validation: {
+              type: "range",
+              targetParam: "x",
+              targetRange: [1.5, 2.5]
+            },
+            explanation:
+              "A derivada associa a cada instante uma inclinação. Por isso ela própria forma uma nova função."
+          },
+          {
+            title: "Onde o carro acelera?",
+            instruction:
+              "Mova o ponto para uma região em que a velocidade instantânea seja positiva e observe a inclinação da curva original.",
+            widget: "derivativeFunctionExplorer",
+            validation: {
+              type: "positiveDerivative"
+            },
+            explanation:
+              "Quando a derivada é positiva, a função original está crescendo naquele ponto. Quando é negativa, a função está diminuindo."
+          },
+          {
+            title: "Generalize",
+            instruction:
+              "Selecione a frase que melhor explica a derivada como função.",
+            widget: "formulaMatch",
+            options: [
+              {
+                id: "a",
+                latex: String.raw`f':x\mapsto\text{inclinação de }f\text{ em }x`,
+                feedback:
+                  "Correto. A derivada transforma cada ponto da função original em uma taxa de mudança."
+              },
+              {
+                id: "b",
+                latex: String.raw`f'(x)=f(x)\text{ para toda função}`,
+                feedback:
+                  "Isso só ocorre em casos específicos, não para toda função."
+              }
+            ],
+            validation: {
+              type: "formulaMatch",
+              correctAnswer: "a"
+            },
+            explanation:
+              "A derivada é uma função que responde, ponto a ponto, como a função original está mudando."
+          }
+        ],
+        summary: {
+          title: "O que você aprendeu",
+          content:
+            "A derivada não é apenas um número. Ela é uma nova função que descreve a taxa de mudança da função original em cada ponto.",
+          keyTakeaway:
+            "Função original: posição. Derivada: velocidade. A mesma estrutura aparece em muitos contextos."
+        }
+      },
+
+      {
+        id: "derivative-rules",
+        unit: "Unidade 2 — Derivadas",
+        title: "Power rule, product rule e chain rule",
+        description:
+          "Descubra por que diferentes situações de mudança exigem diferentes formas de acompanhar as variáveis.",
+        estimatedTime: "12 min",
+        scenario:
+          "Uma empresa acompanha sua receita como preço vezes quantidade. Os dois valores mudam ao longo do tempo. Em outro problema, o volume de um balão depende do raio, e o raio depende do tempo. Como calcular a mudança final sem perder o caminho entre as variáveis?",
+        objectives: [
+          "Reconhecer quando uma função é uma potência simples.",
+          "Entender duas quantidades variando em um produto.",
+          "Acompanhar mudanças encadeadas."
+        ],
+        steps: [
+          {
+            title: "Uma variável elevada a uma potência",
+            instruction:
+              "Ajuste o expoente e observe como a inclinação da função muda. Este é o cenário mais simples.",
+            widget: "rulePlayground",
+            validation: {
+              type: "ruleSelection",
+              target: "power"
+            },
+            explanation:
+              "Para uma potência, a regra do produto entre o expoente e a potência reduzida organiza o limite em uma forma rápida."
+          },
+          {
+            title: "Receita: preço vezes quantidade",
+            instruction:
+              "Selecione produto. Observe que tanto o preço quanto a quantidade podem contribuir para a mudança total da receita.",
+            widget: "rulePlayground",
+            validation: {
+              type: "ruleSelection",
+              target: "product"
+            },
+            explanation:
+              "Se R(t) = p(t)q(t), a taxa de mudança da receita depende da mudança do preço e da mudança da quantidade: $$R'(t)=p'(t)q(t)+p(t)q'(t)$$."
+          },
+          {
+            title: "Raio, volume e tempo",
+            instruction:
+              "Selecione cadeia. O raio muda com o tempo, e o volume muda com o raio. A taxa final precisa atravessar essas duas relações.",
+            widget: "rulePlayground",
+            validation: {
+              type: "ruleSelection",
+              target: "chain"
+            },
+            explanation:
+              "A regra da cadeia acompanha uma mudança que acontece através de outra variável: $$\frac{dV}{dt}=\frac{dV}{dr}\cdot\frac{dr}{dt}$$."
+          },
+          {
+            title: "As regras são atalhos",
+            instruction:
+              "Escolha a ideia comum às três regras.",
+            widget: "formulaMatch",
+            options: [
+              {
+                id: "a",
+                latex: String.raw`\text{Cada regra é uma forma organizada de calcular uma taxa de mudança}`,
+                feedback:
+                  "Correto. As regras não substituem a ideia de derivada; elas tornam o cálculo mais eficiente."
+              },
+              {
+                id: "b",
+                latex: String.raw`\text{Cada regra é uma fórmula sem relação com limites}`,
+                feedback:
+                  "As regras são consequências da definição da derivada e das propriedades dos limites."
+              }
+            ],
+            validation: {
+              type: "formulaMatch",
+              correctAnswer: "a"
+            },
+            explanation:
+              "A fórmula geral continua sendo a base. Power rule, product rule e chain rule são atalhos derivados dessa mesma ideia."
+          }
+        ],
+        summary: {
+          title: "O que você aprendeu",
+          content:
+            "As regras de derivação refletem diferentes estruturas de problemas: uma potência, um produto de quantidades ou uma cadeia de dependências.",
+          keyTakeaway:
+            "Antes de escolher uma regra, identifique como as variáveis estão relacionadas no problema."
+        }
+      }
+    ];
+
+    /*
+     * ============================================================
+     * Estado da aplicação
+     * ============================================================
+     */
+
+    const state = {
+      currentLessonIndex: 0,
+      currentStepIndex: 0,
+      completedLessons: JSON.parse(
+        localStorage.getItem("calculus-completed-lessons") || "[]"
+      ),
+      widgetState: {}
+    };
+
+    const elements = {
+      navigation: document.getElementById("lessonNavigation"),
+      unitLabel: document.getElementById("unitLabel"),
+      lessonTitle: document.getElementById("lessonTitle"),
+      scenarioText: document.getElementById("scenarioText"),
+      lessonMeta: document.getElementById("lessonMeta"),
+      objectiveList: document.getElementById("objectiveList"),
+      lessonContent: document.getElementById("lessonContent"),
+      summaryCard: document.getElementById("summaryCard"),
+      progressFill: document.getElementById("progressFill"),
+      progressLabel: document.getElementById("progressLabel"),
+      resetProgressButton: document.getElementById("resetProgressButton")
+    };
+
+    function currentLesson() {
+      return lessons[state.currentLessonIndex];
+    }
+
+    function currentStep() {
+      return currentLesson().steps[state.currentStepIndex];
+    }
+
+    function saveProgress() {
+      localStorage.setItem(
+        "calculus-completed-lessons",
+        JSON.stringify(state.completedLessons)
+      );
+    }
+
+    function updateProgress() {
+      const total = lessons.length;
+      const completed = state.completedLessons.length;
+      const percentage = (completed / total) * 100;
+
+      elements.progressFill.style.width = percentage + "%";
+      elements.progressLabel.textContent =
+        completed + " de " + total + " lições concluídas";
+    }
+
+    function groupLessonsByUnit() {
+      return lessons.reduce((groups, lesson, index) => {
+        if (!groups[lesson.unit]) groups[lesson.unit] = [];
+        groups[lesson.unit].push({ lesson, index });
+        return groups;
+      }, {});
+    }
+
+    function renderNavigation() {
+      elements.navigation.innerHTML = "";
+
+      const grouped = groupLessonsByUnit();
+
+      Object.entries(grouped).forEach(([unit, entries]) => {
+        const title = document.createElement("div");
+        title.className = "unit-title";
+        title.textContent = unit;
+        elements.navigation.appendChild(title);
+
+        const list = document.createElement("div");
+        list.className = "lesson-list";
+
+        entries.forEach(({ lesson, index }) => {
+          const button = document.createElement("button");
+          button.className = "lesson-button";
+
+          if (index === state.currentLessonIndex) {
+            button.classList.add("active");
+          }
+
+          if (state.completedLessons.includes(lesson.id)) {
+            button.classList.add("completed");
+          }
+
+          button.innerHTML = `
+            <span class="lesson-number">${index + 1}</span>
+            <span class="lesson-button-title">${lesson.title}</span>
+          `;
+
+          button.addEventListener("click", () => {
+            state.currentLessonIndex = index;
+            state.currentStepIndex = 0;
+            state.widgetState = {};
+            renderApp();
+          });
+
+          list.appendChild(button);
+        });
+
+        elements.navigation.appendChild(list);
+      });
+    }
+
+    function renderMath(element, latex) {
+      if (!element) return;
+
+      katex.render(latex, element, {
+        throwOnError: false,
+        displayMode: false
+      });
+    }
+
+    function formatNumber(value, decimals = 3) {
+      if (!Number.isFinite(value)) return "indefinido";
+      return Number(value).toFixed(decimals);
+    }
+
+    function createCanvas(container) {
+      const canvas = document.createElement("canvas");
+      const rect = container.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+
+      canvas.width = Math.max(1, rect.width * ratio);
+      canvas.height = Math.max(1, rect.height * ratio);
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+
+      const context = canvas.getContext("2d");
+      context.scale(ratio, ratio);
+
+      container.appendChild(canvas);
+
+      return {
+        canvas,
+        context,
+        width: rect.width,
+        height: rect.height
+      };
+    }
+
+    function drawCoordinateSystem(context, width, height, bounds) {
+      const { xMin, xMax, yMin, yMax } = bounds;
+
+      const xToPixel = x =>
+        ((x - xMin) / (xMax - xMin)) * width;
+
+      const yToPixel = y =>
+        height - ((y - yMin) / (yMax - yMin)) * height;
+
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "#0c1213";
+      context.fillRect(0, 0, width, height);
+
+      context.strokeStyle = "rgba(151, 166, 161, 0.12)";
+      context.lineWidth = 1;
+
+      for (let x = Math.ceil(xMin); x <= xMax; x++) {
+        const px = xToPixel(x);
+        context.beginPath();
+        context.moveTo(px, 0);
+        context.lineTo(px, height);
+        context.stroke();
+      }
+
+      for (let y = Math.ceil(yMin); y <= yMax; y++) {
+        const py = yToPixel(y);
+        context.beginPath();
+        context.moveTo(0, py);
+        context.lineTo(width, py);
+        context.stroke();
+      }
+
+      context.strokeStyle = "rgba(231, 236, 233, 0.5)";
+      context.lineWidth = 1.2;
+
+      if (yMin <= 0 && yMax >= 0) {
+        const py = yToPixel(0);
+        context.beginPath();
+        context.moveTo(0, py);
+        context.lineTo(width, py);
+        context.stroke();
+      }
+
+      if (xMin <= 0 && xMax >= 0) {
+        const px = xToPixel(0);
+        context.beginPath();
+        context.moveTo(px, 0);
+        context.lineTo(px, height);
+        context.stroke();
+      }
+
+      return { xToPixel, yToPixel };
+    }
+
+    function drawFunction(context, width, height, bounds, fn, color, lineWidth = 2.5) {
+      const { xMin, xMax } = bounds;
+      const { xToPixel, yToPixel } =
+        drawCoordinateSystem.bind(null, context, width, height, bounds);
+
+      context.save();
+      context.strokeStyle = color;
+      context.lineWidth = lineWidth;
+      context.beginPath();
+
+      let started = false;
+
+      for (let i = 0; i <= width; i++) {
+        const x = xMin + (i / width) * (xMax - xMin);
+        let y;
+
+        try {
+          y = fn(x);
+        } catch {
+          y = NaN;
+        }
+
+        if (!Number.isFinite(y)) {
+          started = false;
+          continue;
+        }
+
+        const px = xToPixel(x);
+        const py = yToPixel(y);
+
+        if (py < -height * 3 || py > height * 4) {
+          started = false;
+          continue;
+        }
+
+        if (!started) {
+          context.moveTo(px, py);
+          started = true;
+        } else {
+          context.lineTo(px, py);
+        }
+      }
+
+      context.stroke();
+      context.restore();
+
+      return { xToPixel, yToPixel };
+    }
+
+    function drawPoint(context, x, y, color, radius = 6) {
+      context.beginPath();
+      context.arc(x, y, radius, 0, Math.PI * 2);
+      context.fillStyle = color;
+      context.fill();
+      context.strokeStyle = "#0c1213";
+      context.lineWidth = 2;
+      context.stroke();
+    }
+
+    function createWidgetShell(title, note = "") {
+      const widget = document.createElement("div");
+      widget.className = "widget";
+      widget.innerHTML = `
+        <div class="widget-header">
+          <div class="widget-title">${title}</div>
+          <div class="widget-note">${note}</div>
+        </div>
+      `;
+      return widget;
+    }
+
+    /*
+     * ============================================================
+     * Widgets
+     * ============================================================
+     */
+
+    function renderLimitExplorer(container) {
+      const widget = createWidgetShell(
+        "LimitExplorer",
+        "Aproximação pela esquerda e pela direita"
+      );
+
+      const plotWrap = document.createElement("div");
+      plotWrap.className = "plot-wrap";
+      widget.appendChild(plotWrap);
+
+      const table = document.createElement("div");
+      table.className = "table-like";
+      widget.appendChild(table);
+
+      const controls = document.createElement("div");
+      controls.className = "control-row";
+      controls.innerHTML = `
+        <div class="control-group">
+          <label>
+            <span>Distância até t = 2</span>
+            <span class="value" data-distance-value>0.80</span>
+          </label>
+          <input type="range" min="0.05" max="1" value="0.8" step="0.05" data-distance />
+        </div>
+      `;
+      widget.appendChild(controls);
+
+      const canvasState = createCanvas(plotWrap);
+
+      function draw() {
+        const distance = Number(controls.querySelector("[data-distance]").value);
+        controls.querySelector("[data-distance-value]").textContent =
+          distance.toFixed(2);
+
+        const bounds = {
+          xMin: 0.4,
+          xMax: 3.6,
+          yMin: 0,
+          yMax: 8
+        };
+
+        const { context, width, height } = canvasState;
+        const axis = drawCoordinateSystem(context, width, height, bounds);
+        const fn = x => x * x;
+
+        context.strokeStyle = varColor("--color-study-sky");
+        context.lineWidth = 3;
+        context.beginPath();
+
+        let started = false;
+
+        for (let i = 0; i <= width; i++) {
+          const x = bounds.xMin +
+            (i / width) * (bounds.xMax - bounds.xMin);
+          const y = fn(x);
+          const px = axis.xToPixel(x);
+          const py = axis.yToPixel(y);
+
+          if (!started) {
+            context.moveTo(px, py);
+            started = true;
+          } else {
+            context.lineTo(px, py);
+          }
+        }
+
+        context.stroke();
+
+        const leftX = 2 - distance;
+        const rightX = 2 + distance;
+        const pointX = axis.xToPixel(2);
+        const pointY = axis.yToPixel(fn(2));
+
+        context.setLineDash([5, 5]);
+        context.strokeStyle = varColor("--color-accent-warm");
+        context.beginPath();
+        context.moveTo(pointX, 0);
+        context.lineTo(pointX, height);
+        context.stroke();
+        context.setLineDash([]);
+
+        drawPoint(
+          context,
+          axis.xToPixel(leftX),
+          axis.yToPixel(fn(leftX)),
+          varColor("--color-study-teal")
+        );
+
+        drawPoint(
+          context,
+          axis.xToPixel(rightX),
+          axis.yToPixel(fn(rightX)),
+          varColor("--color-accent-secondary")
+        );
+
+        drawPoint(context, pointX, pointY, varColor("--color-accent-warm"));
+
+        const rows = [
+          [leftX, fn(leftX), "pela esquerda"],
+          [rightX, fn(rightX), "pela direita"]
+        ];
+
+        table.innerHTML = `
+          <table class="approach-table">
+            <thead>
+              <tr>
+                <th>Tempo t</th>
+                <th>Posição s(t)</th>
+                <th>Direção</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows
+                .map(
+                  row => `
+                    <tr>
+                      <td>${row[0].toFixed(2)}</td>
+                      <td>${row[1].toFixed(3)}</td>
+                      <td>${row[2]}</td>
+                    </tr>
+                  `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      controls
+        .querySelector("[data-distance]")
+        .addEventListener("input", draw);
+
+      draw();
+      return widget;
+    }
+
+    function renderDiscontinuityExplorer(container) {
+      const widget = createWidgetShell(
+        "DiscontinuityExplorer",
+        "Compare comportamentos perto de x = 2"
+      );
+
+      const plotWrap = document.createElement("div");
+      plotWrap.className = "plot-wrap";
+      widget.appendChild(plotWrap);
+
+      const controls = document.createElement("div");
+      controls.className = "control-row";
+      controls.innerHTML = `
+        <div class="control-group">
+          <label for="discontinuity-mode">
+            <span>Tipo de comportamento</span>
+          </label>
+          <select id="discontinuity-mode">
+            <option value="jump">Salto</option>
+            <option value="asymptote">Assíntota vertical</option>
+          </select>
+        </div>
+      `;
+      widget.appendChild(controls);
+
+      const canvasState = createCanvas(plotWrap);
+
+      function draw() {
+        const mode = controls.querySelector("select").value;
+        state.widgetState.discontinuityMode = mode;
+
+        const bounds = {
+          xMin: -1,
+          xMax: 5,
+          yMin: -5,
+          yMax: 8
+        };
+
+        const { context, width, height } = canvasState;
+        const axis = drawCoordinateSystem(context, width, height, bounds);
+
+        context.strokeStyle = varColor("--color-study-sky");
+        context.lineWidth = 3;
+        context.beginPath();
+
+        for (let i = 0; i <= width; i++) {
+          const x = bounds.xMin +
+            (i / width) * (bounds.xMax - bounds.xMin);
+
+          let y;
+
+          if (mode === "jump") {
+            y = x < 2 ? 2 : 5;
+          } else {
+            y = 1 / (x - 2);
+          }
+
+          if (!Number.isFinite(y)) continue;
+
+          const px = axis.xToPixel(x);
+          const py = axis.yToPixel(y);
+
+          if (i === 0 || Math.abs(x - 2) < 0.025) {
+            context.moveTo(px, py);
+          } else {
+            context.lineTo(px, py);
+          }
+        }
+
+        context.stroke();
+
+        context.setLineDash([5, 5]);
+        context.strokeStyle = varColor("--color-accent-warm");
+        context.beginPath();
+        context.moveTo(axis.xToPixel(2), 0);
+        context.lineTo(axis.xToPixel(2), height);
+        context.stroke();
+        context.setLineDash([]);
+      }
+
+      controls.querySelector("select").addEventListener("change", draw);
+      draw();
+
+      return widget;
+    }
+
+    function renderContinuityExplorer(container) {
+      const widget = createWidgetShell(
+        "ContinuityExplorer",
+        "A função precisa chegar ao mesmo valor"
+      );
+
+      const plotWrap = document.createElement("div");
+      plotWrap.className = "plot-wrap";
+      widget.appendChild(plotWrap);
+
+      const controls = document.createElement("div");
+      controls.className = "control-row";
+      controls.innerHTML = `
+        <div class="control-group">
+          <label for="continuity-mode">
+            <span>Estado da função</span>
+          </label>
+          <select id="continuity-mode">
+            <option value="continuous">Contínua</option>
+            <option value="hole">Buraco em x = 2</option>
+          </select>
+        </div>
+      `;
+      widget.appendChild(controls);
+
+      const metricGrid = document.createElement("div");
+      metricGrid.className = "metric-grid";
+      widget.appendChild(metricGrid);
+
+      const canvasState = createCanvas(plotWrap);
+
+      function draw() {
+        const mode = controls.querySelector("select").value;
+        state.widgetState.continuityMode = mode;
+
+        const bounds = {
+          xMin: -1,
+          xMax: 5,
+          yMin: -1,
+          yMax: 8
+        };
+
+        const { context, width, height } = canvasState;
+        const axis = drawCoordinateSystem(context, width, height, bounds);
+
+        context.strokeStyle = varColor("--color-study-sky");
+        context.lineWidth = 3;
+        context.beginPath();
+
+        for (let i = 0; i <= width; i++) {
+          const x = bounds.xMin +
+            (i / width) * (bounds.xMax - bounds.xMin);
+          const y = x * x / 2;
+          const px = axis.xToPixel(x);
+          const py = axis.yToPixel(y);
+
+          if (mode === "hole" && Math.abs(x - 2) < 0.025) {
+            continue;
+          }
+
+          if (i === 0 || (mode === "hole" && Math.abs(x - 2) < 0.025)) {
+            context.moveTo(px, py);
+          } else {
+            context.lineTo(px, py);
+          }
+        }
+
+        context.stroke();
+
+        const xPoint = axis.xToPixel(2);
+        const yPoint = axis.yToPixel(2);
+
+        drawPoint(
+          context,
+          xPoint,
+          yPoint,
+          mode === "continuous"
+            ? varColor("--color-accent-warm")
+            : varColor("--color-bg"),
+          7
+        );
+
+        if (mode === "hole") {
+          context.strokeStyle = varColor("--color-accent-warm");
+          context.lineWidth = 2;
+          context.beginPath();
+          context.arc(xPoint, yPoint, 7, 0, Math.PI * 2);
+          context.stroke();
+        }
+
+        metricGrid.innerHTML = `
+          <div class="metric">
+            <span class="metric-label">f(2)</span>
+            <span class="metric-value">${mode === "continuous" ? "2" : "não definido"}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">limite em 2</span>
+            <span class="metric-value">2</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">contínua?</span>
+            <span class="metric-value">${mode === "continuous" ? "sim" : "não"}</span>
+          </div>
+        `;
+      }
+
+      controls.querySelector("select").addEventListener("change", draw);
+      draw();
+
+      return widget;
+    }
+
+    function renderAverageSlopeExplorer(container) {
+      const widget = createWidgetShell(
+        "AverageSlopeExplorer",
+        "s(t) = t²"
+      );
+
+      const plotWrap = document.createElement("div");
+      plotWrap.className = "plot-wrap";
+      widget.appendChild(plotWrap);
+
+      const controls = document.createElement("div");
+      controls.className = "control-row";
+      controls.innerHTML = `
+        <div class="control-group">
+          <label>
+            <span>Segundo instante b</span>
+            <span class="value" data-b-value>4.00</span>
+          </label>
+          <input type="range" min="3.05" max="5" value="4" step="0.05" data-b />
+        </div>
+      `;
+      widget.appendChild(controls);
+
+      const metrics = document.createElement("div");
+      metrics.className = "metric-grid";
+      widget.appendChild(metrics);
+
+      const canvasState = createCanvas(plotWrap);
+
+      function draw() {
+        const b = Number(controls.querySelector("[data-b]").value);
+        const a = 3;
+        const fn = x => x * x;
+        const slope = (fn(b) - fn(a)) / (b - a);
+
+        state.widgetState.averageSlopeB = b;
+        controls.querySelector("[data-b-value]").textContent = b.toFixed(2);
+
+        const bounds = {
+          xMin: 1,
+          xMax: 5.5,
+          yMin: 0,
+          yMax: 32
+        };
+
+        const { context, width, height } = canvasState;
+        const axis = drawCoordinateSystem(context, width, height, bounds);
+
+        context.strokeStyle = varColor("--color-study-sky");
+        context.lineWidth = 3;
+        context.beginPath();
+
+        for (let i = 0; i <= width; i++) {
+          const x = bounds.xMin +
+            (i / width) * (bounds.xMax - bounds.xMin);
+          const y = fn(x);
+          const px = axis.xToPixel(x);
+          const py = axis.yToPixel(y);
+
+          if (i === 0) context.moveTo(px, py);
+          else context.lineTo(px, py);
+        }
+
+        context.stroke();
+
+        const yA = fn(a);
+        const yB = fn(b);
+
+        context.strokeStyle = varColor("--color-accent-warm");
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(axis.xToPixel(a), axis.yToPixel(yA));
+        context.lineTo(axis.xToPixel(b), axis.yToPixel(yB));
+        context.stroke();
+
+        drawPoint(
+          context,
+          axis.xToPixel(a),
+          axis.yToPixel(yA),
+          varColor("--color-study-teal")
+        );
+
+        drawPoint(
+          context,
+          axis.xToPixel(b),
+          axis.yToPixel(yB),
+          varColor("--color-accent-secondary")
+        );
+
+        metrics.innerHTML = `
+          <div class="metric">
+            <span class="metric-label">s(3)</span>
+            <span class="metric-value">${formatNumber(yA)}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">s(b)</span>
+            <span class="metric-value">${formatNumber(yB)}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">velocidade média</span>
+            <span class="metric-value">${formatNumber(slope)}</span>
+          </div>
+        `;
+      }
+
+      controls.querySelector("[data-b]").addEventListener("input", draw);
+      draw();
+
+      return widget;
+    }
+
+    function renderTangentLineExplorer(container) {
+      const widget = createWidgetShell(
+        "TangentLineExplorer",
+        "f(x) = x², ponto A em x = 2"
+      );
+
+      const plotWrap = document.createElement("div");
+      plotWrap.className = "plot-wrap";
+      widget.appendChild(plotWrap);
+
+      const controls = document.createElement("div");
+      controls.className = "control-row";
+      controls.innerHTML = `
+        <div class="control-group">
+          <label>
+            <span>h: distância até B</span>
+            <span class="value" data-h-value>1.00</span>
+          </label>
+          <input type="range" min="0.03" max="1.5" value="1" step="0.01" data-h />
+        </div>
+      `;
+      widget.appendChild(controls);
+
+      const metrics = document.createElement("div");
+      metrics.className = "metric-grid";
+      widget.appendChild(metrics);
+
+      const canvasState = createCanvas(plotWrap);
+
+      function draw() {
+        const h = Number(controls.querySelector("[data-h]").value);
+        const a = 2;
+        const b = a + h;
+        const fn = x => x * x;
+        const secantSlope = (fn(b) - fn(a)) / h;
+        const tangentSlope = 2 * a;
+
+        state.widgetState.tangentH = h;
+        controls.querySelector("[data-h-value]").textContent = h.toFixed(2);
+
+        const bounds = {
+          xMin: 0,
+          xMax: 4.2,
+          yMin: 0,
+          yMax: 18
+        };
+
+        const { context, width, height } = canvasState;
+        const axis = drawCoordinateSystem(context, width, height, bounds);
+
+        context.strokeStyle = varColor("--color-study-sky");
+        context.lineWidth = 3;
+        context.beginPath();
+
+        for (let i = 0; i <= width; i++) {
+          const x = bounds.xMin +
+            (i / width) * (bounds.xMax - bounds.xMin);
+          const y = fn(x);
+          const px = axis.xToPixel(x);
+          const py = axis.yToPixel(y);
+
+          if (i === 0) context.moveTo(px, py);
+          else context.lineTo(px, py);
+        }
+
+        context.stroke();
+
+        const yA = fn(a);
+        const yB = fn(b);
+        const secantFn = x => yA + secantSlope * (x - a);
+        const tangentFn = x => yA + tangentSlope * (x - a);
+
+        drawLine(
+          context,
+          width,
+          height,
+          axis,
+          bounds,
+          secantFn,
+          varColor("--color-accent-secondary"),
+          2
+        );
+
+        drawLine(
+          context,
+          width,
+          height,
+          axis,
+          bounds,
+          tangentFn,
+          varColor("--color-accent-warm"),
+          2
+        );
+
+        drawPoint(
+          context,
+          axis.xToPixel(a),
+          axis.yToPixel(yA),
+          varColor("--color-study-teal")
+        );
+
+        drawPoint(
+          context,
+          axis.xToPixel(b),
+          axis.yToPixel(yB),
+          varColor("--color-accent-secondary")
+        );
+
+        metrics.innerHTML = `
+          <div class="metric">
+            <span class="metric-label">inclinação da secante</span>
+            <span class="metric-value">${formatNumber(secantSlope)}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">inclinação da tangente</span>
+            <span class="metric-value">${formatNumber(tangentSlope)}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">h</span>
+            <span class="metric-value">${h.toFixed(2)}</span>
+          </div>
+        `;
+      }
+
+      controls.querySelector("[data-h]").addEventListener("input", draw);
+      draw();
+
+      return widget;
+    }
+
+    function renderDerivativeFunctionExplorer(container) {
+      const widget = createWidgetShell(
+        "DerivativeFunctionExplorer",
+        "s(t) = t² e s'(t) = 2t"
+      );
+
+      const plotWrap = document.createElement("div");
+      plotWrap.className = "plot-wrap";
+      widget.appendChild(plotWrap);
+
+      const controls = document.createElement("div");
+      controls.className = "control-row";
+      controls.innerHTML = `
+        <div class="control-group">
+          <label>
+            <span>Instante x</span>
+            <span class="value" data-x-value>2.00</span>
+          </label>
+          <input type="range" min="0" max="4" value="2" step="0.05" data-x />
+        </div>
+      `;
+      widget.appendChild(controls);
+
+      const metrics = document.createElement("div");
+      metrics.className = "metric-grid";
+      widget.appendChild(metrics);
+
+      const canvasState = createCanvas(plotWrap);
+
+      function draw() {
+        const x = Number(controls.querySelector("[data-x]").value);
+        const position = x * x;
+        const velocity = 2 * x;
+
+        state.widgetState.derivativeX = x;
+        controls.querySelector("[data-x-value]").textContent = x.toFixed(2);
+
+        const bounds = {
+          xMin: 0,
+          xMax: 4,
+          yMin: 0,
+          yMax: 18
+        };
+
+        const { context, width, height } = canvasState;
+        const axis = drawCoordinateSystem(context, width, height, bounds);
+
+        drawLine(
+          context,
+          width,
+          height,
+          axis,
+          bounds,
+          value => value * value,
+          varColor("--color-study-sky"),
+          3
+        );
+
+        drawLine(
+          context,
+          width,
+          height,
+          axis,
+          bounds,
+          value => 2 * value,
+          varColor("--color-study-teal"),
+          3
+        );
+
+        drawPoint(
+          context,
+          axis.xToPixel(x),
+          axis.yToPixel(position),
+          varColor("--color-accent-warm")
+        );
+
+        drawPoint(
+          context,
+          axis.xToPixel(x),
+          axis.yToPixel(velocity),
+          varColor("--color-accent-secondary")
+        );
+
+        metrics.innerHTML = `
+          <div class="metric">
+            <span class="metric-label">posição s(x)</span>
+            <span class="metric-value">${formatNumber(position)}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">velocidade s'(x)</span>
+            <span class="metric-value">${formatNumber(velocity)}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">sinal da derivada</span>
+            <span class="metric-value">${velocity > 0 ? "positivo" : "zero"}</span>
+          </div>
+        `;
+      }
+
+      controls.querySelector("[data-x]").addEventListener("input", draw);
+      draw();
+
+      return widget;
+    }
+
+    function renderRulePlayground(container) {
+      const widget = createWidgetShell(
+        "ParameterSliderPlayground",
+        "Observe a estrutura antes de escolher a regra"
+      );
+
+      const controls = document.createElement("div");
+      controls.className = "control-row";
+      controls.innerHTML = `
+        <div class="control-group">
+          <label for="rule-select">
+            <span>Estrutura do problema</span>
+          </label>
+          <select id="rule-select">
+            <option value="power">Potência: x³</option>
+            <option value="product">Produto: p(t)q(t)</option>
+            <option value="chain">Cadeia: V(r(t))</option>
+          </select>
+        </div>
+      `;
+      widget.appendChild(controls);
+
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      widget.appendChild(explanation);
+
+      const formula = document.createElement("div");
+      formula.style.marginTop = "18px";
+      widget.appendChild(formula);
+
+      function update() {
+        const rule = controls.querySelector("select").value;
+        state.widgetState.rule = rule;
+
+        const content = {
+          power: {
+            text:
+              "Uma única variável aparece elevada a uma potência. O expoente desce e a potência é reduzida.",
+            latex: String.raw`\frac{d}{dx}x^n = nx^{n-1}`
+          },
+          product: {
+            text:
+              "Preço e quantidade mudam simultaneamente. A receita sente os dois efeitos.",
+            latex: String.raw`\frac{d}{dt}[p(t)q(t)] = p'(t)q(t)+p(t)q'(t)`
+          },
+          chain: {
+            text:
+              "O volume depende do raio, e o raio depende do tempo. A mudança percorre duas relações.",
+            latex: String.raw`\frac{dV}{dt}=\frac{dV}{dr}\cdot\frac{dr}{dt}`
+          }
+        }[rule];
+
+        explanation.textContent = content.text;
+        renderMath(formula, content.latex);
+      }
+
+      controls.querySelector("select").addEventListener("change", update);
+      update();
+
+      return widget;
+    }
+
+    function drawLine(
+      context,
+      width,
+      height,
+      axis,
+      bounds,
+      fn,
+      color,
+      lineWidth = 2
+    ) {
+      context.save();
+      context.strokeStyle = color;
+      context.lineWidth = lineWidth;
+      context.beginPath();
+
+      let started = false;
+
+      for (let i = 0; i <= width; i++) {
+        const x =
+          bounds.xMin +
+          (i / width) * (bounds.xMax - bounds.xMin);
+
+        let y;
+
+        try {
+          y = fn(x);
+        } catch {
+          y = NaN;
+        }
+
+        if (!Number.isFinite(y)) {
+          started = false;
+          continue;
+        }
+
+        const px = axis.xToPixel(x);
+        const py = axis.yToPixel(y);
+
+        if (py < -height * 3 || py > height * 4) {
+          started = false;
+          continue;
+        }
+
+        if (!started) {
+          context.moveTo(px, py);
+          started = true;
+        } else {
+          context.lineTo(px, py);
+        }
+      }
+
+      context.stroke();
+      context.restore();
+    }
+
+    function renderFormulaMatch(step) {
+      const widget = createWidgetShell(
+        "FormulaMatch",
+        "Escolha a interpretação que corresponde ao que você observou"
+      );
+
+      const options = document.createElement("div");
+      options.className = "formula-options";
+
+      step.options.forEach(option => {
+        const button = document.createElement("button");
+        button.className = "formula-option";
+        button.dataset.optionId = option.id;
+        button.innerHTML = `
+          <input type="radio" name="formula-choice" value="${option.id}" />
+          <span></span>
+        `;
+
+        renderMath(button.querySelector("span"), option.latex);
+
+        button.addEventListener("click", () => {
+          options
+            .querySelectorAll(".formula-option")
+            .forEach(item => item.classList.remove("selected"));
+
+          button.classList.add("selected");
+          button.querySelector("input").checked = true;
+          state.widgetState.formulaAnswer = option.id;
+        });
+
+        options.appendChild(button);
+      });
+
+      widget.appendChild(options);
+      return widget;
+    }
+
+    function renderWidget(type, step) {
+      const container = document.createElement("div");
+
+      switch (type) {
+        case "limitExplorer":
+          return renderLimitExplorer(container);
+
+        case "discontinuityExplorer":
+          return renderDiscontinuityExplorer(container);
+
+        case "continuityExplorer":
+          return renderContinuityExplorer(container);
+
+        case "averageSlopeExplorer":
+          return renderAverageSlopeExplorer(container);
+
+        case "tangentLineExplorer":
+          return renderTangentLineExplorer(container);
+
+        case "derivativeFunctionExplorer":
+          return renderDerivativeFunctionExplorer(container);
+
+        case "rulePlayground":
+          return renderRulePlayground(container);
+
+        case "formulaMatch":
+          return renderFormulaMatch(step);
+
+        default:
+          return createWidgetShell(
+            "Widget não encontrado",
+            "Configure um widget válido no JSON da lição"
+          );
+      }
+    }
+
+    /*
+     * ============================================================
+     * Validação da etapa
+     * ============================================================
+     */
+
+    function validateStep(step) {
+      const validation = step.validation;
+
+      if (!validation) return true;
+
+      switch (validation.type) {
+        case "formulaMatch":
+          return state.widgetState.formulaAnswer === validation.correctAnswer;
+
+        case "limitTableCompletion":
+          return true;
+
+        case "modeSelection":
+          return state.widgetState.discontinuityMode === validation.target;
+
+        case "continuityToggle":
+          return state.widgetState.continuityMode === validation.target;
+
+        case "range": {
+          const current =
+            state.widgetState.averageSlopeB ??
+            state.widgetState.tangentH ??
+            state.widgetState.derivativeX;
+
+          if (!Number.isFinite(current)) return false;
+
+          return (
+            current >= validation.targetRange[0] &&
+            current <= validation.targetRange[1]
+          );
+        }
+
+        case "positiveDerivative":
+          return (state.widgetState.derivativeX ?? 0) > 0;
+
+        case "ruleSelection":
+          return state.widgetState.rule === validation.target;
+
+        default:
+          return true;
+      }
+    }
+
+    function validationMessage(step) {
+      const type = step.validation?.type;
+
+      const messages = {
+        formulaMatch: "Escolha uma fórmula antes de continuar.",
+        modeSelection:
+          "Explore o comportamento solicitado no controle do widget.",
+        continuityToggle:
+          "Alterne o estado da função para o modo indicado na instrução.",
+        range:
+          "Aproxime o controle da faixa indicada e observe novamente.",
+        positiveDerivative:
+          "Mova o ponto para uma região em que a derivada seja positiva.",
+        ruleSelection:
+          "Selecione a estrutura matemática indicada na instrução."
+      };
+
+      return messages[type] || "Explore o widget e tente novamente.";
+    }
+
+    /*
+     * ============================================================
+     * Renderização da lição
+     * ============================================================
+     */
+
+    function renderLesson() {
+      const lesson = currentLesson();
+      const step = currentStep();
+
+      elements.unitLabel.textContent = lesson.unit;
+      elements.lessonTitle.textContent = lesson.title;
+      elements.scenarioText.textContent = lesson.scenario;
+
+      elements.lessonMeta.innerHTML = `
+        <span class="tag">${lesson.estimatedTime}</span>
+        <span class="tag">${lesson.steps.length} etapas</span>
+        <span class="tag">Aprendizagem por descoberta</span>
+      `;
+
+      elements.objectiveList.innerHTML = lesson.objectives
+        .map(objective => `<li>${objective}</li>`)
+        .join("");
+
+      elements.lessonContent.innerHTML = "";
+
+      const heading = document.createElement("div");
+      heading.className = "step-heading";
+      heading.innerHTML = `
+        <div>
+          <div class="step-counter">
+            Etapa ${state.currentStepIndex + 1} de ${lesson.steps.length}
+          </div>
+          <h3>${step.title}</h3>
+        </div>
+      `;
+
+      const instruction = document.createElement("p");
+      instruction.className = "instruction";
+      instruction.textContent = step.instruction;
+
+      const widget = renderWidget(step.widget, step);
+
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      explanation.innerHTML = step.explanation.replace(
+        /\$\$(.*?)\$\$/gs,
+        (_, formula) => `<span class="formula"></span>`
+      );
+
+      const formulaMatches = [...step.explanation.matchAll(/\$\$(.*?)\$\$/gs)];
+      formulaMatches.forEach((match, index) => {
+        const formulaElement = explanation.querySelectorAll(".formula")[index];
+        renderMath(formulaElement, match[1]);
+      });
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback";
+      feedback.dataset.feedback;
+
+      const actions = document.createElement("div");
+      actions.className = "footer-actions";
+
+      const backButton = document.createElement("button");
+      backButton.className = "secondary-button";
+      backButton.textContent = "Etapa anterior";
+      backButton.disabled = state.currentStepIndex === 0;
+      backButton.addEventListener("click", () => {
+        state.currentStepIndex--;
+        state.widgetState = {};
+        renderApp();
+      });
+
+      const nextButton = document.createElement("button");
+      nextButton.className = "primary-button";
+      nextButton.textContent =
+        state.currentStepIndex === lesson.steps.length - 1
+          ? "Concluir lição"
+          : "Continuar";
+
+      nextButton.addEventListener("click", () => {
+        if (!validateStep(step)) {
+          feedback.className = "feedback show error";
+          feedback.textContent = validationMessage(step);
+          return;
+        }
+
+        if (state.currentStepIndex < lesson.steps.length - 1) {
+          state.currentStepIndex++;
+          state.widgetState = {};
+          renderApp();
+          return;
+        }
+
+        if (!state.completedLessons.includes(lesson.id)) {
+          state.completedLessons.push(lesson.id);
+          saveProgress();
+        }
+
+        renderNavigation();
+        updateProgress();
+        renderSummary();
+      });
+
+      actions.append(backButton, nextButton);
+
+      elements.lessonContent.append(
+        heading,
+        instruction,
+        widget,
+        explanation,
+        feedback,
+        actions
+      );
+
+      elements.summaryCard.hidden = true;
+    }
+
+    function renderSummary() {
+      const lesson = currentLesson();
+
+      elements.summaryCard.hidden = false;
+      elements.summaryCard.querySelector("h3").textContent =
+        lesson.summary.title;
+      elements.summaryCard.querySelector(".summary-content").textContent =
+        lesson.summary.content;
+      elements.summaryCard.querySelector(".summary-key").textContent =
+        lesson.summary.keyTakeaway;
+
+      window.scrollTo({
+        top: elements.summaryCard.offsetTop - 30,
+        behavior: "smooth"
+      });
+    }
+
+    function renderApp() {
+      renderNavigation();
+      updateProgress();
+      renderLesson();
+    }
+
+    function varColor(variable) {
+      return getComputedStyle(document.documentElement)
+        .getPropertyValue(variable)
+        .trim();
+    }
+
+    elements.resetProgressButton.addEventListener("click", () => {
+      const confirmed = window.confirm(
+        "Reiniciar todo o progresso desta aplicação?"
+      );
+
+      if (!confirmed) return;
+
+      state.completedLessons = [];
+      state.currentLessonIndex = 0;
+      state.currentStepIndex = 0;
+      state.widgetState = {};
+      saveProgress();
+      renderApp();
+    });
+
+    window.addEventListener("resize", () => {
+      renderLesson();
+    });
+
+    renderApp();
+  </script>
+</body>
+</html>

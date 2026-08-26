@@ -1,0 +1,180 @@
+// Shared widget-level styles. Imported (with `@import`) into each component's
+// SCSS so that Angular's emulated encapsulation scopes these classes to the
+// component that renders them. The palette is inherited from `:host`.
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+select {
+  font: inherit;
+}
+
+.widget {
+  min-height: 260px;
+  margin: 19px 0;
+  padding: 17px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: #101719;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.widget-title {
+  color: var(--color-study-sage);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.widget-note {
+  color: var(--color-text-muted);
+  font-size: 0.77rem;
+}
+
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.control-group {
+  min-width: 160px;
+  flex: 1;
+}
+
+.control-group label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--color-study-teal);
+}
+
+select {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  outline: none;
+  color: var(--color-text);
+  background: #101719;
+}
+
+.value {
+  color: var(--color-accent-warm);
+  font-weight: 800;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.metric {
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: rgba(34, 48, 51, 0.5);
+}
+
+.metric-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.metric-value {
+  color: var(--color-text);
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.table-like {
+  overflow-x: auto;
+  margin-top: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.approach-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.approach-table th,
+.approach-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(51, 67, 63, 0.6);
+  text-align: right;
+}
+
+.approach-table th:first-child,
+.approach-table td:first-child {
+  text-align: left;
+}
+
+.approach-table th {
+  color: var(--color-study-sage);
+  font-weight: 800;
+}
+
+.formula-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 17px;
+}
+
+.formula-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text);
+  background: #101719;
+  text-align: left;
+}
+
+.formula-option:hover {
+  border-color: var(--color-study-teal);
+  background: var(--color-surface-hover);
+}
+
+.formula-option.selected {
+  border-color: var(--color-accent-warm);
+  background: rgba(255, 163, 0, 0.08);
+}
+
+.formula-option input {
+  accent-color: var(--color-accent-warm);
+}
+
+.explanation {
+  margin: 22px 0 0;
+  padding: 16px;
+  border-left: 3px solid var(--color-study-teal);
+  color: var(--color-text-muted);
+  background: rgba(79, 179, 166, 0.06);
+  line-height: 1.7;
+}

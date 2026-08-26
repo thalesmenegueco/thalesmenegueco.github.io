@@ -1,0 +1,40 @@
+<div class="widget">
+  <div class="widget-header">
+    <div class="widget-title">AverageSlopeExplorer</div>
+    <div class="widget-note">s(t) = t²</div>
+  </div>
+
+  <app-plot-canvas [drawFn]="drawFn" />
+
+  <div class="control-row">
+    <div class="control-group">
+      <label>
+        <span>Segundo instante b</span>
+        <span class="value">{{ formatNumber(b(), 2) }}</span>
+      </label>
+      <input
+        type="range"
+        min="3.05"
+        max="5"
+        step="0.05"
+        [value]="b()"
+        (input)="onB($event)"
+      />
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric">
+      <span class="metric-label">s(3)</span>
+      <span class="metric-value">{{ formatNumber(metrics().yA) }}</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">s(b)</span>
+      <span class="metric-value">{{ formatNumber(metrics().yB) }}</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">velocidade média</span>
+      <span class="metric-value">{{ formatNumber(metrics().slope) }}</span>
+    </div>
+  </div>
+</div>

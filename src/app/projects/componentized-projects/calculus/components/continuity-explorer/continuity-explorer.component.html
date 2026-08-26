@@ -1,0 +1,33 @@
+<div class="widget">
+  <div class="widget-header">
+    <div class="widget-title">ContinuityExplorer</div>
+    <div class="widget-note">A função precisa chegar ao mesmo valor</div>
+  </div>
+
+  <app-plot-canvas [drawFn]="drawFn" />
+
+  <div class="control-row">
+    <div class="control-group">
+      <label><span>Estado da função</span></label>
+      <select [value]="mode()" (change)="onMode($event)">
+        <option value="continuous">Contínua</option>
+        <option value="hole">Buraco em x = 2</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric">
+      <span class="metric-label">f(2)</span>
+      <span class="metric-value">{{ metrics().f2 }}</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">limite em 2</span>
+      <span class="metric-value">{{ metrics().limit }}</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">contínua?</span>
+      <span class="metric-value">{{ metrics().continuous }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+<div class="widget">
+  <div class="widget-header">
+    <div class="widget-title">LimitExplorer</div>
+    <div class="widget-note">Aproximação pela esquerda e pela direita</div>
+  </div>
+
+  <app-plot-canvas [drawFn]="drawFn" />
+
+  <div class="table-like">
+    <table class="approach-table">
+      <thead>
+        <tr>
+          <th>Tempo t</th>
+          <th>Posição s(t)</th>
+          <th>Direção</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track $index) {
+          <tr>
+            <td>{{ formatNumber(row.t, 2) }}</td>
+            <td>{{ formatNumber(row.s, 3) }}</td>
+            <td>{{ row.direction }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="control-row">
+    <div class="control-group">
+      <label>
+        <span>Distância até t = 2</span>
+        <span class="value">{{ formatNumber(distance(), 2) }}</span>
+      </label>
+      <input
+        type="range"
+        min="0.05"
+        max="1"
+        step="0.05"
+        [value]="distance()"
+        (input)="onDistance($event)"
+      />
+    </div>
+  </div>
+</div>

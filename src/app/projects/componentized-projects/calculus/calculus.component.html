@@ -1,0 +1,149 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-kicker">Calculus I</div>
+      <h1>Entender antes de memorizar</h1>
+      <p>
+        Explore o problema, observe as variáveis mudarem e só então nomeie a
+        ideia matemática.
+      </p>
+    </div>
+
+    <div class="progress-summary">
+      <strong>Seu progresso</strong>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+      <span class="progress-label">
+        {{ completedIds().length }} de {{ lessons.length }} lições concluídas
+      </span>
+    </div>
+
+    <nav class="lesson-nav">
+      @for (group of navigation(); track group.unit) {
+        <div class="unit-title">{{ group.unit }}</div>
+        <div class="lesson-list">
+          @for (item of group.items; track item.index) {
+            <button
+              type="button"
+              class="lesson-button"
+              [class.active]="item.index === currentLessonIndex()"
+              [class.completed]="completedIds().includes(item.lesson.id)"
+              (click)="selectLesson(item.index)"
+            >
+              <span class="lesson-number">{{ item.index + 1 }}</span>
+              <span class="lesson-button-title">{{ item.lesson.title }}</span>
+            </button>
+          }
+        </div>
+      }
+    </nav>
+  </aside>
+
+  <div class="main">
+    @let lesson = currentLesson();
+    @let step = currentStep();
+
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">{{ lesson.unit }}</p>
+        <h2>{{ lesson.title }}</h2>
+      </div>
+      <button type="button" class="reset-button" (click)="resetProgress()">
+        Reiniciar progresso
+      </button>
+    </div>
+
+    <section class="scenario-card">
+      <div class="scenario-label">O problema primeiro</div>
+      <p>{{ lesson.scenario }}</p>
+      <div class="lesson-meta">
+        <span class="tag">{{ lesson.estimatedTime }}</span>
+        <span class="tag">{{ lesson.steps.length }} etapas</span>
+        <span class="tag">Aprendizagem por descoberta</span>
+      </div>
+      <ul class="objective-list">
+        @for (objective of lesson.objectives; track $index) {
+          <li>{{ objective }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="lesson-card">
+      <div class="step-heading">
+        <div>
+          <div class="step-counter">
+            Etapa {{ currentStepIndex() + 1 }} de {{ lesson.steps.length }}
+          </div>
+          <h3>{{ step.title }}</h3>
+        </div>
+      </div>
+
+      <p class="instruction">{{ step.instruction }}</p>
+
+      @for (key of [stepKey()]; track key) {
+        @switch (step.widget) {
+          @case ('limitExplorer') {
+            <app-limit-explorer (valueChange)="onWidgetValue($event)" />
+          }
+          @case ('discontinuityExplorer') {
+            <app-discontinuity-explorer (valueChange)="onWidgetValue($event)" />
+          }
+          @case ('continuityExplorer') {
+            <app-continuity-explorer (valueChange)="onWidgetValue($event)" />
+          }
+          @case ('averageSlopeExplorer') {
+            <app-average-slope-explorer (valueChange)="onWidgetValue($event)" />
+          }
+          @case ('tangentLineExplorer') {
+            <app-tangent-line-explorer (valueChange)="onWidgetValue($event)" />
+          }
+          @case ('derivativeFunctionExplorer') {
+            <app-derivative-function-explorer
+              (valueChange)="onWidgetValue($event)"
+            />
+          }
+          @case ('rulePlayground') {
+            <app-rule-playground (valueChange)="onWidgetValue($event)" />
+          }
+          @case ('formulaMatch') {
+            <app-formula-match
+              [options]="step.options ?? []"
+              (valueChange)="onWidgetValue($event)"
+            />
+          }
+        }
+      }
+
+      <div class="explanation">
+        <app-rich-math-text [text]="step.explanation" />
+      </div>
+
+      @if (feedback()) {
+        <div class="feedback show error">{{ feedback() }}</div>
+      }
+
+      <div class="footer-actions">
+        <button
+          type="button"
+          class="secondary-button"
+          [disabled]="currentStepIndex() === 0"
+          (click)="back()"
+        >
+          Etapa anterior
+        </button>
+        <button type="button" class="primary-button" (click)="next()">
+          {{ isLastStep() ? 'Concluir lição' : 'Continuar' }}
+        </button>
+      </div>
+    </section>
+
+    @if (showSummary()) {
+      <section class="summary-card" #summaryCard>
+        <h3>{{ lesson.summary.title }}</h3>
+        <p class="summary-content">{{ lesson.summary.content }}</p>
+        <div class="summary-key">{{ lesson.summary.keyTakeaway }}</div>
+      </section>
+    }
+  </div>
+</div>
