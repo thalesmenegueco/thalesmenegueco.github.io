@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  height: 150px;
+  margin-bottom: 34px;
+}
+
+.wrap {
+  width: 100%;
+  height: 100%;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 720px) {
+  :host {
+    height: 120px;
+  }
+}

@@ -1,0 +1,162 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-kicker">Cálculo I · Prática</div>
+      <h1>O cálculo aparece no problema</h1>
+      <p>
+        Resolva situações de engenharia, projeto, código e economia usando as
+        ideias das lições.
+      </p>
+    </div>
+
+    <div class="progress-card">
+      <strong>Progresso dos exercícios</strong>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+      <span class="progress-label">
+        {{ completedIds().length }} de {{ problems.length }} exercícios concluídos
+      </span>
+    </div>
+
+    <label class="filter-label" for="areaFilter">Filtrar por área</label>
+    <select
+      id="areaFilter"
+      class="filter-select"
+      [value]="filter()"
+      (change)="onFilterChange($event)"
+    >
+      <option value="all">Todas as áreas</option>
+      @for (area of areas; track area) {
+        <option [value]="area">{{ areaLabel(area) }}</option>
+      }
+    </select>
+
+    <div class="problem-list">
+      @for (item of visibleProblems(); track item.problem.id) {
+        <button
+          type="button"
+          class="problem-button"
+          [class.active]="item.index === currentIndex()"
+          [class.completed]="completedIds().includes(item.problem.id)"
+          (click)="selectProblem(item.index)"
+        >
+          <span class="problem-index">{{ item.index + 1 }}</span>
+          <span class="problem-button-title">{{ item.problem.title }}</span>
+        </button>
+      }
+    </div>
+  </aside>
+
+  <main class="main">
+    @let problem = currentProblem();
+
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">{{ areaLabel(problem.area) }}</p>
+        <h2>{{ problem.title }}</h2>
+      </div>
+      <button type="button" class="secondary-button" (click)="resetProgress()">
+        Reiniciar progresso
+      </button>
+    </div>
+
+    <section class="scenario-card">
+      <div class="scenario-label">Situação real</div>
+      <h3>{{ problem.scenarioTitle }}</h3>
+      <p>{{ problem.scenario }}</p>
+
+      <div class="metadata">
+        <span class="tag">{{ areaLabel(problem.area) }}</span>
+        <span class="tag">Derivadas</span>
+        <span class="tag">Problema aplicado</span>
+        <span class="tag">Resposta numérica</span>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section class="card">
+        <p class="section-kicker">Sua tarefa</p>
+        <p class="prompt">{{ problem.prompt }}</p>
+
+        <div class="math-display">
+          <app-katex [latex]="problem.formula" [displayMode]="true" />
+        </div>
+
+        <app-problem-visualization [visualization]="problem.visualization" />
+
+        <div class="answer-panel">
+          <label for="answerInput">{{ problem.answerLabel }}</label>
+          <div class="answer-row">
+            <input
+              id="answerInput"
+              class="answer-input"
+              type="number"
+              step="any"
+              placeholder="Digite sua resposta"
+              [(ngModel)]="answerText"
+              (keydown.enter)="checkAnswer()"
+            />
+            <button type="button" class="primary-button" (click)="checkAnswer()">
+              Verificar
+            </button>
+          </div>
+
+          <div class="hint-area">
+            <button type="button" class="hint-button" (click)="toggleHint()">
+              {{ showHint() ? 'Ocultar dica' : 'Mostrar dica' }}
+            </button>
+            @if (showHint()) {
+              <div class="hint visible">{{ problem.hint }}</div>
+            }
+          </div>
+
+          @if (feedback(); as fb) {
+            <div
+              class="feedback visible"
+              [class.success]="fb.kind === 'success'"
+              [class.error]="fb.kind === 'error'"
+            >
+              {{ fb.text }}
+            </div>
+          }
+        </div>
+
+        @if (showSolution()) {
+          <div class="solution-card visible">
+            <h3>O raciocínio</h3>
+            <div class="solution-content">
+              @for (step of problem.solution; track $index) {
+                <div class="math-display">
+                  <app-katex [latex]="step.latex" [displayMode]="true" />
+                </div>
+              }
+            </div>
+            <div class="takeaway">
+              <strong>O conceito por trás</strong>
+              <p>{{ problem.takeaway }}</p>
+            </div>
+          </div>
+        }
+
+        <div class="next-area">
+          <button type="button" class="primary-button" (click)="nextProblem()">
+            Próximo exercício
+          </button>
+        </div>
+      </section>
+
+      <aside class="card right-card">
+        <p class="section-kicker">Ideias mobilizadas</p>
+        <ul class="concept-list">
+          @for (concept of problem.concepts; track $index) {
+            <li>
+              <strong>{{ concept.title }}</strong>
+              {{ concept.text }}
+            </li>
+          }
+        </ul>
+      </aside>
+    </div>
+  </main>
+</div>

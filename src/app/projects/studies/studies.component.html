@@ -1,0 +1,79 @@
+<div class="studies-shell">
+  <header class="hero">
+    <p class="hero-kicker">Exatas em Movimento</p>
+    <h1>Aprender fazendo, no seu ritmo</h1>
+    <p class="hero-lead">
+      Cada disciplina tem dois momentos: primeiro você entende a teoria
+      explorando problemas, depois aplica a ideia em situações reais.
+    </p>
+  </header>
+
+  <app-hero-motion />
+
+  <section class="path" aria-label="Como funciona">
+    <div class="path-step">
+      <span class="path-step__number">1</span>
+      <div class="path-step__body">
+        <strong>Teoria</strong>
+        <p>
+          Explore o problema, observe as variáveis mudarem e descubra o
+          conceito antes da fórmula.
+        </p>
+      </div>
+    </div>
+    <div class="path-arrow" aria-hidden="true">→</div>
+    <div class="path-step">
+      <span class="path-step__number">2</span>
+      <div class="path-step__body">
+        <strong>Matemática aplicada</strong>
+        <p>Use o que aprendeu para resolver problemas reais e fixar o conteúdo.</p>
+      </div>
+    </div>
+  </section>
+
+  <main class="subjects">
+    @for (subject of subjects; track subject.id) {
+      <section class="subject">
+        <header class="subject-header">
+          <h2>{{ subject.name }}</h2>
+          <p>{{ subject.tagline }}</p>
+        </header>
+
+        <div class="module-grid">
+          @for (module of subject.modules; track module.id) {
+            <article
+              class="module-card"
+              [class.module-card--muted]="module.status === 'coming-soon'"
+            >
+              <div class="module-card__top">
+                <span
+                  class="module-kind"
+                  [class.module-kind--applied]="module.kind === 'aplicada'"
+                >
+                  {{ moduleKindLabel(module.kind) }}
+                </span>
+              </div>
+
+              <img class="module-icon" [src]="module.icon" alt="" />
+
+              <h3 class="module-title">{{ module.title }}</h3>
+              <p class="module-desc">{{ module.description }}</p>
+
+              <ul class="module-meta">
+                @for (item of module.meta; track $index) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+
+              @if (module.status === 'available' && module.route) {
+                <a class="module-cta" [href]="module.route">Começar →</a>
+              } @else {
+                <span class="module-cta module-cta--disabled">Em breve</span>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+  </main>
+</div>

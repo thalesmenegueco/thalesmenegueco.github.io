@@ -19,12 +19,6 @@ export class ProjectsComponent {
       link: './tools/explore-data'
     },
     {
-      name: "Cálculo I",
-      description: 'Aprenda limites e derivadas resolvendo problemas reais — entender antes de memorizar',
-      image: 'icons/calculus.svg',
-      link: './tools/calculus'
-    },
-    {
       name: "Gerencie Projetos",
       description: 'Gerenciador de Projetos com lista de tarefas, ficam salvas no seu navegador 😉',
       image: 'https://www.svgrepo.com/show/489271/style.svg',
