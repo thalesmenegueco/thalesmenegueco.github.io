@@ -1,0 +1,620 @@
+// Visual identity shared with the Calculus apps. Keep the palette in sync
+// with `calculus.palette.ts` and `calculus.component.scss`.
+:host {
+  display: block;
+  min-height: 100vh;
+
+  --color-bg: #0a0f10;
+  --color-surface: #182023;
+  --color-surface-hover: #223033;
+  --color-text: #e7ece9;
+  --color-text-muted: #97a6a1;
+  --color-border: #33433f;
+  --color-accent-warm: #ffa300;
+  --color-accent-warm-soft: #e0a94f;
+  --color-study-sage: #8fae9b;
+  --color-study-teal: #4fb3a6;
+  --color-study-sky: #7fb4d4;
+  --color-accent-secondary: #b06aa3;
+  --color-danger: #d87878;
+  --shadow: 0 20px 55px rgba(0, 0, 0, 0.28);
+  --radius: 16px;
+
+  background:
+    radial-gradient(circle at 15% 0%, rgba(79, 179, 166, 0.1), transparent 34%),
+    radial-gradient(circle at 92% 30%, rgba(255, 163, 0, 0.07), transparent 30%),
+    var(--color-bg);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+}
+
+// ---------- Sidebar ----------
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 28px 20px;
+  border-right: 1px solid var(--color-border);
+  background: rgba(10, 15, 16, 0.92);
+  backdrop-filter: blur(16px);
+}
+
+.brand {
+  margin-bottom: 28px;
+}
+
+.brand-kicker {
+  color: var(--color-accent-warm);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.brand h1 {
+  margin: 8px 0;
+  font-size: 1.48rem;
+  line-height: 1.08;
+}
+
+.brand p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.progress-card {
+  margin-bottom: 25px;
+  padding: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.progress-card strong {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 0.82rem;
+}
+
+.progress-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #2d3938;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-study-teal), var(--color-study-sky));
+  transition: width 250ms ease;
+}
+
+.progress-label {
+  display: block;
+  margin-top: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.stage-list {
+  display: grid;
+  gap: 6px;
+}
+
+.stage-button {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 9px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  color: var(--color-text-muted);
+  background: transparent;
+  text-align: left;
+  transition: 180ms ease;
+}
+
+.stage-button:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.stage-button.active {
+  border-color: rgba(79, 179, 166, 0.5);
+  color: var(--color-text);
+  background: rgba(79, 179, 166, 0.1);
+}
+
+.stage-button.completed .stage-index {
+  color: var(--color-accent-warm);
+}
+
+.stage-index {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-study-sage);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.stage-name {
+  font-size: 0.81rem;
+  line-height: 1.3;
+}
+
+// ---------- Main ----------
+
+.main {
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 40px clamp(20px, 5vw, 70px) 90px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 29px;
+}
+
+.eyebrow {
+  margin: 0 0 7px;
+  color: var(--color-study-teal);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.topbar h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2.25rem);
+  line-height: 1.1;
+}
+
+.reset-button {
+  padding: 9px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-muted);
+  background: transparent;
+}
+
+.reset-button:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+// ---------- Scenario ----------
+
+.scenario-card {
+  margin-bottom: 23px;
+  padding: clamp(21px, 4vw, 32px);
+  border: 1px solid rgba(255, 163, 0, 0.3);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(255, 163, 0, 0.1), transparent 62%),
+    var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.scenario-label {
+  margin-bottom: 10px;
+  color: var(--color-accent-warm);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.scenario-card h3 {
+  margin: 0 0 11px;
+  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+}
+
+.scenario-card p {
+  max-width: 930px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.tag {
+  padding: 5px 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  color: var(--color-text-muted);
+  font-size: 0.71rem;
+}
+
+// ---------- Stage card ----------
+
+.stage-card {
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: rgba(24, 32, 35, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.stage-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.stage-counter {
+  color: var(--color-study-teal);
+  font-size: 0.73rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.stage-header h3 {
+  margin: 6px 0 0;
+  font-size: clamp(1.28rem, 2.6vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.stage-purpose {
+  margin: 0 0 22px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+// ---------- Flow strip ----------
+
+.flow-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.flow-node {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  color: var(--color-text-muted);
+  background: #101719;
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.flow-node.active {
+  border-color: var(--color-accent-warm);
+  color: var(--color-accent-warm);
+  background: rgba(255, 163, 0, 0.08);
+}
+
+.flow-arrow {
+  flex: 0 0 auto;
+  color: var(--color-border);
+}
+
+// ---------- Visual grid ----------
+
+.visual-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.75fr);
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.visual-card {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: #0d1415;
+}
+
+.visual-card-title {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-study-sage);
+  font-size: 0.79rem;
+  font-weight: 900;
+}
+
+.plot-area {
+  position: relative;
+  height: 315px;
+}
+
+.visual-caption {
+  padding: 11px 14px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+// ---------- Formula chain ----------
+
+.formula-chain {
+  display: grid;
+  gap: 10px;
+  padding: 15px;
+}
+
+.formula-step {
+  padding: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #101719;
+}
+
+.formula-step-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.69rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.formula-step.current {
+  border-color: rgba(255, 163, 0, 0.55);
+  background: rgba(255, 163, 0, 0.07);
+}
+
+.formula-step .katex-display {
+  margin: 0.2em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+// ---------- Controls ----------
+
+.controls {
+  display: grid;
+  gap: 14px;
+  margin-top: 19px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  background: rgba(34, 48, 51, 0.45);
+}
+
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.control {
+  min-width: 190px;
+  flex: 1;
+}
+
+.control label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+  color: var(--color-text-muted);
+  font-size: 0.77rem;
+}
+
+.control-value {
+  color: var(--color-accent-warm);
+  font-weight: 900;
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--color-study-teal);
+}
+
+// ---------- Metrics ----------
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 10px;
+  margin-top: 17px;
+}
+
+.metric {
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #101719;
+}
+
+.metric-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.metric-value {
+  color: var(--color-text);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+// ---------- Reasoning ----------
+
+.reasoning-card {
+  margin-top: 22px;
+  padding: 17px;
+  border-left: 3px solid var(--color-study-teal);
+  color: var(--color-text-muted);
+  background: rgba(79, 179, 166, 0.06);
+  line-height: 1.72;
+}
+
+.reasoning-card strong {
+  color: var(--color-text);
+}
+
+// ---------- Actions ----------
+
+.action-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.primary-button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  color: #171109;
+  background: var(--color-accent-warm);
+  font-weight: 900;
+}
+
+.primary-button:hover {
+  background: #ffb52d;
+}
+
+.secondary-action {
+  padding: 12px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text);
+  background: transparent;
+}
+
+.secondary-action:hover {
+  background: var(--color-surface-hover);
+}
+
+.secondary-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+// ---------- Completion ----------
+
+.completion-card {
+  margin-top: 23px;
+  padding: 25px;
+  border: 1px solid rgba(176, 106, 163, 0.48);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(176, 106, 163, 0.1), transparent 65%),
+    var(--color-surface);
+}
+
+.completion-card h3 {
+  margin-top: 0;
+}
+
+.completion-card p {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.completion-result {
+  margin-top: 17px;
+  padding: 17px;
+  border-radius: 11px;
+  color: var(--color-text);
+  background: rgba(255, 163, 0, 0.1);
+}
+
+.completion-formula {
+  margin-top: 8px;
+}
+
+// ---------- Responsive ----------
+
+@media (max-width: 940px) {
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .stage-list {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  }
+
+  .visual-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 570px) {
+  .topbar {
+    flex-direction: column;
+  }
+
+  .reset-button {
+    width: 100%;
+  }
+
+  .plot-area {
+    height: 255px;
+  }
+
+  .action-row {
+    flex-direction: column-reverse;
+  }
+
+  .action-row button {
+    width: 100%;
+  }
+}

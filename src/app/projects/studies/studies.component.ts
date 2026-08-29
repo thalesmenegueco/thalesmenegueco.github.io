@@ -13,7 +13,13 @@ import { ModuleKind } from './study.types';
 export class StudiesComponent {
   readonly subjects = STUDY_SUBJECTS;
 
+  private readonly kindLabels: Record<ModuleKind, string> = {
+    teoria: 'Teoria',
+    aplicada: 'Matemática aplicada',
+    processo: 'Processo',
+  };
+
   moduleKindLabel(kind: ModuleKind): string {
-    return kind === 'teoria' ? 'Teoria' : 'Matemática aplicada';
+    return this.kindLabels[kind];
   }
 }

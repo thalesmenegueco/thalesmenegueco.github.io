@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Calculus Process Lab</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+  />
+
+  <style>
+    :root {
+      --color-bg: #0a0f10;
+      --color-surface: #182023;
+      --color-surface-hover: #223033;
+      --color-text: #e7ece9;
+      --color-text-muted: #97a6a1;
+      --color-border: #33433f;
+
+      --color-accent-warm: #ffa300;
+      --color-accent-warm-soft: #e0a94f;
+
+      --color-study-sage: #8fae9b;
+      --color-study-teal: #4fb3a6;
+      --color-study-sky: #7fb4d4;
+
+      --color-accent-secondary: #b06aa3;
+      --color-danger: #d87878;
+
+      --shadow: 0 20px 55px rgba(0, 0, 0, 0.28);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--color-text);
+      background:
+        radial-gradient(
+          circle at 15% 0%,
+          rgba(79, 179, 166, 0.1),
+          transparent 34%
+        ),
+        radial-gradient(
+          circle at 92% 30%,
+          rgba(255, 163, 0, 0.07),
+          transparent 30%
+        ),
+        var(--color-bg);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 28px 20px;
+      border-right: 1px solid var(--color-border);
+      background: rgba(10, 15, 16, 0.92);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      margin-bottom: 28px;
+    }
+
+    .brand-kicker {
+      color: var(--color-accent-warm);
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .brand h1 {
+      margin: 8px 0;
+      font-size: 1.48rem;
+      line-height: 1.08;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .progress-card {
+      margin-bottom: 25px;
+      padding: 15px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-surface);
+    }
+
+    .progress-card strong {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 0.82rem;
+    }
+
+    .progress-track {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: #2d3938;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(
+        90deg,
+        var(--color-study-teal),
+        var(--color-study-sky)
+      );
+      transition: width 250ms ease;
+    }
+
+    .progress-label {
+      display: block;
+      margin-top: 8px;
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+    }
+
+    .stage-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .stage-button {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 9px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      color: var(--color-text-muted);
+      background: transparent;
+      text-align: left;
+      transition: 180ms ease;
+    }
+
+    .stage-button:hover {
+      color: var(--color-text);
+      background: var(--color-surface-hover);
+    }
+
+    .stage-button.active {
+      border-color: rgba(79, 179, 166, 0.5);
+      color: var(--color-text);
+      background: rgba(79, 179, 166, 0.1);
+    }
+
+    .stage-button.completed .stage-index {
+      color: var(--color-accent-warm);
+    }
+
+    .stage-index {
+      width: 27px;
+      height: 27px;
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      color: var(--color-study-sage);
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+
+    .stage-name {
+      font-size: 0.81rem;
+      line-height: 1.3;
+    }
+
+    .main {
+      width: 100%;
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 40px clamp(20px, 5vw, 70px) 90px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 29px;
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--color-study-teal);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: clamp(1.45rem, 3vw, 2.25rem);
+      line-height: 1.1;
+    }
+
+    .reset-button {
+      padding: 9px 13px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      color: var(--color-text-muted);
+      background: transparent;
+    }
+
+    .reset-button:hover {
+      color: var(--color-text);
+      background: var(--color-surface);
+    }
+
+    .scenario-card {
+      margin-bottom: 23px;
+      padding: clamp(21px, 4vw, 32px);
+      border: 1px solid rgba(255, 163, 0, 0.3);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255, 163, 0, 0.1), transparent 62%),
+        var(--color-surface);
+      box-shadow: var(--shadow);
+    }
+
+    .scenario-label {
+      margin-bottom: 10px;
+      color: var(--color-accent-warm);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .scenario-card h3 {
+      margin: 0 0 11px;
+      font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+    }
+
+    .scenario-card p {
+      max-width: 930px;
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: 1rem;
+      line-height: 1.72;
+    }
+
+    .metadata {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      padding: 5px 9px;
+      border: 1px solid var(--color-border);
+      border-radius: 99px;
+      color: var(--color-text-muted);
+      font-size: 0.71rem;
+    }
+
+    .stage-card {
+      padding: clamp(20px, 4vw, 32px);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: rgba(24, 32, 35, 0.82);
+      box-shadow: var(--shadow);
+    }
+
+    .stage-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 14px;
+    }
+
+    .stage-counter {
+      color: var(--color-study-teal);
+      font-size: 0.73rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .stage-header h3 {
+      margin: 6px 0 0;
+      font-size: clamp(1.28rem, 2.6vw, 1.75rem);
+      line-height: 1.15;
+    }
+
+    .stage-purpose {
+      margin: 0 0 22px;
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+
+    .flow-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 22px 0;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .flow-node {
+      flex: 0 0 auto;
+      padding: 8px 11px;
+      border: 1px solid var(--color-border);
+      border-radius: 9px;
+      color: var(--color-text-muted);
+      background: #101719;
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+
+    .flow-node.active {
+      border-color: var(--color-accent-warm);
+      color: var(--color-accent-warm);
+      background: rgba(255, 163, 0, 0.08);
+    }
+
+    .flow-arrow {
+      flex: 0 0 auto;
+      color: var(--color-border);
+    }
+
+    .visual-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.75fr);
+      gap: 18px;
+      margin: 20px 0;
+    }
+
+    .visual-card {
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      background: #0d1415;
+    }
+
+    .visual-card-title {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-study-sage);
+      font-size: 0.79rem;
+      font-weight: 900;
+    }
+
+    .plot-area {
+      position: relative;
+      height: 315px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .visual-caption {
+      padding: 11px 14px;
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      font-size: 0.76rem;
+      line-height: 1.5;
+    }
+
+    .formula-chain {
+      display: grid;
+      gap: 10px;
+      padding: 15px;
+    }
+
+    .formula-step {
+      padding: 13px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      background: #101719;
+    }
+
+    .formula-step-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--color-text-muted);
+      font-size: 0.69rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .formula-step.current {
+      border-color: rgba(255, 163, 0, 0.55);
+      background: rgba(255, 163, 0, 0.07);
+    }
+
+    .formula-step .katex-display {
+      margin: 0.2em 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .controls {
+      display: grid;
+      gap: 14px;
+      margin-top: 19px;
+      padding: 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 11px;
+      background: rgba(34, 48, 51, 0.45);
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .control {
+      min-width: 190px;
+      flex: 1;
+    }
+
+    .control label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 7px;
+      color: var(--color-text-muted);
+      font-size: 0.77rem;
+    }
+
+    .control-value {
+      color: var(--color-accent-warm);
+      font-weight: 900;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--color-study-teal);
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 9px;
+      outline: none;
+      color: var(--color-text);
+      background: #101719;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 10px;
+      margin-top: 17px;
+    }
+
+    .metric {
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      background: #101719;
+    }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--color-text-muted);
+      font-size: 0.7rem;
+    }
+
+    .metric-value {
+      color: var(--color-text);
+      font-size: 1.1rem;
+      font-weight: 900;
+    }
+
+    .reasoning-card {
+      margin-top: 22px;
+      padding: 17px;
+      border-left: 3px solid var(--color-study-teal);
+      color: var(--color-text-muted);
+      background: rgba(79, 179, 166, 0.06);
+      line-height: 1.72;
+    }
+
+    .reasoning-card strong {
+      color: var(--color-text);
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .primary-button {
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 10px;
+      color: #171109;
+      background: var(--color-accent-warm);
+      font-weight: 900;
+    }
+
+    .primary-button:hover {
+      background: #ffb52d;
+    }
+
+    .secondary-action {
+      padding: 12px 18px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      color: var(--color-text);
+      background: transparent;
+    }
+
+    .secondary-action:hover {
+      background: var(--color-surface-hover);
+    }
+
+    .completion-card {
+      display: none;
+      margin-top: 23px;
+      padding: 25px;
+      border: 1px solid rgba(176, 106, 163, 0.48);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(176, 106, 163, 0.1), transparent 65%),
+        var(--color-surface);
+    }
+
+    .completion-card.visible {
+      display: block;
+    }
+
+    .completion-card h3 {
+      margin-top: 0;
+    }
+
+    .completion-card p {
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+
+    .completion-result {
+      margin-top: 17px;
+      padding: 17px;
+      border-radius: 11px;
+      color: var(--color-text);
+      background: rgba(255, 163, 0, 0.1);
+    }
+
+    @media (max-width: 940px) {
+      .app-shell {
+        display: block;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .stage-list {
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      }
+
+      .visual-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 570px) {
+      .topbar {
+        flex-direction: column;
+      }
+
+      .reset-button {
+        width: 100%;
+      }
+
+      .plot-area {
+        height: 255px;
+      }
+
+      .action-row {
+        flex-direction: column-reverse;
+      }
+
+      .action-row button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-kicker">Calculus I · Process Lab</div>
+        <h1>See the mathematics emerge</h1>
+        <p>
+          Follow one real engineering problem from physical observation to
+          final derivative.
+        </p>
+      </div>
+
+      <div class="progress-card">
+        <strong>Process progress</strong>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="progress-label" id="progressLabel">
+          0 of 8 stages completed
+        </span>
+      </div>
+
+      <nav class="stage-list" id="stageList"></nav>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <p class="eyebrow">One problem · many mathematical views</p>
+          <h2 id="stageTitle">Loading...</h2>
+        </div>
+
+        <button class="reset-button" id="resetButton">
+          Reset progress
+        </button>
+      </div>
+
+      <section class="scenario-card">
+        <div class="scenario-label">The situation</div>
+        <h3>How quickly is an RC circuit charging right now?</h3>
+        <p>
+          An electronic sensor is connected to a charging capacitor. The
+          sensor should only activate when the capacitor voltage is changing
+          slowly enough. We need to determine the instantaneous charging rate
+          at a specific time.
+        </p>
+
+        <div class="metadata">
+          <span class="tag">Electrical engineering</span>
+          <span class="tag">Limits</span>
+          <span class="tag">Continuity</span>
+          <span class="tag">Derivatives</span>
+          <span class="tag">Rate of change</span>
+        </div>
+      </section>
+
+      <section class="stage-card">
+        <div class="stage-header">
+          <div>
+            <div class="stage-counter" id="stageCounter"></div>
+            <h3 id="stageHeading"></h3>
+          </div>
+        </div>
+
+        <p class="stage-purpose" id="stagePurpose"></p>
+
+        <div class="flow-strip" id="flowStrip"></div>
+
+        <div class="visual-grid">
+          <div class="visual-card">
+            <div class="visual-card-title" id="visualTitle">
+              Mathematical view
+            </div>
+
+            <div class="plot-area">
+              <canvas id="mainCanvas"></canvas>
+            </div>
+
+            <div class="visual-caption" id="visualCaption"></div>
+          </div>
+
+          <div class="visual-card">
+            <div class="visual-card-title">
+              Formula transformation
+            </div>
+
+            <div class="formula-chain" id="formulaChain"></div>
+          </div>
+        </div>
+
+        <div class="controls" id="controls"></div>
+
+        <div class="metric-grid" id="metrics"></div>
+
+        <div class="reasoning-card" id="reasoning"></div>
+
+        <div class="action-row">
+          <button class="secondary-action" id="previousButton">
+            Previous stage
+          </button>
+
+          <button class="primary-button" id="completeButton">
+            Complete stage
+          </button>
+
+          <button class="primary-button" id="nextButton">
+            Continue
+          </button>
+        </div>
+      </section>
+
+      <section class="completion-card" id="completionCard">
+        <h3>The complete chain</h3>
+
+        <p>
+          You started with a physical question about a capacitor and ended
+          with a derivative that measures its instantaneous charging rate.
+          Every formula transformation preserved the meaning of the original
+          situation.
+        </p>
+
+        <div class="completion-result" id="completionResult"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <script>
+    /*
+     * ============================================================
+     * Core model
+     * ============================================================
+     *
+     * Engineering model:
+     *
+     * V(t) = Vmax(1 - e^(-t/tau))
+     *
+     * Parameters:
+     * - Vmax = 12 volts
+     * - tau = 3 seconds
+     * - target time = 3 seconds
+     *
+     * Final result:
+     *
+     * V'(3) = (12 / 3)e^(-3/3)
+     *        = 4e^(-1)
+     *        ≈ 1.4715 V/s
+     */
+
+    const CIRCUIT = {
+      vmax: 12,
+      tau: 3,
+      targetTime: 3
+    };
+
+    const stages = [
+      {
+        id: "situation",
+        title: "Start with the physical situation",
+        purpose:
+          "Before writing a formula, identify what is changing, what is being measured, and what decision the engineer needs to make.",
+        visual: "circuit",
+        visualTitle: "A charging capacitor",
+        visualCaption:
+          "The voltage rises quickly at first, then approaches a maximum value.",
+        formulas: [
+          {
+            label: "What we know",
+            latex: String.raw`V_{\max}=12\text{ V},\qquad \tau=3\text{ s}`
+          },
+          {
+            label: "What we need",
+            latex: String.raw`\text{How fast is }V\text{ changing at }t=3\text{ s}?`
+          }
+        ],
+        metrics: [
+          ["Maximum voltage", "12 V"],
+          ["Time constant", "3 s"],
+          ["Target instant", "3 s"]
+        ],
+        reasoning:
+          "<strong>Translation:</strong> the physical question is not asking for the voltage itself. It asks for a rate: how many volts per second are being added at one instant.",
+        controls: "none"
+      },
+
+      {
+        id: "model",
+        title: "Build the model",
+        purpose:
+          "Represent the charging process with a function whose variables still have their physical meaning.",
+        visual: "model",
+        visualTitle: "Voltage as a function of time",
+        visualCaption:
+          "The horizontal axis is time in seconds. The vertical axis is capacitor voltage in volts.",
+        formulas: [
+          {
+            label: "Physical model",
+            latex: String.raw`V(t)=V_{\max}\left(1-e^{-t/\tau}\right)`
+          },
+          {
+            label: "Insert the circuit values",
+            latex: String.raw`V(t)=12\left(1-e^{-t/3}\right)`
+          }
+        ],
+        metrics: [
+          ["Input variable", "time t"],
+          ["Output variable", "voltage V(t)"],
+          ["Units", "volts"]
+        ],
+        reasoning:
+          "<strong>Meaning:</strong> the function is not just an expression to manipulate. It maps each time t to the voltage reached by the capacitor at that time.",
+        controls: "time"
+      },
+
+      {
+        id: "limit-continuity",
+        title: "Ask whether the process is continuous",
+        purpose:
+          "The physical charging process appears smooth. Use a limit to check what happens as time approaches the target instant.",
+        visual: "continuity",
+        visualTitle: "Approaching t = 3 seconds",
+        visualCaption:
+          "The red point moves toward the target instant from both sides.",
+        formulas: [
+          {
+            label: "The question",
+            latex: String.raw`\lim_{t\to 3}V(t)=?`
+          },
+          {
+            label: "Substitute the target time",
+            latex: String.raw`\lim_{t\to 3}12\left(1-e^{-t/3}\right)`
+          }
+        ],
+        metrics: [
+          ["Approach from left", "same value"],
+          ["Approach from right", "same value"],
+          ["Continuity", "yes"]
+        ],
+        reasoning:
+          "<strong>Continuity:</strong> since the model approaches the same voltage from both sides and the function is defined at t = 3, the voltage process is continuous at the instant we want to study.",
+        controls: "approach"
+      },
+
+      {
+        id: "find-limit",
+        title: "Find the limit",
+        purpose:
+          "Now evaluate the voltage that the model approaches when time approaches the target.",
+        visual: "limit",
+        visualTitle: "The limiting voltage",
+        visualCaption:
+          "The approaching values converge to the voltage at t = 3 seconds.",
+        formulas: [
+          {
+            label: "Start with the limit",
+            latex: String.raw`\lim_{t\to 3}12\left(1-e^{-t/3}\right)`
+          },
+          {
+            label: "Because the function is continuous",
+            latex: String.raw`=12\left(1-e^{-3/3}\right)`
+          },
+          {
+            label: "Evaluate",
+            latex: String.raw`=12\left(1-e^{-1}\right)\approx 7.585\text{ V}`
+          }
+        ],
+        metrics: [
+          ["Voltage near 3 s", "≈ 7.585 V"],
+          ["Function value V(3)", "≈ 7.585 V"],
+          ["Limit exists", "yes"]
+        ],
+        reasoning:
+          "<strong>Important distinction:</strong> the limit describes the value approached by nearby times. Continuity lets us identify that approached value with the actual voltage at t = 3.",
+        controls: "approach"
+      },
+
+      {
+        id: "secant",
+        title: "From average change to a secant",
+        purpose:
+          "A rate over an interval gives an average charging rate. We now compare the target instant with a nearby time.",
+        visual: "secant",
+        visualTitle: "Two nearby measurements",
+        visualCaption:
+          "The blue line connects two measurements and represents average voltage change.",
+        formulas: [
+          {
+            label: "Average rate of change",
+            latex: String.raw`\frac{V(3+h)-V(3)}{h}`
+          },
+          {
+            label: "With the circuit model",
+            latex: String.raw`\frac{12(1-e^{-(3+h)/3})-12(1-e^{-1})}{h}`
+          }
+        ],
+        metrics: [
+          ["Target time", "3 s"],
+          ["Second time", "3 + h"],
+          ["Interpretation", "average rate"]
+        ],
+        reasoning:
+          "<strong>Secant meaning:</strong> the slope of the secant tells us how many volts per second the capacitor gained between two distinct times.",
+        controls: "h"
+      },
+
+      {
+        id: "tangent",
+        title: "Let the secant become a tangent",
+        purpose:
+          "To obtain the rate at exactly one instant, shrink the interval until the second measurement approaches the target measurement.",
+        visual: "tangent",
+        visualTitle: "The secant approaching the tangent",
+        visualCaption:
+          "As h approaches zero, the secant line approaches the tangent line at t = 3.",
+        formulas: [
+          {
+            label: "Shrink the interval",
+            latex: String.raw`h\to 0`
+          },
+          {
+            label: "Take the limit of the secant slope",
+            latex: String.raw`\lim_{h\to 0}\frac{V(3+h)-V(3)}{h}`
+          },
+          {
+            label: "This is the derivative",
+            latex: String.raw`V'(3)`
+          }
+        ],
+        metrics: [
+          ["Interval h", "adjustable"],
+          ["Secant slope", "adjustable"],
+          ["Tangent slope", "instantaneous"]
+        ],
+        reasoning:
+          "<strong>Key transition:</strong> the derivative is not a new physical quantity invented after the fact. It is the limiting value of average rates over smaller and smaller intervals.",
+        controls: "h"
+      },
+
+      {
+        id: "differentiate",
+        title: "Transform the formula",
+        purpose:
+          "Apply the derivative rules while keeping track of what each factor means in the circuit.",
+        visual: "derivative",
+        visualTitle: "Voltage and charging rate",
+        visualCaption:
+          "The voltage curve and its derivative are shown together.",
+        formulas: [
+          {
+            label: "Original model",
+            latex: String.raw`V(t)=12\left(1-e^{-t/3}\right)`
+          },
+          {
+            label: "Differentiate",
+            latex: String.raw`V'(t)=\frac{12}{3}e^{-t/3}`
+          },
+          {
+            label: "Simplify",
+            latex: String.raw`V'(t)=4e^{-t/3}`
+          }
+        ],
+        metrics: [
+          ["Derivative", "4e^(-t/3)"],
+          ["Unit", "volts per second"],
+          ["At t = 3", "≈ 1.4715 V/s"]
+        ],
+        reasoning:
+          "<strong>Physical meaning:</strong> V'(t) is the instantaneous charging rate. Its units are volts per second, exactly matching the engineering question.",
+        controls: "time"
+      },
+
+      {
+        id: "result",
+        title: "Reach the engineering result",
+        purpose:
+          "Substitute the target time, interpret the number, and connect the full mathematical process back to the sensor decision.",
+        visual: "result",
+        visualTitle: "The final charging rate",
+        visualCaption:
+          "At t = 3 seconds, the tangent slope is the instantaneous charging rate.",
+        formulas: [
+          {
+            label: "Derivative",
+            latex: String.raw`V'(t)=4e^{-t/3}`
+          },
+          {
+            label: "Evaluate at t = 3",
+            latex: String.raw`V'(3)=4e^{-3/3}`
+          },
+          {
+            label: "Final result",
+            latex: String.raw`V'(3)=4e^{-1}\approx 1.4715\text{ V/s}`
+          }
+        ],
+        metrics: [
+          ["Voltage at t = 3", "≈ 7.585 V"],
+          ["Charging rate", "≈ 1.4715 V/s"],
+          ["Engineering meaning", "instantaneous rate"]
+        ],
+        reasoning:
+          "<strong>Conclusion:</strong> after 3 seconds, the capacitor voltage is approximately 7.585 V and is still increasing at approximately 1.4715 volts per second. The derivative answers the original physical question.",
+        controls: "result"
+      }
+    ];
+
+    const state = {
+      currentStage: 0,
+      completedStages: JSON.parse(
+        localStorage.getItem("calculus-process-completed") || "[]"
+      ),
+      time: CIRCUIT.targetTime,
+      h: 1,
+      approachDistance: 0.7
+    };
+
+    const elements = {
+      stageList: document.getElementById("stageList"),
+      progressFill: document.getElementById("progressFill"),
+      progressLabel: document.getElementById("progressLabel"),
+      stageTitle: document.getElementById("stageTitle"),
+      stageCounter: document.getElementById("stageCounter"),
+      stageHeading: document.getElementById("stageHeading"),
+      stagePurpose: document.getElementById("stagePurpose"),
+      flowStrip: document.getElementById("flowStrip"),
+      visualTitle: document.getElementById("visualTitle"),
+      visualCaption: document.getElementById("visualCaption"),
+      formulaChain: document.getElementById("formulaChain"),
+      controls: document.getElementById("controls"),
+      metrics: document.getElementById("metrics"),
+      reasoning: document.getElementById("reasoning"),
+      canvas: document.getElementById("mainCanvas"),
+      previousButton: document.getElementById("previousButton"),
+      completeButton: document.getElementById("completeButton"),
+      nextButton: document.getElementById("nextButton"),
+      resetButton: document.getElementById("resetButton"),
+      completionCard: document.getElementById("completionCard"),
+      completionResult: document.getElementById("completionResult")
+    };
+
+    function currentStage() {
+      return stages[state.currentStage];
+    }
+
+    function voltage(t) {
+      return CIRCUIT.vmax * (1 - Math.exp(-t / CIRCUIT.tau));
+    }
+
+    function chargingRate(t) {
+      return (CIRCUIT.vmax / CIRCUIT.tau) *
+        Math.exp(-t / CIRCUIT.tau);
+    }
+
+    function secantSlope(t, h) {
+      return (voltage(t + h) - voltage(t)) / h;
+    }
+
+    function formatNumber(value, digits = 4) {
+      return Number(value).toFixed(digits);
+    }
+
+    function saveProgress() {
+      localStorage.setItem(
+        "calculus-process-completed",
+        JSON.stringify(state.completedStages)
+      );
+    }
+
+    function updateProgress() {
+      const completed = state.completedStages.length;
+      const total = stages.length;
+
+      elements.progressFill.style.width =
+        (completed / total) * 100 + "%";
+
+      elements.progressLabel.textContent =
+        completed + " of " + total + " stages completed";
+    }
+
+    function renderMath(element, latex) {
+      katex.render(latex, element, {
+        throwOnError: false,
+        displayMode: true
+      });
+    }
+
+    function renderNavigation() {
+      elements.stageList.innerHTML = "";
+
+      stages.forEach((stage, index) => {
+        const button = document.createElement("button");
+        button.className = "stage-button";
+
+        if (index === state.currentStage) {
+          button.classList.add("active");
+        }
+
+        if (state.completedStages.includes(stage.id)) {
+          button.classList.add("completed");
+        }
+
+        button.innerHTML = `
+          <span class="stage-index">${index + 1}</span>
+          <span class="stage-name">${stage.title}</span>
+        `;
+
+        button.addEventListener("click", () => {
+          state.currentStage = index;
+          renderApp();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        elements.stageList.appendChild(button);
+      });
+    }
+
+    function renderFlow() {
+      elements.flowStrip.innerHTML = "";
+
+      const flowLabels = [
+        "Situation",
+        "Model",
+        "Limit",
+        "Secant",
+        "Tangent",
+        "Derivative",
+        "Result"
+      ];
+
+      flowLabels.forEach((label, index) => {
+        const node = document.createElement("div");
+        node.className = "flow-node";
+
+        if (
+          index === state.currentStage ||
+          (state.currentStage >= 7 && index === 6)
+        ) {
+          node.classList.add("active");
+        }
+
+        node.textContent = label;
+        elements.flowStrip.appendChild(node);
+
+        if (index < flowLabels.length - 1) {
+          const arrow = document.createElement("div");
+          arrow.className = "flow-arrow";
+          arrow.textContent = "→";
+          elements.flowStrip.appendChild(arrow);
+        }
+      });
+    }
+
+    function renderFormulaChain(stage) {
+      elements.formulaChain.innerHTML = "";
+
+      stage.formulas.forEach((formula, index) => {
+        const item = document.createElement("div");
+        item.className = "formula-step";
+
+        if (index === stage.formulas.length - 1) {
+          item.classList.add("current");
+        }
+
+        item.innerHTML = `
+          <span class="formula-step-label">${formula.label}</span>
+          <div class="formula-render"></div>
+        `;
+
+        renderMath(
+          item.querySelector(".formula-render"),
+          formula.latex
+        );
+
+        elements.formulaChain.appendChild(item);
+      });
+    }
+
+    function renderMetrics(metrics) {
+      elements.metrics.innerHTML = metrics
+        .map(
+          metric => `
+            <div class="metric">
+              <span class="metric-label">${metric[0]}</span>
+              <span class="metric-value">${metric[1]}</span>
+            </div>
+          `
+        )
+        .join("");
+    }
+
+    function renderControls(type) {
+      elements.controls.innerHTML = "";
+
+      if (type === "none") {
+        elements.controls.style.display = "none";
+        return;
+      }
+
+      elements.controls.style.display = "grid";
+
+      if (type === "time") {
+        elements.controls.innerHTML = `
+          <div class="control-row">
+            <div class="control">
+              <label>
+                <span>Observation time t</span>
+                <span class="control-value" data-time-value></span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="9"
+                step="0.05"
+                value="${state.time}"
+                data-time-input
+              />
+            </div>
+          </div>
+        `;
+
+        const input = elements.controls.querySelector("[data-time-input]");
+        const value = elements.controls.querySelector("[data-time-value]");
+
+        const update = () => {
+          state.time = Number(input.value);
+          value.textContent = state.time.toFixed(2) + " s";
+          drawCurrentVisualization();
+          updateDynamicMetrics(type);
+        };
+
+        input.addEventListener("input", update);
+        update();
+        return;
+      }
+
+      if (type === "h") {
+        elements.controls.innerHTML = `
+          <div class="control-row">
+            <div class="control">
+              <label>
+                <span>Interval h</span>
+                <span class="control-value" data-h-value></span>
+              </label>
+              <input
+                type="range"
+                min="0.02"
+                max="1.8"
+                step="0.01"
+                value="${state.h}"
+                data-h-input
+              />
+            </div>
+          </div>
+        `;
+
+        const input = elements.controls.querySelector("[data-h-input]");
+        const value = elements.controls.querySelector("[data-h-value]");
+
+        const update = () => {
+          state.h = Number(input.value);
+          value.textContent = state.h.toFixed(2) + " s";
+          drawCurrentVisualization();
+          updateDynamicMetrics(type);
+        };
+
+        input.addEventListener("input", update);
+        update();
+        return;
+      }
+
+      if (type === "approach") {
+        elements.controls.innerHTML = `
+          <div class="control-row">
+            <div class="control">
+              <label>
+                <span>Distance from t = 3</span>
+                <span class="control-value" data-approach-value></span>
+              </label>
+              <input
+                type="range"
+                min="0.03"
+                max="0.9"
+                step="0.01"
+                value="${state.approachDistance}"
+                data-approach-input
+              />
+            </div>
+          </div>
+        `;
+
+        const input =
+          elements.controls.querySelector("[data-approach-input]");
+        const value =
+          elements.controls.querySelector("[data-approach-value]");
+
+        const update = () => {
+          state.approachDistance = Number(input.value);
+          value.textContent =
+            state.approachDistance.toFixed(2) + " s";
+          drawCurrentVisualization();
+          updateDynamicMetrics(type);
+        };
+
+        input.addEventListener("input", update);
+        update();
+        return;
+      }
+
+      if (type === "result") {
+        elements.controls.innerHTML = `
+          <div class="control-row">
+            <div class="control">
+              <label>
+                <span>Choose the instant to evaluate</span>
+                <span class="control-value" data-result-time-value></span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="9"
+                step="0.05"
+                value="${CIRCUIT.targetTime}"
+                data-result-time-input
+              />
+            </div>
+          </div>
+        `;
+
+        const input =
+          elements.controls.querySelector("[data-result-time-input]");
+        const value =
+          elements.controls.querySelector("[data-result-time-value]");
+
+        const update = () => {
+          state.time = Number(input.value);
+          value.textContent = state.time.toFixed(2) + " s";
+          drawCurrentVisualization();
+          updateDynamicMetrics(type);
+        };
+
+        input.addEventListener("input", update);
+        update();
+      }
+    }
+
+    function updateDynamicMetrics(controlType) {
+      const stage = currentStage();
+
+      if (controlType === "time") {
+        renderMetrics([
+          ["Time t", state.time.toFixed(2) + " s"],
+          ["Voltage V(t)", formatNumber(voltage(state.time)) + " V"],
+          ["Rate V'(t)", formatNumber(chargingRate(state.time)) + " V/s"]
+        ]);
+        return;
+      }
+
+      if (controlType === "h") {
+        renderMetrics([
+          ["Target time", "3.00 s"],
+          ["Second time", (3 + state.h).toFixed(2) + " s"],
+          [
+            "Secant slope",
+            formatNumber(secantSlope(3, state.h)) + " V/s"
+          ],
+          [
+            "Tangent slope",
+            formatNumber(chargingRate(3)) + " V/s"
+          ]
+        ]);
+        return;
+      }
+
+      if (controlType === "approach") {
+        const left = 3 - state.approachDistance;
+        const right = 3 + state.approachDistance;
+
+        renderMetrics([
+          ["Left-side value", formatNumber(voltage(left)) + " V"],
+          ["Right-side value", formatNumber(voltage(right)) + " V"],
+          ["Value at t = 3", formatNumber(voltage(3)) + " V"]
+        ]);
+        return;
+      }
+
+      if (controlType === "result") {
+        renderMetrics([
+          ["Selected time", state.time.toFixed(2) + " s"],
+          ["Voltage", formatNumber(voltage(state.time)) + " V"],
+          [
+            "Charging rate",
+            formatNumber(chargingRate(state.time)) + " V/s"
+          ]
+        ]);
+        return;
+      }
+
+      renderMetrics(stage.metrics);
+    }
+
+    function setupCanvas() {
+      const canvas = elements.canvas;
+      const parent = canvas.parentElement;
+      const rect = parent.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+
+      canvas.width = Math.max(1, rect.width * ratio);
+      canvas.height = Math.max(1, rect.height * ratio);
+
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+
+      const context = canvas.getContext("2d");
+      context.scale(ratio, ratio);
+
+      return {
+        context,
+        width: rect.width,
+        height: rect.height
+      };
+    }
+
+    function drawAxes(context, width, height, bounds) {
+      const xToPixel = x =>
+        ((x - bounds.xMin) / (bounds.xMax - bounds.xMin)) *
+        width;
+
+      const yToPixel = y =>
+        height -
+        ((y - bounds.yMin) / (bounds.yMax - bounds.yMin)) *
+        height;
+
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "#0d1415";
+      context.fillRect(0, 0, width, height);
+
+      context.strokeStyle = "rgba(151, 166, 161, 0.13)";
+      context.lineWidth = 1;
+
+      for (
+        let x = Math.ceil(bounds.xMin);
+        x <= bounds.xMax;
+        x++
+      ) {
+        const px = xToPixel(x);
+
+        context.beginPath();
+        context.moveTo(px, 0);
+        context.lineTo(px, height);
+        context.stroke();
+      }
+
+      for (
+        let y = Math.ceil(bounds.yMin);
+        y <= bounds.yMax;
+        y++
+      ) {
+        const py = yToPixel(y);
+
+        context.beginPath();
+        context.moveTo(0, py);
+        context.lineTo(width, py);
+        context.stroke();
+      }
+
+      context.strokeStyle = "rgba(231, 236, 233, 0.5)";
+      context.lineWidth = 1.2;
+
+      if (bounds.yMin <= 0 && bounds.yMax >= 0) {
+        const py = yToPixel(0);
+        context.beginPath();
+        context.moveTo(0, py);
+        context.lineTo(width, py);
+        context.stroke();
+      }
+
+      return { xToPixel, yToPixel };
+    }
+
+    function drawFunction(
+      context,
+      width,
+      height,
+      axis,
+      bounds,
+      fn,
+      colorValue,
+      lineWidth = 3
+    ) {
+      context.strokeStyle = colorValue;
+      context.lineWidth = lineWidth;
+      context.beginPath();
+
+      let started = false;
+
+      for (let i = 0; i <= width; i++) {
+        const x =
+          bounds.xMin +
+          (i / width) * (bounds.xMax - bounds.xMin);
+
+        const y = fn(x);
+        const px = axis.xToPixel(x);
+        const py = axis.yToPixel(y);
+
+        if (
+          !Number.isFinite(y) ||
+          py < -height * 3 ||
+          py > height * 4
+        ) {
+          started = false;
+          continue;
+        }
+
+        if (!started) {
+          context.moveTo(px, py);
+          started = true;
+        } else {
+          context.lineTo(px, py);
+        }
+      }
+
+      context.stroke();
+    }
+
+    function drawPoint(context, px, py, colorValue, radius = 6) {
+      context.beginPath();
+      context.arc(px, py, radius, 0, Math.PI * 2);
+      context.fillStyle = colorValue;
+      context.fill();
+
+      context.strokeStyle = "#0d1415";
+      context.lineWidth = 2;
+      context.stroke();
+    }
+
+    function drawLine(
+      context,
+      axis,
+      fn,
+      bounds,
+      width,
+      height,
+      colorValue,
+      lineWidth = 2
+    ) {
+      drawFunction(
+        context,
+        width,
+        height,
+        axis,
+        bounds,
+        fn,
+        colorValue,
+        lineWidth
+      );
+    }
+
+    function drawCurrentVisualization() {
+      const stage = currentStage();
+      const { context, width, height } = setupCanvas();
+
+      if (stage.visual === "circuit") {
+        drawCircuit(context, width, height);
+        return;
+      }
+
+      if (stage.visual === "model") {
+        drawModel(context, width, height);
+        return;
+      }
+
+      if (
+        stage.visual === "continuity" ||
+        stage.visual === "limit"
+      ) {
+        drawLimit(context, width, height);
+        return;
+      }
+
+      if (stage.visual === "secant") {
+        drawSecant(context, width, height);
+        return;
+      }
+
+      if (stage.visual === "tangent") {
+        drawTangent(context, width, height);
+        return;
+      }
+
+      if (stage.visual === "derivative") {
+        drawDerivative(context, width, height);
+        return;
+      }
+
+      if (stage.visual === "result") {
+        drawResult(context, width, height);
+      }
+    }
+
+    function drawCircuit(context, width, height) {
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "#0d1415";
+      context.fillRect(0, 0, width, height);
+
+      const centerY = height / 2;
+      const left = width * 0.16;
+      const right = width * 0.84;
+
+      context.strokeStyle = color("--color-study-sky");
+      context.lineWidth = 3;
+      context.beginPath();
+      context.moveTo(left, centerY);
+      context.lineTo(right, centerY);
+      context.stroke();
+
+      context.strokeStyle = color("--color-accent-warm");
+      context.lineWidth = 5;
+      context.beginPath();
+      context.moveTo(width * 0.48, centerY - 50);
+      context.lineTo(width * 0.48, centerY + 50);
+      context.moveTo(width * 0.54, centerY - 50);
+      context.lineTo(width * 0.54, centerY + 50);
+      context.stroke();
+
+      context.strokeStyle = color("--color-study-teal");
+      context.lineWidth = 3;
+      context.beginPath();
+      context.arc(width * 0.27, centerY, 30, 0, Math.PI * 2);
+      context.stroke();
+
+      context.fillStyle = color("--color-text");
+      context.font = "700 14px system-ui";
+      context.fillText("source", width * 0.22, centerY - 52);
+      context.fillText("capacitor", width * 0.44, centerY + 82);
+      context.fillText("sensor", width * 0.73, centerY - 52);
+
+      const voltageLevel =
+        30 + voltage(CIRCUIT.targetTime) / CIRCUIT.vmax * 100;
+
+      context.fillStyle = "rgba(79, 179, 166, 0.15)";
+      context.fillRect(
+        width * 0.69,
+        centerY + 22 - voltageLevel,
+        50,
+        voltageLevel
+      );
+
+      context.strokeStyle = color("--color-study-teal");
+      context.strokeRect(
+        width * 0.69,
+        centerY - 80,
+        50,
+        102
+      );
+    }
+
+    function drawModel(context, width, height) {
+      const bounds = {
+        xMin: 0,
+        xMax: 9,
+        yMin: 0,
+        yMax: 13
+      };
+
+      const axis = drawAxes(context, width, height, bounds);
+
+      drawFunction(
+        context,
+        width,
+        height,
+        axis,
+        bounds,
+        voltage,
+        color("--color-study-sky")
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(state.time),
+        axis.yToPixel(voltage(state.time)),
+        color("--color-accent-warm")
+      );
+    }
+
+    function drawLimit(context, width, height) {
+      const bounds = {
+        xMin: 1.5,
+        xMax: 4.5,
+        yMin: 4,
+        yMax: 10
+      };
+
+      const axis = drawAxes(context, width, height, bounds);
+
+      drawFunction(
+        context,
+        width,
+        height,
+        axis,
+        bounds,
+        voltage,
+        color("--color-study-sky")
+      );
+
+      const distance = state.approachDistance;
+      const left = 3 - distance;
+      const right = 3 + distance;
+
+      context.setLineDash([5, 5]);
+      context.strokeStyle = color("--color-accent-warm");
+      context.beginPath();
+      context.moveTo(axis.xToPixel(3), 0);
+      context.lineTo(axis.xToPixel(3), height);
+      context.stroke();
+      context.setLineDash([]);
+
+      drawPoint(
+        context,
+        axis.xToPixel(left),
+        axis.yToPixel(voltage(left)),
+        color("--color-study-teal")
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(right),
+        axis.yToPixel(voltage(right)),
+        color("--color-accent-secondary")
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(3),
+        axis.yToPixel(voltage(3)),
+        "transparent",
+        8
+      );
+
+      context.strokeStyle = color("--color-accent-warm");
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(
+        axis.xToPixel(3),
+        axis.yToPixel(voltage(3)),
+        8,
+        0,
+        Math.PI * 2
+      );
+      context.stroke();
+    }
+
+    function drawSecant(context, width, height) {
+      const bounds = {
+        xMin: 0,
+        xMax: 7,
+        yMin: 0,
+        yMax: 13
+      };
+
+      const axis = drawAxes(context, width, height, bounds);
+      const t = 3;
+      const h = state.h;
+      const slope = secantSlope(t, h);
+
+      drawFunction(
+        context,
+        width,
+        height,
+        axis,
+        bounds,
+        voltage,
+        color("--color-study-sky")
+      );
+
+      const y0 = voltage(t);
+      const secant = x => y0 + slope * (x - t);
+
+      drawLine(
+        context,
+        axis,
+        secant,
+        bounds,
+        width,
+        height,
+        color("--color-accent-secondary"),
+        2
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(t),
+        axis.yToPixel(y0),
+        color("--color-study-teal")
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(t + h),
+        axis.yToPixel(voltage(t + h)),
+        color("--color-accent-secondary")
+      );
+    }
+
+    function drawTangent(context, width, height) {
+      const bounds = {
+        xMin: 0,
+        xMax: 7,
+        yMin: 0,
+        yMax: 13
+      };
+
+      const axis = drawAxes(context, width, height, bounds);
+      const t = 3;
+      const h = state.h;
+      const secant = secantSlope(t, h);
+      const tangent = chargingRate(t);
+      const y0 = voltage(t);
+
+      drawFunction(
+        context,
+        width,
+        height,
+        axis,
+        bounds,
+        voltage,
+        color("--color-study-sky")
+      );
+
+      drawLine(
+        context,
+        axis,
+        x => y0 + secant * (x - t),
+        bounds,
+        width,
+        height,
+        color("--color-accent-secondary"),
+        2
+      );
+
+      drawLine(
+        context,
+        axis,
+        x => y0 + tangent * (x - t),
+        bounds,
+        width,
+        height,
+        color("--color-accent-warm"),
+        2
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(t),
+        axis.yToPixel(y0),
+        color("--color-accent-warm"),
+        7
+      );
+    }
+
+    function drawDerivative(context, width, height) {
+      const bounds = {
+        xMin: 0,
+        xMax: 9,
+        yMin: 0,
+        yMax: 13
+      };
+
+      const axis = drawAxes(context, width, height, bounds);
+
+      drawFunction(
+        context,
+        width,
+        height,
+        axis,
+        bounds,
+        voltage,
+        color("--color-study-sky")
+      );
+
+      drawFunction(
+        context,
+        width,
+        height,
+        axis,
+        bounds,
+        chargingRate,
+        color("--color-accent-warm")
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(state.time),
+        axis.yToPixel(voltage(state.time)),
+        color("--color-study-teal")
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(state.time),
+        axis.yToPixel(chargingRate(state.time)),
+        color("--color-accent-warm")
+      );
+    }
+
+    function drawResult(context, width, height) {
+      const bounds = {
+        xMin: 0,
+        xMax: 7,
+        yMin: 0,
+        yMax: 13
+      };
+
+      const axis = drawAxes(context, width, height, bounds);
+      const t = state.time;
+      const slope = chargingRate(t);
+      const y = voltage(t);
+
+      drawFunction(
+        context,
+        width,
+        height,
+        axis,
+        bounds,
+        voltage,
+        color("--color-study-sky")
+      );
+
+      drawLine(
+        context,
+        axis,
+        x => y + slope * (x - t),
+        bounds,
+        width,
+        height,
+        color("--color-accent-warm"),
+        3
+      );
+
+      drawPoint(
+        context,
+        axis.xToPixel(t),
+        axis.yToPixel(y),
+        color("--color-accent-warm"),
+        7
+      );
+    }
+
+    function renderStage() {
+      const stage = currentStage();
+
+      elements.stageTitle.textContent = stage.title;
+      elements.stageCounter.textContent =
+        "Stage " + (state.currentStage + 1) + " of " + stages.length;
+      elements.stageHeading.textContent = stage.title;
+      elements.stagePurpose.textContent = stage.purpose;
+      elements.visualTitle.textContent = stage.visualTitle;
+      elements.visualCaption.textContent = stage.visualCaption;
+      elements.reasoning.innerHTML = stage.reasoning;
+
+      renderFlow();
+      renderFormulaChain(stage);
+      renderMetrics(stage.metrics);
+      renderControls(stage.controls);
+      drawCurrentVisualization();
+
+      elements.previousButton.disabled = state.currentStage === 0;
+
+      elements.nextButton.style.display =
+        state.currentStage === stages.length - 1
+          ? "none"
+          : "inline-block";
+
+      elements.completeButton.textContent =
+        state.completedStages.includes(stage.id)
+          ? "Stage completed"
+          : "Complete stage";
+
+      elements.completionCard.className = "completion-card";
+    }
+
+    function completeCurrentStage() {
+      const stage = currentStage();
+
+      if (!state.completedStages.includes(stage.id)) {
+        state.completedStages.push(stage.id);
+        saveProgress();
+      }
+
+      updateProgress();
+      renderNavigation();
+
+      if (state.currentStage === stages.length - 1) {
+        elements.completionCard.className = "completion-card visible";
+        elements.completionResult.innerHTML = `
+          <strong>Final result</strong><br /><br />
+          At t = 3 seconds:
+          <br /><br />
+          <span class="math-final"></span>
+        `;
+
+        renderMath(
+          elements.completionResult.querySelector(".math-final"),
+          String.raw`V'(3)=4e^{-1}\approx 1.4715\text{ V/s}`
+        );
+      }
+    }
+
+    function goToNextStage() {
+      if (state.currentStage >= stages.length - 1) {
+        completeCurrentStage();
+        return;
+      }
+
+      state.currentStage++;
+      renderApp();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goToPreviousStage() {
+      if (state.currentStage === 0) return;
+
+      state.currentStage--;
+      renderApp();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderApp() {
+      renderNavigation();
+      updateProgress();
+      renderStage();
+    }
+
+    elements.completeButton.addEventListener(
+      "click",
+      completeCurrentStage
+    );
+
+    elements.nextButton.addEventListener(
+      "click",
+      goToNextStage
+    );
+
+    elements.previousButton.addEventListener(
+      "click",
+      goToPreviousStage
+    );
+
+    elements.resetButton.addEventListener("click", () => {
+      const confirmed = window.confirm(
+        "Reset the progress through the mathematical process?"
+      );
+
+      if (!confirmed) return;
+
+      state.currentStage = 0;
+      state.completedStages = [];
+      state.time = CIRCUIT.targetTime;
+      state.h = 1;
+      state.approachDistance = 0.7;
+
+      saveProgress();
+      renderApp();
+    });
+
+    window.addEventListener("resize", () => {
+      drawCurrentVisualization();
+    });
+
+    renderApp();
+  </script>
+</body>
+</html>

@@ -3,9 +3,10 @@ import { StudySubject } from './study.types';
 /**
  * The study catalogue for "Exatas em Movimento".
  *
- * Each discipline exposes two modules — Teoria and Matemática aplicada — so
- * students first understand the concept and then apply it. Add new subjects
- * here as they are created.
+ * Each discipline exposes its learning moments — Teoria, Matemática aplicada
+ * and Processo — so students understand the concept, apply it, and follow it
+ * through a complete mathematical chain. Add new subjects here as they are
+ * created.
  */
 export const STUDY_SUBJECTS: StudySubject[] = [
   {
@@ -34,6 +35,17 @@ export const STUDY_SUBJECTS: StudySubject[] = [
         route: '/estudos/calculo/aplicada',
         icon: 'icons/applied-math.svg',
         meta: ['6 exercícios', 'Resposta numérica'],
+      },
+      {
+        id: 'calculo-processo',
+        kind: 'processo',
+        status: 'available',
+        title: 'Cálculo em processo',
+        description:
+          'Acompanhe um problema real — da situação física à derivada — vendo a matemática emergir etapa por etapa.',
+        route: '/estudos/calculo/processo',
+        icon: 'icons/process.svg',
+        meta: ['8 etapas', '1 problema completo'],
       },
     ],
   },

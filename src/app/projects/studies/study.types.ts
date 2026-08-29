@@ -1,13 +1,14 @@
 /**
  * Data model for the "Exatas em Movimento" study hub.
  *
- * A `StudySubject` groups the two learning moments of a discipline:
- * a theory module (discovery-based, like the Calculus app) and an applied
- * module (real-world problem solving). New mini-courses only need to add a
- * subject to the catalog — the container renders them automatically.
+ * A `StudySubject` groups the learning moments of a discipline: a theory
+ * module (discovery-based), an applied module (real-world problem solving),
+ * and a process module (one problem walked through the full mathematical
+ * chain). New mini-courses only need to add a subject to the catalog — the
+ * container renders them automatically.
  */
 
-export type ModuleKind = 'teoria' | 'aplicada';
+export type ModuleKind = 'teoria' | 'aplicada' | 'processo';
 
 export type ModuleStatus = 'available' | 'coming-soon';
 

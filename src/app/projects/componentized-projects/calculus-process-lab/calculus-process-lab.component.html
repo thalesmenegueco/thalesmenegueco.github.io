@@ -1,0 +1,239 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-kicker">Cálculo I · Processo</div>
+      <h1>Veja a matemática emergir</h1>
+      <p>
+        Acompanhe um problema real de engenharia, da observação física à
+        derivada final.
+      </p>
+    </div>
+
+    <div class="progress-card">
+      <strong>Progresso do processo</strong>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+      <span class="progress-label">
+        {{ completedIds().length }} de {{ process.stages.length }} etapas concluídas
+      </span>
+    </div>
+
+    <nav class="stage-list">
+      @for (stage of process.stages; track stage.id; let idx = $index) {
+        <button
+          type="button"
+          class="stage-button"
+          [class.active]="idx === currentStageIndex()"
+          [class.completed]="isCompleted(stage)"
+          (click)="selectStage(idx)"
+        >
+          <span class="stage-index">{{ idx + 1 }}</span>
+          <span class="stage-name">{{ stage.title }}</span>
+        </button>
+      }
+    </nav>
+  </aside>
+
+  <main class="main">
+    @let stage = currentStage();
+
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">Um problema · muitas visões matemáticas</p>
+        <h2>{{ stage.title }}</h2>
+      </div>
+      <button type="button" class="reset-button" (click)="resetProgress()">
+        Reiniciar progresso
+      </button>
+    </div>
+
+    <section class="scenario-card">
+      <div class="scenario-label">{{ process.scenario.label }}</div>
+      <h3>{{ process.scenario.title }}</h3>
+      <p>{{ process.scenario.description }}</p>
+      <div class="metadata">
+        @for (tag of process.scenario.tags; track $index) {
+          <span class="tag">{{ tag }}</span>
+        }
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-header">
+        <div>
+          <div class="stage-counter">
+            Etapa {{ currentStageIndex() + 1 }} de {{ process.stages.length }}
+          </div>
+          <h3>{{ stage.title }}</h3>
+        </div>
+      </div>
+
+      <p class="stage-purpose">{{ stage.purpose }}</p>
+
+      <div class="flow-strip">
+        @for (node of process.stages; track node.id; let idx = $index; let last = $last) {
+          <div class="flow-node" [class.active]="idx === currentStageIndex()">
+            {{ node.flowLabel }}
+          </div>
+          @if (!last) {
+            <div class="flow-arrow" aria-hidden="true">→</div>
+          }
+        }
+      </div>
+
+      <div class="visual-grid">
+        <div class="visual-card">
+          <div class="visual-card-title">{{ stage.visualTitle }}</div>
+          <div class="plot-area">
+            <app-process-visualization
+              [visual]="stage.visual"
+              [time]="time()"
+              [h]="h()"
+              [approachDistance]="approachDistance()"
+            />
+          </div>
+          <div class="visual-caption">{{ stage.visualCaption }}</div>
+        </div>
+
+        <div class="visual-card">
+          <div class="visual-card-title">Transformação da fórmula</div>
+          <div class="formula-chain">
+            @for (formula of stage.formulas; track formula.label; let last = $last) {
+              <div class="formula-step" [class.current]="last">
+                <span class="formula-step-label">{{ formula.label }}</span>
+                <app-katex [latex]="formula.latex" [displayMode]="true" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (stage.controls !== 'none') {
+        <div class="controls">
+          @switch (stage.controls) {
+            @case ('time') {
+              <div class="control-row">
+                <div class="control">
+                  <label>
+                    <span>Tempo de observação t</span>
+                    <span class="control-value">{{ time().toFixed(2) }} s</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="9"
+                    step="0.05"
+                    [value]="time()"
+                    (input)="time.set($any($event.target).valueAsNumber)"
+                  />
+                </div>
+              </div>
+            }
+            @case ('approach') {
+              <div class="control-row">
+                <div class="control">
+                  <label>
+                    <span>Distância de t = 3</span>
+                    <span class="control-value">{{ approachDistance().toFixed(2) }} s</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0.03"
+                    max="0.9"
+                    step="0.01"
+                    [value]="approachDistance()"
+                    (input)="approachDistance.set($any($event.target).valueAsNumber)"
+                  />
+                </div>
+              </div>
+            }
+            @case ('h') {
+              <div class="control-row">
+                <div class="control">
+                  <label>
+                    <span>Intervalo h</span>
+                    <span class="control-value">{{ h().toFixed(2) }} s</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0.02"
+                    max="1.8"
+                    step="0.01"
+                    [value]="h()"
+                    (input)="h.set($any($event.target).valueAsNumber)"
+                  />
+                </div>
+              </div>
+            }
+            @case ('result') {
+              <div class="control-row">
+                <div class="control">
+                  <label>
+                    <span>Escolha o instante a avaliar</span>
+                    <span class="control-value">{{ time().toFixed(2) }} s</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="9"
+                    step="0.05"
+                    [value]="time()"
+                    (input)="time.set($any($event.target).valueAsNumber)"
+                  />
+                </div>
+              </div>
+            }
+          }
+        </div>
+      }
+
+      <div class="metric-grid">
+        @for (metric of metrics(); track metric.label) {
+          <div class="metric">
+            <span class="metric-label">{{ metric.label }}</span>
+            <span class="metric-value">{{ metric.value }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="reasoning-card">
+        <strong>{{ stage.reasoning.lead }}</strong> {{ stage.reasoning.text }}
+      </div>
+
+      <div class="action-row">
+        <button
+          type="button"
+          class="secondary-action"
+          [disabled]="isFirst()"
+          (click)="goPrevious()"
+        >
+          Etapa anterior
+        </button>
+
+        <button type="button" class="primary-button" (click)="completeStage()">
+          {{ isCompleted(stage) ? 'Etapa concluída' : 'Concluir etapa' }}
+        </button>
+
+        @if (!isLast()) {
+          <button type="button" class="primary-button" (click)="goNext()">
+            Continuar
+          </button>
+        }
+      </div>
+    </section>
+
+    @if (showCompletion()) {
+      <section class="completion-card">
+        <h3>{{ process.finalResult.title }}</h3>
+        <p>{{ process.finalResult.description }}</p>
+        <div class="completion-result">
+          <strong>{{ process.finalResult.label }}</strong>
+          <div class="completion-formula">
+            <app-katex [latex]="process.finalResult.latex" [displayMode]="true" />
+          </div>
+        </div>
+      </section>
+    }
+  </main>
+</div>

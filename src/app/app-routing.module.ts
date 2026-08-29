@@ -28,6 +28,7 @@ export const routes: Routes = [
   { path: 'estudos', component: StudiesComponent },
   { path: 'estudos/calculo/teoria', loadComponent: () => import('./projects/componentized-projects/calculus/calculus.component').then(m => m.CalculusComponent) },
   { path: 'estudos/calculo/aplicada', loadComponent: () => import('./projects/componentized-projects/calculus-practice/calculus-practice.component').then(m => m.CalculusPracticeComponent) },
+  { path: 'estudos/calculo/processo', loadComponent: () => import('./projects/componentized-projects/calculus-process-lab/calculus-process-lab.component').then(m => m.CalculusProcessLabComponent) },
   { path: 'tools/calculus', redirectTo: '/estudos/calculo/teoria', pathMatch: 'full' },
   { path: '', redirectTo: '/project-gallery', pathMatch: 'full' },
   { path: '**', redirectTo: '/project-gallery' }
