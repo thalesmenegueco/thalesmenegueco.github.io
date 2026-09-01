@@ -407,7 +407,21 @@
         [ngModel]="task.done"
         (ngModelChange)="toggleTaskById(parentList, task.id)"
       />
-      <span class="pm-task-text">{{ task.text }}</span>
+      @if (editingTaskId === task.id) {
+        <input
+          type="text"
+          class="pm-input pm-task-edit-input"
+          [(ngModel)]="editingTaskText"
+          (keydown)="onTaskEditKeydown(task, $event)"
+          (blur)="saveEditTask(task)"
+          autofocus
+        />
+      } @else {
+        <span
+          class="pm-task-text pm-editable"
+          (click)="startEditTask(task, $event)"
+          title="Clique para editar">{{ task.text }}</span>
+      }
       <div class="pm-task-actions">
         @if (depth < 2) {
           <button

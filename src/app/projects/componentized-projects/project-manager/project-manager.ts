@@ -56,6 +56,8 @@ export class ProjectManager implements OnInit {
   selectedProjectId: string | null = null;
   showSidebar = false;
   addTaskText = '';
+  editingTaskId: string | null = null;
+  editingTaskText = '';
 
   templates: ProjectTemplate[] = [];
   showTemplates = false;
@@ -467,6 +469,38 @@ export class ProjectManager implements OnInit {
     if (task) {
       task.done = !task.done;
       this.saveToStorage();
+    }
+  }
+
+  // --- tasks: edit ---
+
+  startEditTask(task: Task, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.editingTaskId = task.id;
+    this.editingTaskText = task.text;
+  }
+
+  saveEditTask(task: Task): void {
+    if (this.editingTaskId !== task.id) return;
+    const text = this.editingTaskText.trim();
+    if (text) {
+      task.text = text;
+    }
+    this.editingTaskId = null;
+    this.editingTaskText = '';
+    this.saveToStorage();
+  }
+
+  cancelEditTask(): void {
+    this.editingTaskId = null;
+    this.editingTaskText = '';
+  }
+
+  onTaskEditKeydown(task: Task, event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.saveEditTask(task);
+    } else if (event.key === 'Escape') {
+      this.cancelEditTask();
     }
   }
 

@@ -388,4 +388,86 @@ describe('ProjectManager', () => {
       expect(data[0].name).toBe('X');
     });
   });
+
+  describe('task editing', () => {
+    it('startEditTask should record the task id and current text', () => {
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+
+      component.startEditTask(task);
+
+      expect(component.editingTaskId).toBe('t1');
+      expect(component.editingTaskText).toBe('Original');
+    });
+
+    it('saveEditTask should trim and update the text, clear state and persist', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+
+      component.startEditTask(task);
+      component.editingTaskText = '  Editado  ';
+
+      component.saveEditTask(task);
+
+      expect(task.text).toBe('Editado');
+      expect(component.editingTaskId).toBeNull();
+      expect(component.editingTaskText).toBe('');
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('saveEditTask should keep the original text when the edit is blank', () => {
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+
+      component.startEditTask(task);
+      component.editingTaskText = '   ';
+
+      component.saveEditTask(task);
+
+      expect(task.text).toBe('Original');
+      expect(component.editingTaskId).toBeNull();
+    });
+
+    it('saveEditTask should be a no-op for a different task id', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+      component.editingTaskId = 'other';
+      component.editingTaskText = 'Lixo';
+
+      component.saveEditTask(task);
+
+      expect(task.text).toBe('Original');
+      expect(setItem).not.toHaveBeenCalled();
+    });
+
+    it('cancelEditTask should clear state without changing the task', () => {
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+
+      component.startEditTask(task);
+      component.editingTaskText = 'Alterado';
+
+      component.cancelEditTask();
+
+      expect(component.editingTaskId).toBeNull();
+      expect(component.editingTaskText).toBe('');
+      expect(task.text).toBe('Original');
+    });
+
+    it('onTaskEditKeydown should save on Enter and cancel on Escape', () => {
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+
+      component.startEditTask(task);
+      component.editingTaskText = 'Novo';
+      component.onTaskEditKeydown(task, new KeyboardEvent('keydown', { key: 'Enter' }));
+
+      expect(task.text).toBe('Novo');
+      expect(component.editingTaskId).toBeNull();
+
+      component.startEditTask(task);
+      component.editingTaskText = 'Lixo';
+      component.onTaskEditKeydown(task, new KeyboardEvent('keydown', { key: 'Escape' }));
+
+      expect(component.editingTaskId).toBeNull();
+      expect(component.editingTaskText).toBe('');
+      expect(task.text).toBe('Novo');
+    });
+  });
 });

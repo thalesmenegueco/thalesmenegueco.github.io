@@ -430,6 +430,12 @@
   }
 }
 
+.pm-task-edit-input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
 .pm-textarea {
   resize: vertical;
   min-height: 48px;
