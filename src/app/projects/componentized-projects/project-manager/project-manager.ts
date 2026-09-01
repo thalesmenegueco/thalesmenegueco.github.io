@@ -23,7 +23,25 @@ interface StoredData {
   standaloneTasks: Task[];
 }
 
+interface TemplateTask {
+  text: string;
+  subtasks: TemplateTask[];
+}
+
+interface ProjectTemplate {
+  id: string;
+  name: string;
+  description: string;
+  tasks: TemplateTask[];
+}
+
+/** Structural shape shared by `Task` and `TemplateTask` for counting helpers. */
+interface TaskLike {
+  subtasks: TaskLike[];
+}
+
 const STORAGE_KEY = 'project-manager-data';
+const TEMPLATES_STORAGE_KEY = 'project-manager-templates';
 
 @Component({
   selector: 'app-project-manager',
@@ -39,11 +57,21 @@ export class ProjectManager implements OnInit {
   showSidebar = false;
   addTaskText = '';
 
+  templates: ProjectTemplate[] = [];
+  showTemplates = false;
+
   newProjectName = '';
   newProjectDescription = '';
+  newProjectTemplateId: string | null = null;
   showNewProjectForm = false;
   editFieldProjectId: string | null = null;
   editFieldName: string | null = null;
+
+  showSaveTemplateForm = false;
+  templateName = '';
+  templateDescription = '';
+  editTemplateFieldId: string | null = null;
+  editTemplateFieldName: string | null = null;
 
   statuses: Project['status'][] = ['Pendente', 'Em andamento', 'Concluído'];
   statusFilter: Project['status'] | 'all' = 'all';
@@ -72,8 +100,19 @@ export class ProjectManager implements OnInit {
     return active < total ? `${active}/${total}` : `${total}`;
   }
 
+  get templateNameConflict(): boolean {
+    const name = this.templateName.trim().toLowerCase();
+    if (!name) {
+      return false;
+    }
+    return this.templates.some(
+      (t) => t.name.trim().toLowerCase() === name
+    );
+  }
+
   ngOnInit(): void {
     this.loadFromStorage();
+    this.loadTemplatesFromStorage();
   }
 
   loadFromStorage(): void {
@@ -98,8 +137,38 @@ export class ProjectManager implements OnInit {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
 
+  loadTemplatesFromStorage(): void {
+    try {
+      const raw = localStorage.getItem(TEMPLATES_STORAGE_KEY);
+      if (raw) {
+        this.templates = this.normalizeTemplates(JSON.parse(raw));
+      }
+    } catch {
+      this.templates = [];
+    }
+  }
+
+  saveTemplatesToStorage(): void {
+    localStorage.setItem(
+      TEMPLATES_STORAGE_KEY,
+      JSON.stringify({ templates: this.templates })
+    );
+  }
+
   selectProject(id: string | null): void {
     this.selectedProjectId = id;
+    this.showTemplates = false;
+    this.showSidebar = false;
+  }
+
+  openGeneralTasks(): void {
+    this.selectedProjectId = null;
+    this.showTemplates = false;
+    this.showSidebar = false;
+  }
+
+  openTemplates(): void {
+    this.showTemplates = true;
     this.showSidebar = false;
   }
 
@@ -113,9 +182,38 @@ export class ProjectManager implements OnInit {
     return '';
   }
 
+  openNewProjectForm(): void {
+    this.newProjectName = '';
+    this.newProjectDescription = '';
+    this.newProjectTemplateId = null;
+    this.showNewProjectForm = true;
+  }
+
+  cancelNewProject(): void {
+    this.showNewProjectForm = false;
+    this.newProjectName = '';
+    this.newProjectDescription = '';
+    this.newProjectTemplateId = null;
+  }
+
+  onNewProjectTemplateChange(id: string | null): void {
+    this.newProjectTemplateId = id;
+    const template = id
+      ? this.templates.find((t) => t.id === id)
+      : null;
+    if (template) {
+      this.newProjectName = template.name;
+      this.newProjectDescription = template.description;
+    }
+  }
+
   addProject(): void {
     const name = this.newProjectName.trim();
     if (!name) return;
+
+    const template = this.newProjectTemplateId
+      ? this.templates.find((t) => t.id === this.newProjectTemplateId)
+      : null;
 
     const project: Project = {
       id: crypto.randomUUID(),
@@ -123,12 +221,13 @@ export class ProjectManager implements OnInit {
       description: this.newProjectDescription.trim(),
       status: 'Pendente',
       deadline: null,
-      tasks: [],
+      tasks: template ? this.instantiateTemplateTasks(template.tasks) : [],
     };
 
     this.projects.push(project);
     this.newProjectName = '';
     this.newProjectDescription = '';
+    this.newProjectTemplateId = null;
     this.showNewProjectForm = false;
     this.selectedProjectId = project.id;
     this.saveToStorage();
@@ -176,6 +275,127 @@ export class ProjectManager implements OnInit {
     } else if (event.key === 'Escape') {
       this.cancelEditField();
     }
+  }
+
+  // --- templates: save from a project ---
+
+  openSaveTemplateForm(): void {
+    const project = this.selectedProject;
+    this.templateName = project?.name ?? '';
+    this.templateDescription = project?.description ?? '';
+    this.showSaveTemplateForm = true;
+  }
+
+  cancelSaveTemplate(): void {
+    this.showSaveTemplateForm = false;
+    this.templateName = '';
+    this.templateDescription = '';
+  }
+
+  saveTemplateFromProject(): void {
+    const project = this.selectedProject;
+    if (!project) return;
+
+    const name = this.templateName.trim();
+    if (!name) return;
+
+    const tasks = this.toTemplateTasks(project.tasks);
+    const existing = this.templates.find(
+      (t) => t.name.trim().toLowerCase() === name.toLowerCase()
+    );
+
+    if (existing) {
+      existing.name = name;
+      existing.description = this.templateDescription.trim();
+      existing.tasks = tasks;
+    } else {
+      this.templates.push({
+        id: crypto.randomUUID(),
+        name,
+        description: this.templateDescription.trim(),
+        tasks,
+      });
+    }
+
+    this.saveTemplatesToStorage();
+    this.showSaveTemplateForm = false;
+    this.templateName = '';
+    this.templateDescription = '';
+  }
+
+  // --- templates: use + manage ---
+
+  createProjectFromTemplate(template: ProjectTemplate): void {
+    const project: Project = {
+      id: crypto.randomUUID(),
+      name: template.name,
+      description: template.description,
+      status: 'Pendente',
+      deadline: null,
+      tasks: this.instantiateTemplateTasks(template.tasks),
+    };
+
+    this.projects.push(project);
+    this.saveToStorage();
+    this.showTemplates = false;
+    this.selectedProjectId = project.id;
+    this.showSidebar = false;
+  }
+
+  deleteTemplate(id: string): void {
+    if (!confirm('Tem certeza que deseja excluir este template?')) return;
+    this.templates = this.templates.filter((t) => t.id !== id);
+    this.saveTemplatesToStorage();
+  }
+
+  startEditTemplateField(templateId: string, fieldName: string): void {
+    this.editTemplateFieldId = templateId;
+    this.editTemplateFieldName = fieldName;
+  }
+
+  saveEditTemplateField(): void {
+    this.editTemplateFieldId = null;
+    this.editTemplateFieldName = null;
+    this.saveTemplatesToStorage();
+  }
+
+  cancelEditTemplateField(): void {
+    this.editTemplateFieldId = null;
+    this.editTemplateFieldName = null;
+    this.loadTemplatesFromStorage();
+  }
+
+  onTemplateFieldKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.saveEditTemplateField();
+    } else if (event.key === 'Escape') {
+      this.cancelEditTemplateField();
+    }
+  }
+
+  // --- templates: helpers ---
+
+  countTasks(tasks: TaskLike[]): number {
+    return tasks.reduce(
+      (sum, task) => sum + 1 + this.countTasks(task.subtasks),
+      0
+    );
+  }
+
+  private toTemplateTasks(tasks: Task[]): TemplateTask[] {
+    return tasks.map((task) => ({
+      text: task.text,
+      subtasks: this.toTemplateTasks(task.subtasks),
+    }));
+  }
+
+  private instantiateTemplateTasks(tasks: TemplateTask[]): Task[] {
+    return tasks.map((task) => ({
+      id: crypto.randomUUID(),
+      text: task.text,
+      done: false,
+      subtasks: this.instantiateTemplateTasks(task.subtasks),
+    }));
   }
 
   addTask(list: Task[], event?: Event): void {
@@ -329,12 +549,97 @@ export class ProjectManager implements OnInit {
     }
   }
 
+  // --- templates: export / import ---
+
+  exportTemplatesFilename(): string {
+    return `project-manager-templates-${new Date().toISOString().slice(0, 10)}.json`;
+  }
+
+  exportTemplatesData(): string {
+    return JSON.stringify({ templates: this.templates }, null, 2);
+  }
+
+  downloadTemplatesExport(): void {
+    const blob = new Blob([this.exportTemplatesData()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = this.exportTemplatesFilename();
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
+  importTemplatesData(json: string): boolean {
+    let raw: unknown;
+    try {
+      raw = JSON.parse(json);
+    } catch {
+      alert('Arquivo inválido. Selecione um .json exportado por esta ferramenta.');
+      return false;
+    }
+
+    this.templates = this.normalizeTemplates(raw);
+    this.saveTemplatesToStorage();
+    return true;
+  }
+
+  async onImportTemplatesFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!confirm('Substituir os templates atuais pelos importados?')) {
+      input.value = '';
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      this.importTemplatesData(text);
+    } catch {
+      alert('Não foi possível ler o arquivo.');
+    } finally {
+      input.value = '';
+    }
+  }
+
   normalizeData(raw: unknown): StoredData {
     const obj = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
     return {
       projects: this.normalizeProjects(obj['projects']),
       standaloneTasks: this.normalizeTasks(obj['standaloneTasks']),
     };
+  }
+
+  normalizeTemplates(raw: unknown): ProjectTemplate[] {
+    const obj = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
+    const list = Array.isArray(obj['templates'])
+      ? obj['templates']
+      : Array.isArray(raw)
+        ? raw
+        : [];
+    return list
+      .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+      .map((item) => ({
+        id: this.toId(item['id']),
+        name: this.toString(item['name']),
+        description: this.toString(item['description']),
+        tasks: this.normalizeTemplateTasks(item['tasks']),
+      }));
+  }
+
+  private normalizeTemplateTasks(raw: unknown): TemplateTask[] {
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+    return raw
+      .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+      .map((item) => ({
+        text: this.toString(item['text']),
+        subtasks: this.normalizeTemplateTasks(item['subtasks']),
+      }));
   }
 
   private normalizeProjects(raw: unknown): Project[] {

@@ -1,0 +1,3 @@
+# Per-project lean-ctx override (auto-merged with the global config).
+# Only compress shell output inside AI-agent sessions — never in a normal terminal.
+shell_activation = "agents-only"

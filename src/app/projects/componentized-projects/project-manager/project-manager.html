@@ -11,14 +11,23 @@
       <div class="pm-sidebar-section">
         <button
           class="pm-nav-item"
-          [class.active]="selectedProjectId === null"
-          (click)="selectProject(null)">
+          [class.active]="!showTemplates && selectedProjectId === null"
+          (click)="openGeneralTasks()">
           <span class="pm-nav-icon">📋</span>
           <span class="pm-nav-label">Tarefas Gerais</span>
           <span class="pm-nav-badge">{{ generalTasksCount }}</span>
         </button>
+        <button
+          class="pm-nav-item"
+          [class.active]="showTemplates"
+          (click)="openTemplates()">
+          <span class="pm-nav-icon">📚</span>
+          <span class="pm-nav-label">Templates</span>
+          <span class="pm-nav-badge">{{ templates.length }}</span>
+        </button>
       </div>
 
+      @if (!showTemplates) {
       <div class="pm-sidebar-section">
         <div class="pm-status-tabs">
           <button
@@ -68,11 +77,21 @@
 
       <div class="pm-sidebar-section">
         @if (!showNewProjectForm) {
-          <button class="pm-btn pm-btn-secondary pm-btn-full" (click)="showNewProjectForm = true">
+          <button class="pm-btn pm-btn-secondary pm-btn-full" (click)="openNewProjectForm()">
             + Novo Projeto
           </button>
         } @else {
           <div class="pm-new-project-form">
+            <label class="pm-field-label">Template (opcional)</label>
+            <select
+              class="pm-select"
+              [ngModel]="newProjectTemplateId"
+              (ngModelChange)="onNewProjectTemplateChange($event)">
+              <option [ngValue]="null">Em branco</option>
+              @for (template of templates; track template.id) {
+                <option [ngValue]="template.id">{{ template.name }}</option>
+              }
+            </select>
             <input
               type="text"
               class="pm-input"
@@ -88,31 +107,129 @@
             ></textarea>
             <div class="pm-form-actions">
               <button class="pm-btn pm-btn-primary" (click)="addProject()">Criar</button>
-              <button class="pm-btn pm-btn-ghost" (click)="showNewProjectForm = false; newProjectName = ''; newProjectDescription = ''">Cancel</button>
+              <button class="pm-btn pm-btn-ghost" (click)="cancelNewProject()">Cancel</button>
             </div>
           </div>
         }
       </div>
+      }
 
       <div class="pm-sidebar-section pm-sidebar-footer" style="margin-bottom: 50px;">
-        <button class="pm-btn pm-btn-secondary pm-btn-full pm-io-btn" (click)="downloadExport()">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-          </svg>
-          <span>Exportar notas</span>
-        </button>
-        <label class="pm-btn pm-btn-secondary pm-btn-full pm-io-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-          </svg>
-          <span>Importar notas</span>
-          <input type="file" accept=".json,application/json" (change)="onImportFileSelected($event)" hidden />
-        </label>
+        @if (!showTemplates) {
+          <button class="pm-btn pm-btn-secondary pm-btn-full pm-io-btn" (click)="downloadExport()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            <span>Exportar notas</span>
+          </button>
+          <label class="pm-btn pm-btn-secondary pm-btn-full pm-io-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+            </svg>
+            <span>Importar notas</span>
+            <input type="file" accept=".json,application/json" (change)="onImportFileSelected($event)" hidden />
+          </label>
+        } @else {
+          <button class="pm-btn pm-btn-secondary pm-btn-full pm-io-btn" (click)="downloadTemplatesExport()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            <span>Exportar templates</span>
+          </button>
+          <label class="pm-btn pm-btn-secondary pm-btn-full pm-io-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+            </svg>
+            <span>Importar templates</span>
+            <input type="file" accept=".json,application/json" (change)="onImportTemplatesFileSelected($event)" hidden />
+          </label>
+        }
       </div>
     </aside>
 
     <main class="pm-main">
-      @if (selectedProjectId === null) {
+      @if (showTemplates) {
+        <div class="pm-content">
+          <div class="pm-content-header">
+            <h2 class="pm-content-title">📚 Templates</h2>
+          </div>
+          <p class="pm-templates-lead">
+            Modelos reutilizáveis para criar projetos com estrutura pronta.
+          </p>
+
+          <div class="pm-template-grid">
+            @for (template of templates; track template.id) {
+              <article class="pm-template-card">
+                <div class="pm-template-card-header">
+                  @if (editTemplateFieldId === template.id && editTemplateFieldName === 'name') {
+                    <input
+                      type="text"
+                      class="pm-input pm-inline-edit"
+                      [(ngModel)]="template.name"
+                      (keydown)="onTemplateFieldKeydown($event)"
+                      (blur)="saveEditTemplateField()"
+                      autofocus
+                    />
+                  } @else {
+                    <h3
+                      class="pm-template-name pm-editable"
+                      (click)="startEditTemplateField(template.id, 'name')"
+                      title="Clique para editar">{{ template.name }}</h3>
+                  }
+                  <div class="pm-content-actions">
+                    <button
+                      class="pm-btn pm-btn-ghost pm-btn-small"
+                      (click)="startEditTemplateField(template.id, 'description')"
+                      title="Editar descrição">✏️</button>
+                    <button
+                      class="pm-btn pm-btn-ghost pm-btn-small pm-btn-danger"
+                      (click)="deleteTemplate(template.id)"
+                      title="Excluir template">🗑</button>
+                  </div>
+                </div>
+
+                @if (editTemplateFieldId === template.id && editTemplateFieldName === 'description') {
+                  <textarea
+                    class="pm-input pm-textarea"
+                    [(ngModel)]="template.description"
+                    (keydown)="onTemplateFieldKeydown($event)"
+                    (blur)="saveEditTemplateField()"
+                    rows="2"
+                    autofocus
+                  ></textarea>
+                } @else {
+                  <p class="pm-template-desc">{{ template.description || 'Sem descrição' }}</p>
+                }
+
+                <div class="pm-template-meta">
+                  <span>{{ template.tasks.length }} tarefa(s) principais</span>
+                  <span>{{ countTasks(template.tasks) }} no total</span>
+                </div>
+
+                <ul class="pm-template-preview">
+                  @for (task of template.tasks.slice(0, 3); track $index) {
+                    <li>{{ task.text }}</li>
+                  }
+                  @if (template.tasks.length > 3) {
+                    <li class="pm-template-more">…</li>
+                  }
+                </ul>
+
+                <button
+                  class="pm-btn pm-btn-primary pm-btn-full"
+                  (click)="createProjectFromTemplate(template)">
+                  Criar projeto →
+                </button>
+              </article>
+            }
+            @if (templates.length === 0) {
+              <p class="pm-empty-hint">
+                Nenhum template ainda. Abra um projeto e clique em "Salvar como template".
+              </p>
+            }
+          </div>
+        </div>
+      } @else if (selectedProjectId === null) {
         <div class="pm-content">
           <div class="pm-content-header">
             <h2 class="pm-content-title">📋 Tarefas Gerais</h2>
@@ -159,9 +276,44 @@
                 title="Click para editar">{{ selectedProject.name }}</h2>
             }
             <div class="pm-content-actions">
+              <button
+                class="pm-btn pm-btn-secondary pm-btn-small"
+                (click)="openSaveTemplateForm()"
+                title="Salvar como template">📚 Salvar como template</button>
               <button class="pm-btn pm-btn-danger" (click)="deleteProject(selectedProject.id)">🗑</button>
             </div>
           </div>
+
+          @if (showSaveTemplateForm && selectedProject) {
+            <div class="pm-save-template-form">
+              <h3 class="pm-save-template-title">Salvar como template</h3>
+              <input
+                type="text"
+                class="pm-input"
+                placeholder="Nome do template"
+                [(ngModel)]="templateName"
+                (keydown.enter)="saveTemplateFromProject()"
+              />
+              <textarea
+                class="pm-input pm-textarea"
+                placeholder="Descrição (opcional)"
+                [(ngModel)]="templateDescription"
+                rows="2"
+              ></textarea>
+              <p class="pm-template-summary">
+                Serão salvos: {{ countTasks(selectedProject.tasks) }} tarefa(s) — sempre como pendentes.
+              </p>
+              @if (templateNameConflict) {
+                <p class="pm-template-conflict">
+                  Já existe um template com este nome — será substituído.
+                </p>
+              }
+              <div class="pm-form-actions">
+                <button class="pm-btn pm-btn-primary" (click)="saveTemplateFromProject()">Salvar template</button>
+                <button class="pm-btn pm-btn-ghost" (click)="cancelSaveTemplate()">Cancelar</button>
+              </div>
+            </div>
+          }
 
           <div class="pm-project-meta">
             @if (editFieldProjectId === selectedProject.id && editFieldName === 'description') {

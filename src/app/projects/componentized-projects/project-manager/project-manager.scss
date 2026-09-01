@@ -393,6 +393,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  .pm-select {
+    width: 100%;
+  }
 }
 
 .pm-form-actions {
@@ -595,6 +599,129 @@
     height: 16px;
     flex-shrink: 0;
   }
+}
+
+.pm-nav-item + .pm-nav-item {
+  margin-top: 4px;
+}
+
+.pm-field-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pm-text-muted);
+  margin-bottom: 4px;
+}
+
+.pm-templates-lead {
+  color: var(--pm-text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 20px;
+}
+
+.pm-template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.pm-template-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--pm-surface);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  padding: 16px;
+}
+
+.pm-template-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pm-template-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--pm-accent);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pm-template-desc {
+  font-size: 0.8rem;
+  color: var(--pm-text-muted);
+  margin: 0;
+}
+
+.pm-template-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--pm-text-muted);
+}
+
+.pm-template-preview {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  li {
+    font-size: 0.8rem;
+    color: var(--pm-text);
+    padding-left: 12px;
+    position: relative;
+
+    &::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--pm-secondary);
+    }
+  }
+}
+
+.pm-template-more {
+  color: var(--pm-text-muted) !important;
+}
+
+.pm-save-template-form {
+  background: var(--pm-surface);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pm-save-template-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--pm-accent);
+}
+
+.pm-template-summary {
+  font-size: 0.75rem;
+  color: var(--pm-text-muted);
+  margin: 0;
+}
+
+.pm-template-conflict {
+  font-size: 0.75rem;
+  color: var(--pm-progress);
+  margin: 0;
 }
 
 @media (max-width: 767px) {
