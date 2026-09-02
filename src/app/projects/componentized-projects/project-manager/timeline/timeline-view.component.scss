@@ -1,0 +1,272 @@
+// Timeline styles. Reuses the `--pm-*` design tokens inherited from `.pm-container`.
+
+.tl {
+  display: flex;
+  flex-direction: column;
+}
+
+.tl-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.tl-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--pm-accent);
+}
+
+.tl-count {
+  font-size: 0.8rem;
+  color: var(--pm-text-muted);
+}
+
+.tl-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--pm-text-muted);
+  font-size: 0.9rem;
+}
+
+.tl-issues {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.tl-issue {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(196, 176, 122, 0.15);
+  color: var(--pm-progress);
+  font-size: 0.8rem;
+}
+
+.tl-issue-error {
+  background: rgba(212, 138, 138, 0.15);
+  color: var(--pm-danger);
+}
+
+.tl-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+}
+
+.tl-content {
+  display: flex;
+  align-items: flex-start;
+}
+
+.tl-labels {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  flex: none;
+  background: var(--pm-surface);
+  border-right: 1px solid var(--pm-border);
+}
+
+.tl-label-corner {
+  border-bottom: 1px solid var(--pm-border);
+}
+
+.tl-label {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(200, 195, 210, 0.08);
+  font-size: 0.8rem;
+  color: var(--pm-text);
+  overflow: hidden;
+  box-sizing: border-box;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.tl-label-project {
+  font-weight: 600;
+  color: var(--pm-accent);
+  background: rgba(196, 160, 122, 0.06);
+}
+
+.tl-chart {
+  position: relative;
+  flex: none;
+}
+
+.tl-header {
+  position: relative;
+  z-index: 2;
+  border-bottom: 1px solid var(--pm-border);
+  background: var(--pm-surface);
+}
+
+.tl-header-row {
+  position: relative;
+  height: 24px;
+}
+
+.tl-header-month {
+  position: absolute;
+  top: 0;
+  height: 24px;
+  border-left: 1px solid var(--pm-border);
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--pm-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.tl-header-day {
+  position: absolute;
+  top: 0;
+  height: 24px;
+  border-left: 1px solid rgba(200, 195, 210, 0.15);
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--pm-text-muted);
+  box-sizing: border-box;
+}
+
+.tl-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tl-grid {
+  stroke-width: 1;
+  stroke: rgba(200, 195, 210, 0.06);
+}
+
+.tl-grid-month {
+  stroke: rgba(200, 195, 210, 0.28);
+  stroke-width: 1.5;
+}
+
+.tl-today {
+  stroke: var(--pm-accent);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+
+.tl-connector {
+  fill: none;
+  stroke: var(--pm-text-muted);
+  stroke-width: 1.5;
+}
+
+.tl-connector-dimmed {
+  opacity: 0.25;
+}
+
+.tl-arrow {
+  fill: var(--pm-text-muted);
+}
+
+.tl-rows {
+  position: relative;
+  z-index: 2;
+}
+
+.tl-bar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 4px;
+  background: var(--pm-secondary);
+  color: var(--pm-bg);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0 6px;
+  overflow: hidden;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 1;
+  box-sizing: border-box;
+  transition: filter 0.15s;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  &[data-status='Pendente'] {
+    background: var(--pm-pending);
+  }
+
+  &[data-status='Em andamento'] {
+    background: var(--pm-progress);
+  }
+
+  &[data-status='Concluído'] {
+    background: var(--pm-done);
+  }
+}
+
+.tl-bar-project {
+  background: rgba(196, 160, 122, 0.15);
+  border: 1px solid var(--pm-accent);
+  color: var(--pm-text);
+}
+
+.tl-bar-derived {
+  border-style: dashed;
+}
+
+.tl-bar-milestone {
+  border-radius: 50%;
+  background: var(--pm-accent);
+  border: 1px solid var(--pm-text);
+}
+
+.tl-bar-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+}
+
+.tl-bar-label {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: calc(100% - 8px);
+}
+
+.tl-bar-ancestor {
+  box-shadow: 0 0 0 1px var(--pm-text-muted);
+  opacity: 0.85;
+}
+
+.tl-bar-direct {
+  box-shadow: 0 0 0 2px var(--pm-secondary);
+}
+
+.tl-bar-selected {
+  box-shadow: 0 0 0 2px var(--pm-text) inset, 0 0 0 3px var(--pm-accent);
+}

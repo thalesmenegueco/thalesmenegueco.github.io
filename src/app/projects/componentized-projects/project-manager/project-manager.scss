@@ -363,6 +363,30 @@
   padding-left: 8px;
 }
 
+.pm-task-schedule {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 6px 0 10px 28px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+
+  .pm-field-label {
+    flex: 1 1 160px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 0;
+  }
+}
+
+.pm-btn-schedule-active {
+  background: var(--pm-surface-hover);
+  color: var(--pm-accent);
+}
+
 .pm-checkbox {
   appearance: none;
   width: 18px;

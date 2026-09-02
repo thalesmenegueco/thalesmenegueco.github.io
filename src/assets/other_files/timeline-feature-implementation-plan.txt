@@ -1,0 +1,1509 @@
+PROJECT: Add a Timeline/Gantt View to an Existing Angular Project Manager
+
+ROLE
+
+You are an AI coding agent working inside an existing Angular and TypeScript project manager application.
+
+Your task is to implement a new Timeline/Gantt visualization for existing projects and tasks.
+
+The application already has:
+
+- An established visual identity
+- Existing project and task data models
+- Existing services, stores, facades, or state management
+- Existing navigation and detail views
+- Existing styling conventions and design tokens
+
+Do not redesign the application. Do not replace existing models unnecessarily. Do not introduce a new visual language unless the existing project has no equivalent pattern.
+
+PRIMARY OBJECTIVE
+
+Build a read-only timeline view that helps users understand:
+
+1. Which projects and tasks exist
+2. When each project or task starts and ends
+3. Which tasks depend on other tasks
+4. What must finish before another item can begin
+5. Which items belong to the same project
+6. Which predecessor chain leads to the currently selected item
+
+The first version should prioritize clarity, correctness, maintainability, accessibility, and low coupling with the existing application.
+
+Do not implement a complete project scheduling system in the first version.
+
+VERSION 1 SCOPE
+
+Include:
+
+- Projects displayed as groups or summary rows
+- Tasks displayed as timeline rows
+- Start and end dates
+- Task duration bars
+- Project summary bars when dates are available
+- Horizontal scrolling
+- Timeline date headers
+- Grid lines
+- Visible dependency connectors
+- Arrowheads showing dependency direction
+- Task selection
+- Keyboard-accessible task selection
+- Highlighting of direct predecessors
+- Subtle highlighting of indirect predecessors
+- Existing task/project detail navigation through an output or callback
+- Loading state
+- Empty state
+- Validation-error state
+- Invalid data handling without breaking the entire view
+- Support for approximately 100 tasks per project without virtualization
+
+Do not include in version 1:
+
+- Drag-and-drop date editing
+- Resizing task bars
+- Inline editing
+- Visual creation or deletion of dependencies
+- Automatic task rescheduling
+- Critical path analysis
+- Slack or float calculations
+- Resource allocation
+- Workday calendars
+- Holidays
+- Multiple dependency types
+- Lead or lag values
+- Complex zoom controls
+- Virtual scrolling
+- A third-party Gantt library unless the existing project already uses one and it is clearly appropriate
+
+DEFAULT DEPENDENCY TYPE
+
+Use finish-to-start dependencies for version 1.
+
+Meaning:
+
+- The predecessor must finish before the successor begins.
+- The connector starts at the right side of the predecessor bar.
+- The connector ends at the left side of the successor bar.
+
+REPOSITORY RECONNAISSANCE
+
+Before modifying code, inspect the existing repository.
+
+Inspect:
+
+- package.json
+- Angular version
+- TypeScript version
+- tsconfig files
+- Strict mode settings
+- Standalone component or NgModule architecture
+- Existing routing structure
+- Existing state management
+- Existing project and task interfaces
+- Existing dependency representation
+- Existing date formats
+- Existing status and progress fields
+- Existing detail views
+- Existing layout components
+- Existing design tokens
+- Existing CSS/SCSS conventions
+- Existing test runner
+- Existing lint and formatting commands
+- Existing build commands
+
+Locate:
+
+- The main project manager screen
+- The best host component for the timeline
+- Existing project and task models
+- Existing data-loading services, stores, facades, or signals
+- Existing components used to display project/task information
+- Existing navigation behavior for opening task details
+
+Do not change code during the reconnaissance phase.
+
+Produce a short internal inventory that identifies:
+
+1. Which component should host the timeline
+2. Which existing models contain the required data
+3. How task dependencies are currently represented
+4. Which date format is already used
+5. Whether end dates are inclusive or exclusive
+6. Which existing event or navigation mechanism opens task details
+7. Which test and build commands are valid
+8. Which files should not be modified
+
+ARCHITECTURE
+
+Separate the feature into four layers.
+
+1. Existing domain layer
+
+Reuse the existing:
+
+- Project type
+- Task type
+- Status enums
+- Services
+- Facades
+- Stores
+- Signals
+- Observables
+- Existing navigation mechanisms
+
+Do not duplicate the domain model.
+
+2. Timeline adapter
+
+Create an adapter that transforms existing domain data into a normalized timeline model.
+
+The adapter may know about:
+
+- Project
+- Task
+- Existing API naming
+- Existing date representation
+- Existing dependency fields
+- Existing status representation
+- Existing progress representation
+
+The adapter must preserve original IDs.
+
+If existing API fields change later, most changes should be limited to the adapter.
+
+3. Pure timeline engine
+
+The timeline engine must not import:
+
+- Angular
+- DOM APIs
+- Components
+- Services
+- CSS
+- Browser globals
+
+It should contain pure functions for:
+
+- Date normalization
+- Date validation
+- Timeline range calculation
+- Hierarchy flattening
+- Dependency graph creation
+- Cycle detection
+- Row indexing
+- Bar positioning
+- Grid generation
+- Dependency endpoint calculation
+- Connector path generation
+- Ancestor traversal
+- Layout validation
+
+4. Angular presentation layer
+
+The Angular component should handle:
+
+- Inputs
+- Outputs
+- Template rendering
+- User interaction
+- Selection state
+- Loading state
+- Empty state
+- Error display
+- Existing design-system integration
+
+The Angular component should not contain complex date arithmetic, graph algorithms, or path-routing logic.
+
+NORMALIZED DATA CONTRACT
+
+Adjust names to match the project’s conventions, but preserve this conceptual shape:
+
+type TimelineItemKind = 'project' | 'task';
+
+interface TimelineDependency {
+  readonly predecessorId: string;
+  readonly type: 'finish-to-start';
+}
+
+interface TimelineItem {
+  readonly id: string;
+  readonly kind: TimelineItemKind;
+  readonly parentId?: string;
+  readonly label: string;
+  readonly start: string;
+  readonly end: string;
+  readonly status?: string;
+  readonly progress?: number;
+  readonly colorToken?: string;
+  readonly dependencies: readonly TimelineDependency[];
+}
+
+interface TimelineViewConfig {
+  readonly scale: 'day' | 'week' | 'month';
+  readonly rowHeight: number;
+  readonly barHeight: number;
+  readonly unitWidth: number;
+  readonly showToday: boolean;
+}
+
+interface TimelineIssue {
+  readonly code: string;
+  readonly itemId?: string;
+  readonly relatedItemId?: string;
+  readonly message: string;
+  readonly severity: 'warning' | 'error';
+}
+
+The normalized model must be immutable from the perspective of the renderer.
+
+Do not mutate input project or task objects.
+
+DATE RULES
+
+Choose one internal date representation and document it.
+
+Recommended internal behavior:
+
+- Convert source dates once in the adapter.
+- Use calendar-day indexes in the pure engine.
+- Use a half-open interval internally:
+  [startDay, endDayExclusive)
+
+If the existing domain treats the end date as inclusive, convert it once in the adapter.
+
+Do not silently alter or persist the normalized dates back into the domain model.
+
+Validate:
+
+- Invalid date strings
+- Missing dates
+- End date before start date
+- Zero-duration tasks
+- Date boundaries across months
+- Date boundaries across years
+- Leap-year dates
+- Timezone-related inconsistencies
+
+Never allow these values into geometry calculations:
+
+- NaN
+- Infinity
+- Negative widths
+- Negative heights
+- Undefined x positions
+- Undefined row indexes
+
+For zero-duration items, preserve the real date but render a milestone or minimum-width visual marker.
+
+TIMELINE RANGE
+
+Calculate the global timeline range from valid items.
+
+Recommended process:
+
+1. Convert every valid item date to an integer day index.
+2. Find the minimum start day.
+3. Find the maximum end-exclusive day.
+4. Add visual padding around the range if useful.
+5. Generate all headers and grid lines from this same range.
+6. Use the same coordinate conversion for headers, bars, grid lines, and connectors.
+
+Use a single coordinate function conceptually equivalent to:
+
+x = (dayIndex - rangeStart) * unitWidth
+
+Use a single width function conceptually equivalent to:
+
+width = (endDayExclusive - startDay) * unitWidth
+
+The exact function names are not important. Consistency is important.
+
+LAYOUT RULES
+
+Flatten hierarchical items in a predictable order.
+
+Recommended order:
+
+- Project
+- Visible child tasks
+- Next project
+- Its visible child tasks
+
+Store a row index for each item ID.
+
+Each item should appear only once.
+
+Projects with explicit dates should use those dates.
+
+If projects do not have explicit dates, only derive summary dates from children if this is compatible with the existing product semantics.
+
+Derived project dates must:
+
+- Be marked internally as derived
+- Not be persisted back into the domain accidentally
+- Be covered by tests
+
+Return a layout result containing the calculated data needed by the renderer, such as:
+
+- Timeline range
+- Header units
+- Rows
+- Bars
+- Row indexes
+- Dependency edges
+- Connector paths
+- Today marker position
+- Validation issues
+- Content width
+- Content height
+
+All layout output must be deterministic for the same input.
+
+DEPENDENCY GRAPH
+
+Represent each dependency as:
+
+predecessorId -> successorId
+
+Validate:
+
+- Missing predecessor
+- Missing successor
+- Duplicate dependency
+- Self-dependency
+- Cycles
+- Unsupported dependency type
+
+A dependency problem should not crash the whole timeline.
+
+For invalid edges:
+
+- Produce a validation issue
+- Do not generate a connector path for that edge
+- Continue rendering valid items and valid edges
+
+Use a reverse adjacency map for predecessor traversal.
+
+When a task is selected:
+
+- Highlight direct predecessors strongly
+- Highlight indirect ancestors subtly
+- Reduce the prominence of unrelated dependency edges
+- Avoid infinite traversal by using a visited set
+
+CONNECTOR ROUTING
+
+Use SVG paths for dependency connectors.
+
+The first version only needs predictable orthogonal routing.
+
+Recommended routing:
+
+1. Start at the right edge of the predecessor bar.
+2. Move horizontally.
+3. Move vertically through a calculated routing lane.
+4. Move horizontally toward the successor.
+5. End at the left edge of the successor bar.
+6. Add an arrowhead pointing toward the successor.
+
+Handle:
+
+- Predecessor before successor
+- Successor before predecessor
+- Overlapping bars
+- Same-row relationships
+- Multiple edges using the same lane
+- Several edges between nearby rows
+
+Use deterministic lane assignment.
+
+Keep connectors behind the task bars.
+
+Set connector pointer events to none in version 1 so connectors do not prevent task-bar interaction.
+
+The connector layer is visual support. The DOM labels and buttons remain the primary interactive and semantic representation.
+
+RENDERING STRATEGY
+
+Use a hybrid HTML/CSS and SVG renderer.
+
+Use HTML/CSS for:
+
+- Section structure
+- Toolbar
+- Timeline labels
+- Row labels
+- Task bars
+- Project summary bars
+- Progress indicators
+- Buttons
+- Focus styles
+- Empty and error states
+
+Use SVG for:
+
+- Grid lines
+- Dependency paths
+- Arrowheads
+- Today marker
+- Other geometry-based decoration
+
+Keep all visual layers inside a shared coordinate system.
+
+The horizontal scrolling wrapper should contain one internal content area.
+
+Conceptually:
+
+<section class="timeline">
+  <header class="timeline-toolbar">
+    ...
+  </header>
+
+  <div class="timeline-scroll">
+    <div class="timeline-content">
+      <div class="timeline-labels">
+        ...
+      </div>
+
+      <div class="timeline-chart">
+        <svg>
+          ...
+        </svg>
+
+        <div class="timeline-rows">
+          ...
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+Do not allow the header, bars, and SVG to use separate positioning formulas.
+
+ANGULAR COMPONENT API
+
+Follow the project’s existing input/output conventions.
+
+Conceptually, the component should expose:
+
+- Normalized items or domain items through an input
+- Timeline configuration through an optional input
+- Loading state if needed
+- Validation issues if the host owns them
+- An output for selected item ID
+- An output or callback for opening the existing detail view
+
+The timeline component should not own navigation logic if the existing host already handles navigation.
+
+It should emit the original project/task ID.
+
+The parent component should decide what happens after selection.
+
+INTERACTION
+
+Version 1 interaction:
+
+- Mouse click selects an item.
+- Tab can reach interactive bars.
+- Enter selects the focused item.
+- Space selects the focused item.
+- Focus and hover use equivalent visual emphasis.
+- Escape clears selection if that behavior matches existing application conventions.
+- Selecting an item highlights its dependency chain.
+- Selecting an item must not mutate source data.
+- The host may open an existing detail view in response to selection.
+
+Do not implement drag-to-edit until a persistence contract exists.
+
+Do not pretend that a visual edit is saved if there is no real persistence path.
+
+ACCESSIBILITY
+
+Use native semantic elements wherever possible.
+
+Task bars should be buttons when they are interactive.
+
+Each task button should have an accessible name containing available information such as:
+
+- Task name
+- Project name
+- Start date
+- End date
+- Status
+- Progress
+
+Do not rely on color alone.
+
+Keep visible labels available even when bars are narrow.
+
+Use visible focus styles.
+
+Use descriptive text for loading, empty, and validation states.
+
+The SVG connector layer may be aria-hidden if the same dependency information is available through accessible text or labels.
+
+Do not use role="listbox" if list items contain buttons or other interactive descendants.
+
+Do not use role="grid" merely to obtain keyboard behavior. A grid requires proper grid navigation semantics.
+
+Use SVG attribute bindings correctly in Angular, such as:
+
+[attr.viewBox]
+[attr.x]
+[attr.y]
+[attr.width]
+[attr.height]
+[attr.d]
+
+DESIGN INTEGRATION
+
+Do not create a new visual identity.
+
+Reuse existing:
+
+- Colors
+- Typography
+- Border radius
+- Shadows
+- Spacing
+- Icons
+- Status tokens
+- Focus styles
+- Empty states
+- Error-message patterns
+- Tooltips
+- Buttons
+- Panels
+- Cards
+- Navigation patterns
+
+Dependency lines should be visually subordinate to task bars.
+
+Selected items should be clear without being visually disconnected from the rest of the application.
+
+Progress should be represented as a sublayer inside the task bar, but not as the only information about completion.
+
+Do not create a new color palette solely for dependency states unless the project already has a suitable convention.
+
+IMPLEMENTATION PHASES
+
+Execute these phases sequentially. Do not combine all phases into one large change.
+
+PHASE 0: Baseline and inventory
+
+Tasks:
+
+- Inspect the repository
+- Identify relevant files
+- Identify existing models and services
+- Identify date semantics
+- Identify test commands
+- Run existing tests, lint, and build if available
+- Record baseline status
+
+Do not modify unrelated code.
+
+Acceptance criteria:
+
+- Repository structure is understood
+- Existing baseline is known
+- Timeline host location is identified
+- Existing domain models are identified
+
+PHASE 1: Normalized contract
+
+Tasks:
+
+- Add timeline types
+- Add configuration types
+- Add issue types
+- Add a minimal test fixture
+- Preserve original IDs
+- Do not create the UI yet
+
+Acceptance criteria:
+
+- TypeScript compiles
+- Fixture contains projects, tasks, and dependencies
+- No existing domain types were duplicated unnecessarily
+
+PHASE 2: Date engine
+
+Tasks:
+
+- Implement date normalization
+- Implement date validation
+- Implement day-index conversion
+- Define inclusive/exclusive semantics
+- Handle zero-duration items
+- Add unit tests
+
+Test cases:
+
+- Valid date
+- Invalid date
+- Missing date
+- Equal start and end
+- End before start
+- Month boundary
+- Year boundary
+- Leap-year date
+- Timezone-safe behavior
+
+Acceptance criteria:
+
+- Invalid values become explicit issues
+- No invalid numeric values are returned
+- Date results are deterministic
+
+PHASE 3: Dependency graph
+
+Tasks:
+
+- Build adjacency maps
+- Validate dependency IDs
+- Detect duplicate edges
+- Detect self-dependencies
+- Detect cycles
+- Support finish-to-start dependencies
+- Add unit tests
+
+Acceptance criteria:
+
+- Valid dependencies produce valid edges
+- Invalid dependencies produce issues
+- Cycles do not cause infinite traversal
+- Invalid edges do not generate connector paths
+
+PHASE 4: Layout engine
+
+Tasks:
+
+- Flatten project/task hierarchy
+- Calculate row indexes
+- Calculate timeline range
+- Calculate headers
+- Calculate bar positions
+- Calculate project summary positions
+- Calculate content width and height
+- Add layout tests
+
+Acceptance criteria:
+
+- Same input produces same output
+- Every valid item has one row
+- Every valid item has finite coordinates
+- Widths are never negative
+- Header and bars use the same date-to-x conversion
+
+PHASE 5: Angular shell
+
+Tasks:
+
+- Add the timeline component
+- Add the host integration point
+- Add loading state
+- Add empty state
+- Add validation-error state
+- Add horizontal scroll container
+- Do not add connectors yet
+
+Acceptance criteria:
+
+- Existing navigation still works
+- Timeline can be opened through the intended host
+- States are displayed correctly
+- No new unnecessary data request is introduced
+
+PHASE 6: Static rendering
+
+Tasks:
+
+- Render date header
+- Render grid
+- Render project rows
+- Render task rows
+- Render bars
+- Render progress
+- Render status styling
+- Verify alignment visually
+
+Acceptance criteria:
+
+- Small fixture renders correctly
+- 100-task fixture remains usable
+- Bars align with the grid
+- Long and short tasks render correctly
+- Zero-duration tasks are visible
+
+PHASE 7: Dependency connectors
+
+Tasks:
+
+- Add SVG connector layer
+- Add SVG marker arrowhead
+- Add orthogonal paths
+- Add deterministic routing lanes
+- Keep paths behind bars
+- Disable connector pointer events
+
+Acceptance criteria:
+
+- Connector direction is correct
+- Arrow points toward successor
+- Overlapping tasks do not break the layout
+- Multiple edges remain readable
+- Connectors do not block bar selection
+
+PHASE 8: Selection and highlighting
+
+Tasks:
+
+- Add mouse selection
+- Add keyboard selection
+- Add focus states
+- Add direct predecessor highlighting
+- Add indirect ancestor highlighting
+- Add unrelated-edge de-emphasis
+- Emit selected ID
+- Connect to existing detail behavior
+
+Acceptance criteria:
+
+- Mouse and keyboard selection behave consistently
+- Original IDs are emitted
+- Inputs are not mutated
+- Dependency chain highlighting is correct
+- Direct and indirect relationships are visually distinguishable
+
+PHASE 9: Real-data adapter integration
+
+Tasks:
+
+- Connect the adapter to the existing service/store/facade
+- Map real project/task fields
+- Map existing status tokens
+- Map existing dependencies
+- Handle real missing or partial data
+- Preserve existing navigation
+
+Acceptance criteria:
+
+- Real application data renders
+- No duplicate domain model is introduced
+- Existing project-manager behavior is preserved
+- Invalid real data does not crash the feature
+
+PHASE 10: Quality review
+
+Tasks:
+
+- Run unit tests
+- Run component tests
+- Run integration tests
+- Run lint
+- Run type checking
+- Run production build
+- Inspect responsive behavior
+- Test keyboard navigation
+- Test invalid data
+- Test fixture with approximately 100 tasks
+- Review changed files for accidental scope expansion
+
+Acceptance criteria:
+
+- All project checks pass
+- No unnecessary dependencies were added
+- No unrelated files were modified
+- Feature can be disabled or reverted safely
+
+TEST STRATEGY
+
+Prioritize tests for pure logic.
+
+Date tests:
+
+- Input parsing
+- Range conversion
+- Inclusive/exclusive behavior
+- Invalid date handling
+- Equal dates
+- Reversed dates
+- Month and year transitions
+- Leap years
+- Timezone stability
+
+Graph tests:
+
+- Valid edge
+- Missing predecessor
+- Missing successor
+- Duplicate edge
+- Self-edge
+- Two-node cycle
+- Larger cycle
+- Multiple independent chains
+- Ancestor traversal
+- Safe traversal with visited set
+
+Layout tests:
+
+- Minimum and maximum range
+- Padding
+- Day/week/month scale behavior
+- Zero-duration item
+- Hierarchical flattening
+- Stable row order
+- Project summaries
+- Finite coordinates
+- Non-negative widths
+- 100-item or 100-task fixture
+
+Path tests:
+
+- Predecessor left of successor
+- Successor left of predecessor
+- Overlapping bars
+- Same-row dependency
+- Multiple edges sharing a lane
+- Correct predecessor endpoint
+- Correct successor endpoint
+- Deterministic path output
+
+Component tests:
+
+- Loading state
+- Empty state
+- Validation-error state
+- Rendering labels
+- Rendering bars
+- Selection by click
+- Selection by keyboard
+- Focus visibility
+- Output event
+- Ancestor highlighting
+- Input changes
+- No mutation of source data
+
+Integration tests:
+
+- Existing host opens timeline
+- Real data is adapted correctly
+- Existing detail navigation still works
+- Existing project manager screen is not regressed
+
+Do not test private implementation details unless they are part of a real public contract.
+
+Do not depend on arbitrary timing or sleeps.
+
+Use the test runner already configured in the repository. Do not migrate testing infrastructure as part of this feature.
+
+PERFORMANCE
+
+Optimize for approximately 100 tasks in version 1.
+
+Do not add virtual scrolling immediately.
+
+Before introducing virtualization, measure:
+
+- Initial render time
+- Scroll responsiveness
+- Selection responsiveness
+- Memory usage
+- Number of DOM nodes
+- SVG path count
+
+If future requirements exceed the current scale, consider:
+
+- Fixed-height rows
+- Angular CDK virtual scrolling
+- Memoized layout calculations
+- Incremental path rendering
+- Collapsible project groups
+- Viewport-based rendering
+
+Do not combine virtualization with drag-and-drop and a new dependency system in one change.
+
+ERROR HANDLING
+
+The timeline should degrade gracefully.
+
+For invalid data:
+
+- Preserve valid items
+- Exclude only items or edges that cannot be positioned safely
+- Show meaningful validation issues
+- Avoid crashing the entire component
+- Never silently create fake dates
+- Never invent missing dependencies
+- Never produce NaN geometry
+- Never silently mutate domain data
+
+If the entire dataset is invalid, show an appropriate error state.
+
+If there are no items, show the existing application’s empty-state pattern.
+
+If data is loading, show the existing loading pattern.
+
+ROLLBACK STRATEGY
+
+Keep changes easy to revert.
+
+Recommended commit boundaries:
+
+1. Repository inventory and notes
+2. Timeline types and fixture
+3. Date engine
+4. Dependency graph
+5. Layout engine
+6. Static Angular renderer
+7. SVG connectors
+8. Selection and accessibility
+9. Real-data integration
+10. Final polish
+
+Do not modify database schemas or public APIs unless absolutely required.
+
+Do not add unrelated refactors.
+
+Do not migrate Angular versions, state management, styling systems, or test runners as part of this feature.
+
+If integration fails, the feature should be removable by:
+
+- Removing the host route or tab
+- Removing the feature import
+- Removing the adapter integration
+- Preserving the pure engine and tests if they are independently useful
+
+AGENT OPERATING RULES
+
+For every implementation phase:
+
+1. Read only the files needed for that phase.
+2. State which files may change.
+3. State which files must not change.
+4. Implement the smallest complete increment.
+5. Add or update tests.
+6. Run the relevant validation command.
+7. Report the result.
+8. Stop before beginning the next phase.
+
+Do not solve future phases early.
+
+Do not add speculative abstractions.
+
+Do not introduce a library without first checking:
+
+- Compatibility with the installed Angular version
+- Bundle impact
+- License
+- Accessibility
+- Styling flexibility
+- Dependency API quality
+- Whether it duplicates functionality already present
+
+Do not invent project fields, dependency fields, dates, IDs, colors, or navigation behavior.
+
+If an important domain detail is missing, inspect the repository first. If it cannot be determined safely, isolate the assumption in the adapter and document it instead of spreading it through the application.
+
+DEFINITION OF DONE
+
+The feature is complete when:
+
+- Existing project and task models are reused.
+- Existing visual identity is preserved.
+- The timeline works with real data.
+- Tasks and projects are positioned correctly.
+- Header, grid, bars, and connectors remain aligned.
+- Dependencies point from predecessor to successor.
+- Invalid dates do not break the timeline.
+- Invalid dependencies are reported safely.
+- Cycles cannot cause infinite traversal.
+- The selected task’s dependency chain is understandable.
+- Direct and indirect predecessors have different visual emphasis.
+- Task bars are keyboard accessible.
+- Selection emits the correct existing ID.
+- Existing task detail navigation still works.
+- Loading, empty, and error states are implemented.
+- The feature handles approximately 100 tasks without unnecessary complexity.
+- Unit, component, integration, lint, typecheck, and build checks pass.
+- No unrelated refactoring was introduced.
+- The timeline can be disabled or reverted safely.
+
+FINAL IMPLEMENTATION PRINCIPLE
+
+Build the feature in this order:
+
+1. Understand the existing repository.
+2. Define the normalized contract.
+3. Implement and test date logic.
+4. Implement and test dependency logic.
+5. Implement and test the layout engine.
+6. Render the static timeline.
+7. Add SVG dependency paths.
+8. Add selection and highlighting.
+9. Connect real application data.
+10. Validate accessibility, performance, and integration.
+
+The timeline should be treated as an independent visualization feature connected to the existing project manager through a small adapter and a stable public component API.
+
+DESIGN INTEGRATION
+
+Do not create a new visual identity.
+
+Reuse existing:
+
+- Colors
+- Typography
+- Border radius
+- Shadows
+- Spacing
+- Icons
+- Status tokens
+- Focus styles
+- Empty states
+- Error-message patterns
+- Tooltips
+- Buttons
+- Panels
+- Cards
+- Navigation patterns
+
+Dependency lines should be visually subordinate to task bars.
+
+Use existing status colors when possible. If a status does not have an existing visual token, use a neutral fallback instead of inventing a new color system.
+
+Progress should not be communicated only through color. Use a progress fill, percentage text, tooltip, or another existing pattern from the application.
+
+COMPONENT FILE STRUCTURE
+
+Follow the project’s existing folder and naming conventions.
+
+If there is no clear convention, use a structure similar to:
+
+timeline/
+  timeline-view.component.ts
+  timeline-view.component.html
+  timeline-view.component.scss
+  timeline.types.ts
+  timeline-adapter.ts
+  timeline-date.ts
+  timeline-validation.ts
+  timeline-layout.ts
+  timeline-dependencies.ts
+  timeline-path.ts
+  timeline-view.component.spec.ts
+  timeline-date.spec.ts
+  timeline-validation.spec.ts
+  timeline-layout.spec.ts
+
+Do not create all files automatically if some are unnecessary. Create only the files required by the existing architecture.
+
+IMPLEMENTATION PHASES
+
+Work in small phases. Do not implement the entire feature in one pass.
+
+After each phase:
+
+1. Run the relevant tests.
+2. Run type checking if available.
+3. Run lint if relevant.
+4. Review the changed files.
+5. Confirm that unrelated files were not changed.
+6. Stop before starting the next phase.
+
+PHASE 0: BASELINE
+
+Tasks:
+
+- Inspect the repository.
+- Identify Angular and TypeScript versions.
+- Identify the project manager host component.
+- Identify project and task models.
+- Identify the existing data-loading mechanism.
+- Identify the test runner.
+- Identify build, lint, and type-check commands.
+- Confirm the existing application builds before changes.
+
+Do not modify application code during this phase.
+
+Acceptance criteria:
+
+- A short implementation inventory exists.
+- Existing build and tests pass.
+- The host component is identified.
+- The existing domain models are identified.
+- The existing date and dependency fields are identified.
+
+PHASE 1: NORMALIZED CONTRACT
+
+Tasks:
+
+- Create the internal timeline types.
+- Preserve original project and task IDs.
+- Create a small fixture with projects, tasks, dates, statuses, progress, and dependencies.
+- Avoid modifying the existing domain models.
+
+Acceptance criteria:
+
+- TypeScript compilation passes.
+- The fixture contains at least two projects.
+- At least one project contains multiple tasks.
+- At least one task depends on another.
+- The adapter contract is documented.
+- No existing API or domain type has been duplicated unnecessarily.
+
+PHASE 2: DATE ENGINE
+
+Tasks:
+
+- Implement date normalization.
+- Implement date validation.
+- Define the internal start/end convention.
+- Convert valid dates to integer day indexes.
+- Handle zero-duration items.
+- Return explicit issues for invalid dates.
+
+Tests must include:
+
+- Valid dates
+- Invalid date strings
+- Missing dates
+- Equal start and end dates
+- End date before start date
+- Month boundaries
+- Year boundaries
+- Leap-year dates
+- Timezone-safe behavior
+
+Acceptance criteria:
+
+- Date calculations are deterministic.
+- No invalid date produces NaN.
+- No invalid date reaches the layout engine.
+- The domain source objects are not mutated.
+
+PHASE 3: DEPENDENCY GRAPH
+
+Tasks:
+
+- Build the predecessor-to-successor graph.
+- Build a reverse adjacency map.
+- Validate dependency IDs.
+- Detect duplicate edges.
+- Detect self-dependencies.
+- Detect cycles.
+- Support only finish-to-start dependencies in version 1.
+
+Acceptance criteria:
+
+- Valid dependencies produce valid graph edges.
+- Invalid dependencies produce validation issues.
+- Invalid dependencies do not produce connector paths.
+- Cycles are detected safely.
+- Graph traversal cannot loop indefinitely.
+
+PHASE 4: LAYOUT ENGINE
+
+Tasks:
+
+- Calculate the global timeline range.
+- Flatten the project/task hierarchy.
+- Assign row indexes.
+- Calculate bar positions and widths.
+- Calculate project summary positions.
+- Calculate timeline headers.
+- Calculate grid lines.
+- Calculate today marker position.
+- Return deterministic layout data.
+
+Acceptance criteria:
+
+- The same input always produces the same layout.
+- Every valid item has a row index.
+- Every valid item has finite x, y, width, and height values.
+- No width or height is negative.
+- Header and bars use the same coordinate conversion.
+- The layout works for a fixture containing approximately 100 tasks.
+
+PHASE 5: STATIC UI
+
+Tasks:
+
+- Add the timeline host component.
+- Add the scrolling container.
+- Render labels.
+- Render rows.
+- Render timeline headers.
+- Render grid lines.
+- Render task bars.
+- Render project summary bars.
+- Add loading, empty, and validation states.
+
+Do not add dependency connectors or complex interaction yet.
+
+Acceptance criteria:
+
+- The timeline is accessible from the existing application.
+- Existing navigation continues to work.
+- The visual alignment between headers, grid lines, labels, and bars is correct.
+- The timeline uses the existing visual identity.
+- Empty and invalid states are understandable.
+
+PHASE 6: SVG DEPENDENCY CONNECTORS
+
+Tasks:
+
+- Add the SVG connector layer.
+- Add paths for valid dependencies.
+- Add arrowheads.
+- Use deterministic orthogonal routing.
+- Keep the connector layer behind the bars.
+- Prevent connectors from capturing pointer events.
+
+Acceptance criteria:
+
+- Each dependency line starts at the predecessor.
+- Each dependency line ends at the successor.
+- Arrowheads point toward the successor.
+- Multiple connectors do not overlap unnecessarily.
+- Invalid dependencies produce no paths.
+- The bars remain clickable.
+
+PHASE 7: SELECTION AND HIGHLIGHTING
+
+Tasks:
+
+- Add selection state.
+- Allow selection by mouse.
+- Allow selection by keyboard.
+- Emit the original item ID.
+- Highlight the selected item.
+- Highlight direct predecessors.
+- Highlight indirect ancestors.
+- Reduce prominence of unrelated dependency lines.
+- Integrate with the existing detail view.
+
+Acceptance criteria:
+
+- Mouse and keyboard selection produce the same result.
+- The correct original ID is emitted.
+- Selection does not mutate input data.
+- Ancestor traversal terminates safely.
+- The existing task detail flow remains responsible for navigation.
+
+PHASE 8: REAL DATA INTEGRATION
+
+Tasks:
+
+- Connect the adapter to the existing store, facade, signal, observable, or service.
+- Map real project and task fields to the normalized contract.
+- Map existing status and progress values.
+- Map existing dependencies.
+- Reuse existing loading and error handling where appropriate.
+
+Do not add a new HTTP request unless the existing data source genuinely lacks required information.
+
+Acceptance criteria:
+
+- Real project data renders correctly.
+- Existing project and task types remain the source of truth.
+- No duplicate state is introduced.
+- No unrelated service or route is modified.
+- The existing project manager continues to work.
+
+PHASE 9: QUALITY REVIEW
+
+Run the project’s existing commands for:
+
+- Unit tests
+- Component tests
+- Integration tests
+- Type checking
+- Lint
+- Formatting
+- Production build
+
+Also review:
+
+- Keyboard navigation
+- Visible focus
+- Accessible names
+- Color contrast
+- Loading state
+- Empty state
+- Validation state
+- Horizontal scrolling
+- Small timelines
+- Large timelines
+- Dates crossing months and years
+- Tasks with zero duration
+- Projects without explicit dates
+- Multiple dependency paths
+- Invalid dependency data
+
+Do not migrate the project’s Angular version, test runner, state-management approach, or styling system as part of this feature.
+
+TESTING STRATEGY
+
+Prioritize tests in this order:
+
+1. Pure date functions
+2. Dependency validation
+3. Graph traversal
+4. Layout calculations
+5. SVG path generation
+6. Adapter behavior
+7. Angular component behavior
+8. Real-data integration
+
+Pure functions should be tested without Angular TestBed whenever possible.
+
+Component tests should focus on:
+
+- Public inputs
+- Public outputs
+- Rendered accessible content
+- User-visible states
+- Keyboard interaction
+- Selection behavior
+
+Avoid tests that depend on:
+
+- Private method names
+- Internal implementation details
+- Exact DOM nesting
+- Incidental CSS class names
+- The order of private function calls
+
+PERFORMANCE RULES
+
+For the first version:
+
+- Support approximately 100 tasks per project.
+- Do not add virtualization automatically.
+- Do not optimize before measuring.
+- Avoid unnecessary subscriptions.
+- Avoid repeated date parsing during rendering.
+- Calculate layout once per relevant input change.
+- Keep layout calculations outside the template.
+- Prefer immutable derived data.
+- Avoid recreating large arrays on every change-detection cycle.
+
+Only introduce virtual scrolling after a real benchmark shows that it is necessary.
+
+If virtual scrolling is introduced later:
+
+- Preserve the normalized data contract.
+- Preserve fixed row heights where possible.
+- Keep dependency geometry synchronized with visible rows.
+- Do not combine virtualization with drag editing in the same change.
+
+RULES FOR THE CODING AGENT
+
+Follow these rules throughout the implementation:
+
+- Do not make assumptions about existing field names.
+- Inspect the real project types before writing the adapter.
+- Do not change existing domain models without a documented reason.
+- Do not introduce a library before comparing its cost and benefit.
+- Do not create fake persistence.
+- Do not silently discard invalid data.
+- Do not allow invalid geometry to reach the template.
+- Do not put complex business logic in the Angular template.
+- Do not put DOM logic in the pure layout engine.
+- Do not use colors as the only source of information.
+- Do not add features outside the current phase.
+- Do not refactor unrelated parts of the application.
+- Do not migrate the project’s tooling as part of this feature.
+- Do not claim a phase is complete unless its acceptance criteria are verified.
+- If a requirement is ambiguous, document the ambiguity and use the smallest safe implementation.
+- If a change would affect unrelated features, stop and report the impact before proceeding.
+
+COMMIT STRATEGY
+
+Prefer small commits such as:
+
+1. Timeline inventory and fixtures
+2. Timeline normalized types
+3. Date normalization and tests
+4. Dependency validation and tests
+5. Layout engine and tests
+6. Static timeline UI
+7. SVG dependency connectors
+8. Selection and accessibility
+9. Real-data integration
+10. Final quality improvements
+
+Each commit should have one clear responsibility.
+
+Do not combine unrelated cleanup with the timeline feature.
+
+FUTURE EXTENSIONS
+
+Treat the following as future work:
+
+- Day/week/month zoom controls
+- Dragging task bars
+- Resizing task bars
+- Creating dependencies visually
+- Start-to-start dependencies
+- Finish-to-finish dependencies
+- Lead and lag values
+- Automatic rescheduling
+- Critical path
+- Slack calculation
+- Workday calendars
+- Holidays
+- Resources
+- Assignees
+- Milestones
+- Virtual scrolling
+- URL-based item selection
+- Deep links
+- Mobile-specific timeline interaction
+
+Before implementing any future extension, define:
+
+1. Its data contract
+2. Its persistence behavior
+3. Its validation rules
+4. Its keyboard behavior
+5. Its accessibility behavior
+6. Its performance impact
+7. Its test strategy
+8. Its rollback strategy
+
+FINAL DEFINITION OF DONE
+
+The feature is complete only when:
+
+- The timeline is integrated into the existing project manager.
+- Existing project and task models remain the source of truth.
+- The timeline renders real project data.
+- Tasks and projects have correctly positioned bars.
+- Header, grid, bars, and connectors remain aligned.
+- Dependencies point from predecessor to successor.
+- Invalid data is handled safely.
+- Cycles cannot cause infinite traversal.
+- Selection works with mouse and keyboard.
+- Direct and indirect predecessors can be distinguished.
+- The existing detail view can be opened.
+- Loading, empty, and validation states exist.
+- The interface follows the existing visual identity.
+- The feature does not depend on color alone.
+- The feature passes the existing test, lint, type-check, and build commands.
+- No unrelated application behavior was changed.
+- No unnecessary external library was introduced.
+- The feature can be disabled or reverted without modifying unrelated domain functionality.
+
+FINAL INSTRUCTION
+
+Implement the feature incrementally.
+
+Start with repository reconnaissance. Do not write the full timeline immediately.
+
+After each phase, verify the acceptance criteria and stop.
+
+Prioritize a stable normalized contract, pure date and dependency logic, deterministic layout calculations, and a simple accessible renderer.
+
+The first version should be a reliable read-only visualization, not a complete scheduling editor.

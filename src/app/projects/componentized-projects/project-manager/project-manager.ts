@@ -1,15 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgTemplateOutlet } from '@angular/common';
+import { TimelineViewComponent } from './timeline/timeline-view.component';
+import { adaptToTimelineItems, GENERAL_TASKS_GROUP_ID } from './timeline/timeline.adapter';
+import type { TimelineItem } from './timeline/timeline.types';
 
-interface Task {
+export interface Task {
   id: string;
   text: string;
   done: boolean;
   subtasks: Task[];
+  /** Start date in YYYY-MM-DD (inclusive), or null when unscheduled. */
+  startDate: string | null;
+  /** End date in YYYY-MM-DD (inclusive), or null when unscheduled. */
+  endDate: string | null;
+  /** ID of the task that must finish before this task starts (finish-to-start). */
+  dependsOn: string | null;
 }
 
-interface Project {
+export interface Project {
   id: string;
   name: string;
   description: string;
@@ -45,7 +54,7 @@ const TEMPLATES_STORAGE_KEY = 'project-manager-templates';
 
 @Component({
   selector: 'app-project-manager',
-  imports: [FormsModule, NgTemplateOutlet],
+  imports: [FormsModule, NgTemplateOutlet, TimelineViewComponent],
   templateUrl: './project-manager.html',
   styleUrl: './project-manager.scss',
   standalone: true,
@@ -58,9 +67,12 @@ export class ProjectManager implements OnInit {
   addTaskText = '';
   editingTaskId: string | null = null;
   editingTaskText = '';
+  schedulingTaskId: string | null = null;
 
   templates: ProjectTemplate[] = [];
   showTemplates = false;
+  showTimeline = false;
+  timelineItems: TimelineItem[] = [];
 
   newProjectName = '';
   newProjectDescription = '';
@@ -160,18 +172,44 @@ export class ProjectManager implements OnInit {
   selectProject(id: string | null): void {
     this.selectedProjectId = id;
     this.showTemplates = false;
+    this.showTimeline = false;
     this.showSidebar = false;
   }
 
   openGeneralTasks(): void {
     this.selectedProjectId = null;
     this.showTemplates = false;
+    this.showTimeline = false;
     this.showSidebar = false;
   }
 
   openTemplates(): void {
     this.showTemplates = true;
+    this.showTimeline = false;
     this.showSidebar = false;
+  }
+
+  openTimeline(): void {
+    this.showTemplates = false;
+    this.showTimeline = true;
+    this.showSidebar = false;
+    this.refreshTimelineItems();
+  }
+
+  refreshTimelineItems(): void {
+    this.timelineItems = adaptToTimelineItems(this.projects, this.standaloneTasks);
+  }
+
+  onTimelineSelectItem(id: string): void {
+    if (id === GENERAL_TASKS_GROUP_ID) {
+      this.openGeneralTasks();
+      return;
+    }
+    if (this.projects.some((project) => project.id === id)) {
+      this.selectProject(id);
+    }
+    // Task ids have no dedicated detail view in v1; selection highlights the
+    // dependency chain in place.
   }
 
   getSelectedClass(id: string | null): string {
@@ -231,6 +269,7 @@ export class ProjectManager implements OnInit {
     this.newProjectDescription = '';
     this.newProjectTemplateId = null;
     this.showNewProjectForm = false;
+    this.showTimeline = false;
     this.selectedProjectId = project.id;
     this.saveToStorage();
   }
@@ -340,6 +379,7 @@ export class ProjectManager implements OnInit {
     this.projects.push(project);
     this.saveToStorage();
     this.showTemplates = false;
+    this.showTimeline = false;
     this.selectedProjectId = project.id;
     this.showSidebar = false;
   }
@@ -397,6 +437,9 @@ export class ProjectManager implements OnInit {
       text: task.text,
       done: false,
       subtasks: this.instantiateTemplateTasks(task.subtasks),
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
     }));
   }
 
@@ -410,6 +453,9 @@ export class ProjectManager implements OnInit {
       text,
       done: false,
       subtasks: [],
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
     });
 
     this.addTaskText = '';
@@ -445,6 +491,9 @@ export class ProjectManager implements OnInit {
       text: text.trim(),
       done: false,
       subtasks: [],
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
     });
 
     this.saveToStorage();
@@ -504,6 +553,39 @@ export class ProjectManager implements OnInit {
     }
   }
 
+  // --- tasks: scheduling (timeline data) ---
+
+  toggleTaskSchedule(task: Task, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.schedulingTaskId = this.schedulingTaskId === task.id ? null : task.id;
+  }
+
+  setTaskStartDate(task: Task, value: string): void {
+    task.startDate = value || null;
+    this.saveToStorage();
+  }
+
+  setTaskEndDate(task: Task, value: string): void {
+    task.endDate = value || null;
+    this.saveToStorage();
+  }
+
+  setTaskDependsOn(task: Task, value: string | null): void {
+    task.dependsOn = value || null;
+    this.saveToStorage();
+  }
+
+  flattenTasks(tasks: Task[]): Task[] {
+    return tasks.flatMap((task) => [task, ...this.flattenTasks(task.subtasks)]);
+  }
+
+  get dependencyOptions(): Task[] {
+    if (this.selectedProject) {
+      return this.flattenTasks(this.selectedProject.tasks);
+    }
+    return this.flattenTasks(this.standaloneTasks);
+  }
+
   truncateText(text: string, limit: number): string {
     if (text.length <= limit) return text;
     return text.substring(0, limit) + '...';
@@ -557,6 +639,7 @@ export class ProjectManager implements OnInit {
     this.projects = data.projects;
     this.standaloneTasks = data.standaloneTasks;
     this.selectedProjectId = null;
+    this.showTimeline = false;
     this.saveToStorage();
     return true;
   }
@@ -703,7 +786,14 @@ export class ProjectManager implements OnInit {
         text: this.toString(item['text']),
         done: item['done'] === true,
         subtasks: this.normalizeTasks(item['subtasks']),
+        startDate: this.toNullableString(item['startDate']),
+        endDate: this.toNullableString(item['endDate']),
+        dependsOn: this.toNullableString(item['dependsOn']),
       }));
+  }
+
+  private toNullableString(value: unknown): string | null {
+    return typeof value === 'string' && value ? value : null;
   }
 
   private toString(value: unknown): string {

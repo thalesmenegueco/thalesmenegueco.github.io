@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectManager } from './project-manager';
+import { ProjectManager, Task } from './project-manager';
 
 describe('ProjectManager', () => {
   let component: ProjectManager;
@@ -34,7 +34,7 @@ describe('ProjectManager', () => {
         { id: 'p1', name: 'Projeto', description: '', status: 'Pendente', deadline: null, tasks: [] },
       ];
       component.standaloneTasks = [
-        { id: 't1', text: 'Tarefa', done: false, subtasks: [] },
+        { id: 't1', text: 'Tarefa', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
       ];
 
       const parsed = JSON.parse(component.exportData());
@@ -156,11 +156,14 @@ describe('ProjectManager', () => {
               text: 'A',
               done: false,
               subtasks: [
-                { id: 'a1', text: 'A1', done: false, subtasks: [] },
-                { id: 'a2', text: 'A2', done: false, subtasks: [] },
+                { id: 'a1', text: 'A1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+                { id: 'a2', text: 'A2', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
               ],
+              startDate: null,
+              endDate: null,
+              dependsOn: null,
             },
-            { id: 'b', text: 'B', done: false, subtasks: [] },
+            { id: 'b', text: 'B', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
           ],
         },
       ];
@@ -185,7 +188,10 @@ describe('ProjectManager', () => {
               id: 't1',
               text: 'T1',
               done: true,
-              subtasks: [{ id: 't2', text: 'T1.1', done: false, subtasks: [] }],
+              subtasks: [{ id: 't2', text: 'T1.1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null }],
+              startDate: null,
+              endDate: null,
+              dependsOn: null,
             },
           ],
         },
@@ -391,7 +397,7 @@ describe('ProjectManager', () => {
 
   describe('task editing', () => {
     it('startEditTask should record the task id and current text', () => {
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
 
       component.startEditTask(task);
 
@@ -401,7 +407,7 @@ describe('ProjectManager', () => {
 
     it('saveEditTask should trim and update the text, clear state and persist', () => {
       const setItem = spyOn(localStorage, 'setItem');
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
 
       component.startEditTask(task);
       component.editingTaskText = '  Editado  ';
@@ -415,7 +421,7 @@ describe('ProjectManager', () => {
     });
 
     it('saveEditTask should keep the original text when the edit is blank', () => {
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
 
       component.startEditTask(task);
       component.editingTaskText = '   ';
@@ -428,7 +434,7 @@ describe('ProjectManager', () => {
 
     it('saveEditTask should be a no-op for a different task id', () => {
       const setItem = spyOn(localStorage, 'setItem');
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
       component.editingTaskId = 'other';
       component.editingTaskText = 'Lixo';
 
@@ -439,7 +445,7 @@ describe('ProjectManager', () => {
     });
 
     it('cancelEditTask should clear state without changing the task', () => {
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
 
       component.startEditTask(task);
       component.editingTaskText = 'Alterado';
@@ -452,7 +458,7 @@ describe('ProjectManager', () => {
     });
 
     it('onTaskEditKeydown should save on Enter and cancel on Escape', () => {
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [] };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
 
       component.startEditTask(task);
       component.editingTaskText = 'Novo';
@@ -468,6 +474,128 @@ describe('ProjectManager', () => {
       expect(component.editingTaskId).toBeNull();
       expect(component.editingTaskText).toBe('');
       expect(task.text).toBe('Novo');
+    });
+  });
+
+  describe('task scheduling', () => {
+    const makeTask = (overrides: Partial<Task> = {}): Task => ({
+      id: 't1',
+      text: 'Tarefa',
+      done: false,
+      subtasks: [],
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
+      ...overrides,
+    });
+
+    it('setTaskStartDate should set or clear and persist', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const task = makeTask();
+
+      component.setTaskStartDate(task, '2026-02-01');
+      expect(task.startDate).toBe('2026-02-01');
+
+      component.setTaskStartDate(task, '');
+      expect(task.startDate).toBeNull();
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('setTaskEndDate should set or clear and persist', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const task = makeTask();
+
+      component.setTaskEndDate(task, '2026-02-05');
+      expect(task.endDate).toBe('2026-02-05');
+
+      component.setTaskEndDate(task, '');
+      expect(task.endDate).toBeNull();
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('setTaskDependsOn should set or clear and persist', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const task = makeTask();
+
+      component.setTaskDependsOn(task, 't2');
+      expect(task.dependsOn).toBe('t2');
+
+      component.setTaskDependsOn(task, null);
+      expect(task.dependsOn).toBeNull();
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('toggleTaskSchedule should toggle the scheduling panel', () => {
+      const task = makeTask();
+
+      component.toggleTaskSchedule(task);
+      expect(component.schedulingTaskId as string | null).toBe('t1');
+
+      component.toggleTaskSchedule(task);
+      expect(component.schedulingTaskId).toBeNull();
+    });
+
+    it('flattenTasks should return tasks in pre-order', () => {
+      const nested: Task[] = [
+        {
+          id: 'a',
+          text: 'A',
+          done: false,
+          subtasks: [
+            { id: 'a1', text: 'A1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+          ],
+          startDate: null,
+          endDate: null,
+          dependsOn: null,
+        },
+        { id: 'b', text: 'B', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+      ];
+
+      const flat = component.flattenTasks(nested);
+
+      expect(flat.map(t => t.id)).toEqual(['a', 'a1', 'b']);
+    });
+
+    it('dependencyOptions should reflect the current project or standalone tasks', () => {
+      component.projects = [
+        {
+          id: 'p1',
+          name: 'P',
+          description: '',
+          status: 'Pendente',
+          deadline: null,
+          tasks: [
+            { id: 't1', text: 'T1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+            { id: 't2', text: 'T2', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+          ],
+        },
+      ];
+      component.standaloneTasks = [
+        { id: 's1', text: 'S1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+      ];
+      component.selectedProjectId = 'p1';
+
+      expect(component.dependencyOptions.map(t => t.id)).toEqual(['t1', 't2']);
+
+      component.selectedProjectId = null;
+      expect(component.dependencyOptions.map(t => t.id)).toEqual(['s1']);
+    });
+
+    it('normalizeData should backfill missing schedule fields with null', () => {
+      const data = component.normalizeData({
+        projects: [{ id: 'p1', name: 'P', tasks: [{ id: 't1', text: 'T' }] }],
+        standaloneTasks: [
+          { id: 's1', text: 'S', startDate: '2026-01-01', endDate: '2026-01-02', dependsOn: 'x' },
+        ],
+      });
+
+      expect(data.projects[0].tasks[0].startDate).toBeNull();
+      expect(data.projects[0].tasks[0].endDate).toBeNull();
+      expect(data.projects[0].tasks[0].dependsOn).toBeNull();
+
+      expect(data.standaloneTasks[0].startDate).toBe('2026-01-01');
+      expect(data.standaloneTasks[0].endDate).toBe('2026-01-02');
+      expect(data.standaloneTasks[0].dependsOn).toBe('x');
     });
   });
 });

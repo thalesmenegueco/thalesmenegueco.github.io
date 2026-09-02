@@ -11,7 +11,7 @@
       <div class="pm-sidebar-section">
         <button
           class="pm-nav-item"
-          [class.active]="!showTemplates && selectedProjectId === null"
+          [class.active]="!showTemplates && !showTimeline && selectedProjectId === null"
           (click)="openGeneralTasks()">
           <span class="pm-nav-icon">📋</span>
           <span class="pm-nav-label">Tarefas Gerais</span>
@@ -25,9 +25,17 @@
           <span class="pm-nav-label">Templates</span>
           <span class="pm-nav-badge">{{ templates.length }}</span>
         </button>
+        <button
+          class="pm-nav-item"
+          [class.active]="showTimeline"
+          (click)="openTimeline()">
+          <span class="pm-nav-icon">📅</span>
+          <span class="pm-nav-label">Linha do Tempo</span>
+          <span class="pm-nav-badge">{{ projects.length }}</span>
+        </button>
       </div>
 
-      @if (!showTemplates) {
+      @if (!showTemplates && !showTimeline) {
       <div class="pm-sidebar-section">
         <div class="pm-status-tabs">
           <button
@@ -228,6 +236,13 @@
               </p>
             }
           </div>
+        </div>
+      } @else if (showTimeline) {
+        <div class="pm-content">
+          <app-timeline-view
+            [items]="timelineItems"
+            (selectItem)="onTimelineSelectItem($event)"
+          ></app-timeline-view>
         </div>
       } @else if (selectedProjectId === null) {
         <div class="pm-content">
@@ -430,11 +445,52 @@
             title="Adicionar sub-tarefa">+</button>
         }
         <button
+          class="pm-btn pm-btn-ghost pm-btn-small"
+          [class.pm-btn-schedule-active]="schedulingTaskId === task.id"
+          (click)="toggleTaskSchedule(task, $event)"
+          title="Agendar (datas e dependência)">🗓</button>
+        <button
           class="pm-btn pm-btn-ghost pm-btn-small pm-btn-danger"
           (click)="deleteTaskById(parentList, task.id, $event)"
           title="Deletar to-do">🗑</button>
       </div>
     </div>
+    @if (schedulingTaskId === task.id) {
+      <div class="pm-task-schedule">
+        <label class="pm-field-label">
+          Início
+          <input
+            type="date"
+            class="pm-input"
+            [ngModel]="task.startDate || ''"
+            (ngModelChange)="setTaskStartDate(task, $event)"
+          />
+        </label>
+        <label class="pm-field-label">
+          Fim
+          <input
+            type="date"
+            class="pm-input"
+            [ngModel]="task.endDate || ''"
+            (ngModelChange)="setTaskEndDate(task, $event)"
+          />
+        </label>
+        <label class="pm-field-label">
+          Depende de
+          <select
+            class="pm-select"
+            [ngModel]="task.dependsOn || null"
+            (ngModelChange)="setTaskDependsOn(task, $event)">
+            <option [ngValue]="null">Nenhuma</option>
+            @for (option of dependencyOptions; track option.id) {
+              @if (option.id !== task.id) {
+                <option [ngValue]="option.id">{{ truncateText(option.text, 40) }}</option>
+              }
+            }
+          </select>
+        </label>
+      </div>
+    }
     @if (task.subtasks.length > 0) {
       <div class="pm-subtasks">
         @for (subtask of task.subtasks; track subtask.id) {

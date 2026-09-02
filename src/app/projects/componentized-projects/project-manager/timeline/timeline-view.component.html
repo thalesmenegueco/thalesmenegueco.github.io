@@ -1,0 +1,148 @@
+<section class="tl" aria-label="Linha do tempo">
+  <header class="tl-toolbar">
+    <h2 class="tl-title">📅 Linha do Tempo</h2>
+    <span class="tl-count">{{ items.length }} itens</span>
+  </header>
+
+  @if (loading) {
+    <div class="tl-state" role="status">Carregando…</div>
+  } @else if (layout.rows.length === 0) {
+    <div class="tl-state">Nenhum projeto ou tarefa para exibir.</div>
+  } @else {
+    @if (issues.length > 0) {
+      <div class="tl-issues" role="alert">
+        @for (issue of issues; track $index) {
+          <div class="tl-issue" [class.tl-issue-error]="issue.severity === 'error'">
+            {{ issue.message }}
+          </div>
+        }
+      </div>
+    }
+
+    @if (layout.hasScheduledItem) {
+    <div class="tl-scroll">
+      <div class="tl-content" [style.width.px]="labelWidth + layout.contentWidth">
+        <div class="tl-labels" [style.width.px]="labelWidth">
+          <div class="tl-label-corner" [style.height.px]="headerHeight"></div>
+          @for (row of layout.rows; track row.itemId) {
+            <div
+              class="tl-label"
+              [class.tl-label-project]="row.kind === 'project'"
+              [style.height.px]="config.rowHeight">
+              <span>{{ row.label }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="tl-chart" [style.width.px]="layout.contentWidth">
+          <div class="tl-header" [style.height.px]="headerHeight">
+            <div class="tl-header-row">
+              @for (unit of monthHeaders; track $index) {
+                <div
+                  class="tl-header-month"
+                  [style.left.px]="unit.x"
+                  [style.width.px]="unit.width">{{ unit.label }}</div>
+              }
+            </div>
+            <div class="tl-header-row">
+              @for (unit of dayHeaders; track $index) {
+                <div
+                  class="tl-header-day"
+                  [style.left.px]="unit.x"
+                  [style.width.px]="unit.width">{{ unit.label }}</div>
+              }
+            </div>
+          </div>
+
+          <svg
+            class="tl-svg"
+            [attr.width]="layout.contentWidth"
+            [attr.height]="headerHeight + layout.contentHeight"
+            [attr.viewBox]="'0 0 ' + layout.contentWidth + ' ' + (headerHeight + layout.contentHeight)"
+            aria-hidden="true">
+            <defs>
+              <marker
+                id="tl-arrow"
+                viewBox="0 0 10 10"
+                refX="9"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="tl-arrow" />
+              </marker>
+            </defs>
+
+            @for (line of layout.gridlines; track $index) {
+              <line
+                class="tl-grid"
+                [class.tl-grid-month]="line.kind === 'month'"
+                [class.tl-grid-day]="line.kind === 'day'"
+                [attr.x1]="line.x"
+                [attr.y1]="0"
+                [attr.x2]="line.x"
+                [attr.y2]="headerHeight + layout.contentHeight"
+              />
+            }
+
+            @if (layout.todayMarkerX !== null) {
+              <line
+                class="tl-today"
+                [attr.x1]="layout.todayMarkerX"
+                [attr.y1]="0"
+                [attr.x2]="layout.todayMarkerX"
+                [attr.y2]="headerHeight + layout.contentHeight"
+              />
+            }
+
+            @for (path of paths; track $index) {
+              <path
+                class="tl-connector"
+                [class.tl-connector-dimmed]="isPathDimmed(path)"
+                [attr.d]="path.d"
+                marker-end="url(#tl-arrow)"
+              />
+            }
+          </svg>
+
+          <div class="tl-rows" [style.height.px]="layout.contentHeight">
+            @for (row of layout.rows; track row.itemId) {
+              @if (barFor(row.itemId); as bar) {
+                <button
+                  type="button"
+                  class="tl-bar"
+                  [class.tl-bar-project]="bar.kind === 'project'"
+                  [class.tl-bar-milestone]="bar.milestone"
+                  [class.tl-bar-derived]="bar.derived"
+                  [class.tl-bar-selected]="isSelected(bar.itemId)"
+                  [class.tl-bar-direct]="isDirectPredecessor(bar.itemId)"
+                  [class.tl-bar-ancestor]="isAncestor(bar.itemId)"
+                  [attr.data-status]="bar.status"
+                  [style.left.px]="bar.x"
+                  [style.top.px]="bar.topInRows"
+                  [style.width.px]="bar.width"
+                  [style.height.px]="bar.height"
+                  [attr.aria-label]="barAriaLabel(bar)"
+                  [attr.title]="bar.label"
+                  (click)="select(bar.itemId)"
+                  (keydown)="onBarKeydown(bar.itemId, $event)">
+                  @if (bar.progress !== undefined && !bar.milestone) {
+                    <span class="tl-bar-progress" [style.width.%]="bar.progress"></span>
+                  }
+                  @if (!bar.milestone) {
+                    <span class="tl-bar-label">{{ bar.label }}</span>
+                  }
+                </button>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    } @else {
+      <div class="tl-state">
+        Nenhum item possui datas. Use o botão 🗓 nas tarefas para definir início e fim.
+      </div>
+    }
+  }
+</section>
