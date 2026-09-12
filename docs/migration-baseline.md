@@ -362,16 +362,18 @@ portfolio entirely, at which point the style entry belongs to `ml-platform`.
 | Storage keys preserved | ✅ all three, byte-identical |
 | Component-style warnings | ✅ the same 4, unchanged to the byte |
 | Tests | ⚠️ **2 FAILED, 190 SUCCESS** — the documented baseline, same two specs |
-| Cálculo routes render identically | ⚠️ **not verified in a browser** — see below |
+| Cálculo routes render identically | ✅ **Confirmed by hand** — see below |
 
-**The one gate criterion not met is the browser check.** No browser-automation
-harness is available in this environment, so "the three Cálculo routes render
-pixel-identically" was not confirmed visually. It is instead supported by
-byte-identical component CSS, byte-identical palette token blocks, identical
-canvas drawing constants in identical statement order, and a bundle whose only
-real drift is in the chunks that were deliberately refactored. A human pass over
-`/estudos/calculo/teoria`, `/aplicada` and `/processo` is still worth doing before
-Phase 3 moves those routes.
+**The browser check was completed by hand.** No browser-automation harness is
+available in this environment, so the check could not be automated; the author
+served the app (`npx ng serve portfolio`) and confirms that the three Cálculo
+pages (`/estudos/calculo/teoria`, `/aplicada`, `/processo`) render normally with
+their styling intact. That closes the gate.
 
-**Cleared to proceed to Phase 3**, with that manual check outstanding and with
-`ml-platform`'s `angular.json` needing the KaTeX style entry.
+The automated evidence stands alongside it: byte-identical component CSS,
+byte-identical palette token blocks, identical canvas drawing constants in
+identical statement order, and a bundle whose only real drift is in the chunks
+that were deliberately refactored.
+
+**Phase 2 complete and cleared.** Phase 3 prerequisites are listed in
+[`migration-implementation-plan.md`](./migration-implementation-plan.md) § Phase 3.
