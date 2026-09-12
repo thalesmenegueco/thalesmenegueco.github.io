@@ -22,14 +22,11 @@ jobs:
         node-version: '24'
 
     - name: Install dependencies
-      run: npm install
-
-    - name: Install Angular CLI
-      run: npm install -g @angular/cli
+      run: npm ci
 
 
     - name: Build Angular App
-      run: ng build --configuration production --base-href /
+      run: npx ng build --configuration production --base-href /
 
     - name: Copy index.html to 404.html for SPA routing
       run: cp ./dist/learning-gallery/browser/index.html ./dist/learning-gallery/browser/404.html

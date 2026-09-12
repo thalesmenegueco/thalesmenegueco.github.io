@@ -128,8 +128,8 @@ Gate: build and tests pass; baseline sizes recorded. (`google-chrome` is present
    This adds the `ml-platform` entry to `angular.json` automatically.
 6. Update `.github/workflows/deploy.yml` **in the same commit** as the project rename, since it hardcodes both the build and the publish path: `npm ci`, `npx ng build portfolio --configuration production --base-href /`, `publish_dir: ./dist/portfolio/browser`.
 
-Gate:
-- `npx ng build portfolio` — output set matches the baseline (same chunk inventory, sizes within noise).
+Gate (baseline recorded in [`migration-baseline.md`](./migration-baseline.md)):
+- `npx ng build portfolio` — **content hashes identical to the baseline**. The build is byte-reproducible (verified in Phase 0), so an exact hash comparison is a stronger and cheaper check than a size comparison. Reference hashes: `main-CTXD2HQZ.js` 194,949 B, `chunk-POHH5IVY.js` 5,970,750 B, `worker-JBXFQEKZ.js` 6,026,498 B; initial payload 240,723 B.
 - `npx ng build ml-platform` — empty shell builds.
 - Push the branch and confirm the portfolio still deploys and serves at the existing URL. **Do not proceed until this is confirmed** — this is the one step that can silently break the live site.
 
@@ -164,6 +164,8 @@ Five extractions, all moves rather than rewrites except where noted.
    - `RichMathTextComponent`: `calculus.component.ts`.
 
 Gate: `npx ng build portfolio` and `npx ng test`; all three Cálculo routes render pixel-identically; the initial chunk is unchanged within noise. Leave selectors (`app-plot-canvas`, `app-katex`) as they are — renaming them is Phase 6 optional polish, not migration work.
+
+> "Tests pass" means **190 passing / 2 known failures** throughout — see `migration-baseline.md` §4. The suite was never green; the two stale specs are not caused by, and not fixed by, this migration.
 
 ### Phase 3 — Build the ml-platform app
 
