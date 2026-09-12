@@ -7,9 +7,10 @@
   width: 100%;
   height: 315px;
   overflow: hidden;
-  border: 1px solid #263432;
+  /* Themeable from outside; the fallbacks are `DEFAULT_PLOT_THEME`. */
+  border: 1px solid var(--plot-border-color, #263432);
   border-radius: 10px;
-  background: #0c1213;
+  background: var(--plot-bg, #0c1213);
 }
 
 canvas {

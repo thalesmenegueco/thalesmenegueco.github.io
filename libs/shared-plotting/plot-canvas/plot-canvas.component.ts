@@ -6,12 +6,19 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
-import { PlotSize } from '../../plotting';
+import { PlotSize } from '../plotting';
+import { DEFAULT_PLOT_THEME, PlotTheme } from '../plot-theme';
 
 /**
  * A single responsive `<canvas>` that handles device-pixel-ratio scaling and
  * redraws when its container resizes. The parent supplies `drawFn`, which
  * receives a 2D context and the CSS-pixel size.
+ *
+ * The frame's colours come from the `theme` input rather than hardcoded values,
+ * so a host app with its own identity can restyle the widget without forking
+ * it. `theme` is published to the frame as the `--plot-border-color` and
+ * `--plot-bg` custom properties; the stylesheet consumes them with fallbacks
+ * equal to `DEFAULT_PLOT_THEME`, so an unthemed use renders identically.
  */
 @Component({
   selector: 'app-plot-canvas',
@@ -22,6 +29,10 @@ import { PlotSize } from '../../plotting';
     </div>
   `,
   styleUrl: './plot-canvas.component.scss',
+  host: {
+    '[style.--plot-border-color]': 'theme.plotBorder',
+    '[style.--plot-bg]': 'theme.plotBg',
+  },
 })
 export class PlotCanvasComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
@@ -32,9 +43,28 @@ export class PlotCanvasComponent implements AfterViewInit, OnDestroy {
     size: PlotSize,
   ) => void = () => {};
 
+  /**
+   * Palette used for the plot frame. Setting it re-renders the frame so a
+   * runtime theme switch does not leave a stale canvas behind.
+   */
+  @Input()
+  set theme(value: PlotTheme | undefined) {
+    this.currentTheme = value ?? DEFAULT_PLOT_THEME;
+    if (this.viewReady) {
+      this.redraw();
+    }
+  }
+
+  get theme(): PlotTheme {
+    return this.currentTheme;
+  }
+
+  private currentTheme: PlotTheme = DEFAULT_PLOT_THEME;
   private resizeObserver?: ResizeObserver;
+  private viewReady = false;
 
   ngAfterViewInit(): void {
+    this.viewReady = true;
     this.redraw();
     this.resizeObserver = new ResizeObserver(() => this.redraw());
     this.resizeObserver.observe(this.wrap.nativeElement);

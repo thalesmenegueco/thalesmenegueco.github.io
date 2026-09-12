@@ -24,6 +24,9 @@
             ],
             "tsConfig": "projects/portfolio/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["libs/shared-plotting/styles"]
+            },
             "assets": [
               "projects/portfolio/src/404.html",
               {
@@ -83,6 +86,9 @@
             ],
             "tsConfig": "projects/portfolio/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["libs/shared-plotting/styles"]
+            },
             "assets": [
               {
                 "glob": "**/*",

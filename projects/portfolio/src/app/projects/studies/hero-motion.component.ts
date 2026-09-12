@@ -13,7 +13,9 @@ import {
  * the derivative made visible. It loops slowly, pauses when scrolled out of
  * view, and renders a static frame under `prefers-reduced-motion`.
  *
- * Palette values mirror `studies.component.scss` / `calculus.palette.ts`.
+ * Palette values derive from `DEFAULT_PLOT_THEME` (`@shared/plotting`), with
+ * the axis and tangent strokes given extra transparency for this decorative
+ * use. `studies.component.scss` consumes the same identity via `plot-tokens`.
  */
 
 const LOOP_SECONDS = 9;

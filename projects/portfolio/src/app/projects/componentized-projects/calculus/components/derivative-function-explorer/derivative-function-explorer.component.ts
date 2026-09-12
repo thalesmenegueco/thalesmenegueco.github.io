@@ -7,9 +7,14 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { PlotCanvasComponent } from '../plot-canvas/plot-canvas.component';
-import { drawGrid, drawCurve, drawPoint, PlotSize } from '../../plotting';
-import { PALETTE } from '../../calculus.palette';
+import {
+  PALETTE,
+  PlotCanvasComponent,
+  PlotSize,
+  drawCurve,
+  drawGrid,
+  drawPoint,
+} from '@shared/plotting';
 import { formatNumber } from '../../calculus.format';
 
 @Component({

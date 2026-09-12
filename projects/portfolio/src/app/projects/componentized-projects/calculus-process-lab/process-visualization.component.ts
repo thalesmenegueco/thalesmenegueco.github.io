@@ -8,7 +8,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { PlotSize } from '../calculus/plotting';
+import { PlotSize } from '@shared/plotting';
 import { ProcessVisualType } from './process.types';
 import { drawProcessVisual } from './process-visualizations';
 

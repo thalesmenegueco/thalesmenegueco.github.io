@@ -6,9 +6,12 @@ import {
   ViewChild,
   signal,
 } from '@angular/core';
-import { PlotCanvasComponent } from '../plot-canvas/plot-canvas.component';
-import { drawGrid, PlotSize } from '../../plotting';
-import { PALETTE } from '../../calculus.palette';
+import {
+  PALETTE,
+  PlotCanvasComponent,
+  PlotSize,
+  drawGrid,
+} from '@shared/plotting';
 
 type DiscontinuityMode = 'jump' | 'asymptote';
 

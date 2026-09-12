@@ -1,4 +1,4 @@
-import { PALETTE } from './calculus.palette';
+import { DEFAULT_PLOT_THEME, PlotTheme } from './plot-theme';
 
 export interface PlotBounds {
   xMin: number;
@@ -20,11 +20,15 @@ export interface Axis {
 /**
  * Clears the canvas and draws the grid + axes. Returns the pixel mapping so
  * callers can draw their own curves on top.
+ *
+ * `theme` defaults to `DEFAULT_PLOT_THEME`, so existing callers render exactly
+ * as before; pass a theme to restyle without forking the helpers.
  */
 export function drawGrid(
   ctx: CanvasRenderingContext2D,
   size: PlotSize,
   bounds: PlotBounds,
+  theme: PlotTheme = DEFAULT_PLOT_THEME,
 ): Axis {
   const { xMin, xMax, yMin, yMax } = bounds;
   const xToPixel = (x: number) => ((x - xMin) / (xMax - xMin)) * size.width;
@@ -32,10 +36,10 @@ export function drawGrid(
     size.height - ((y - yMin) / (yMax - yMin)) * size.height;
 
   ctx.clearRect(0, 0, size.width, size.height);
-  ctx.fillStyle = PALETTE.plotBg;
+  ctx.fillStyle = theme.plotBg;
   ctx.fillRect(0, 0, size.width, size.height);
 
-  ctx.strokeStyle = 'rgba(151, 166, 161, 0.12)';
+  ctx.strokeStyle = theme.gridLine;
   ctx.lineWidth = 1;
 
   for (let x = Math.ceil(xMin); x <= xMax; x++) {
@@ -54,7 +58,7 @@ export function drawGrid(
     ctx.stroke();
   }
 
-  ctx.strokeStyle = 'rgba(231, 236, 233, 0.5)';
+  ctx.strokeStyle = theme.axisLine;
   ctx.lineWidth = 1.2;
 
   if (yMin <= 0 && yMax >= 0) {
@@ -80,6 +84,8 @@ export function drawGrid(
  * Draws a continuous curve y = fn(x). Skips non-finite samples (asymptotes,
  * domain holes) by breaking the path, so discontinuities don't draw a bogus
  * connector segment.
+ *
+ * The stroke colour is supplied by the caller, so no theme is needed here.
  */
 export function drawCurve(
   ctx: CanvasRenderingContext2D,
@@ -132,18 +138,23 @@ export function drawCurve(
   ctx.restore();
 }
 
+/**
+ * Draws a filled dot with a thin outline in the plot background colour, so a
+ * point stays legible where it sits on a curve.
+ */
 export function drawPoint(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   color: string,
   radius = 6,
+  theme: PlotTheme = DEFAULT_PLOT_THEME,
 ): void {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fillStyle = color;
   ctx.fill();
-  ctx.strokeStyle = PALETTE.plotBg;
+  ctx.strokeStyle = theme.plotBg;
   ctx.lineWidth = 2;
   ctx.stroke();
 }

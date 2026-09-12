@@ -1,11 +1,11 @@
-import { PALETTE } from '../calculus/calculus.palette';
 import {
+  PALETTE,
   PlotBounds,
   PlotSize,
   drawCurve,
   drawGrid,
   drawPoint,
-} from '../calculus/plotting';
+} from '@shared/plotting';
 import { chargingRate, secantSlope, voltage } from './process-engine';
 import { ProcessVisualType } from './process.types';
 

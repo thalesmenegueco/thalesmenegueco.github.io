@@ -7,9 +7,13 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { PlotCanvasComponent } from '../plot-canvas/plot-canvas.component';
-import { drawGrid, drawPoint, PlotSize } from '../../plotting';
-import { PALETTE } from '../../calculus.palette';
+import {
+  PALETTE,
+  PlotCanvasComponent,
+  PlotSize,
+  drawGrid,
+  drawPoint,
+} from '@shared/plotting';
 
 type ContinuityMode = 'continuous' | 'hole';
 

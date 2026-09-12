@@ -1,11 +1,11 @@
-import { PALETTE } from '../calculus/calculus.palette';
 import {
+  PALETTE,
   PlotBounds,
   PlotSize,
   drawCurve,
   drawGrid,
   drawPoint,
-} from '../calculus/plotting';
+} from '@shared/plotting';
 import { VisualizationType } from './calculus-practice.types';
 
 export const VISUALIZATION_CAPTIONS: Record<VisualizationType, string> = {

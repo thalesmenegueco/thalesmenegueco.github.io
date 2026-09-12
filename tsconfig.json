@@ -14,7 +14,11 @@
     "importHelpers": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@shared/plotting": ["libs/shared-plotting/index.ts"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

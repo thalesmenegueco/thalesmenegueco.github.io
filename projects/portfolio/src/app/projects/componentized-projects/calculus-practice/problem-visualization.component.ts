@@ -8,7 +8,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { PlotSize } from '../calculus/plotting';
+import { PlotSize } from '@shared/plotting';
 import { VisualizationType } from './calculus-practice.types';
 import { VISUALIZATION_CAPTIONS, drawVisualization } from './visualizations';
 
