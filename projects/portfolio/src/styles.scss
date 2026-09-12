@@ -1,5 +1,8 @@
 @import 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap';
-@import 'https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css';
+
+// KaTeX's stylesheet is no longer loaded globally: `@shared/katex` bundles it
+// (and its web fonts) from the installed package, so the lib is self-contained
+// and the app no longer depends on the CDN at runtime.
 
 :root {
   --color-bg: rgb(5, 5, 5);

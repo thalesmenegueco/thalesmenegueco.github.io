@@ -1,6 +1,6 @@
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { KatexComponent } from '../calculus/components/katex/katex.component';
+import { KatexComponent } from '@shared/katex';
 import { ProblemVisualizationComponent } from './problem-visualization.component';
 import { AREA_LABELS, AppliedProblem, ProblemArea } from './calculus-practice.types';
 import { APPLIED_PROBLEMS } from './problem-data';

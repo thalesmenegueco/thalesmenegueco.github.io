@@ -6,7 +6,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { KatexComponent } from '../katex/katex.component';
+import { KatexComponent } from '@shared/katex';
 
 type RuleType = 'power' | 'product' | 'chain';
 

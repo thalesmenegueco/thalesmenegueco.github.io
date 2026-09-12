@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FormulaOption } from '../../calculus.types';
-import { KatexComponent } from '../katex/katex.component';
+import { KatexComponent } from '@shared/katex';
 
 @Component({
   selector: 'app-formula-match',

@@ -1,5 +1,5 @@
 import { Component, computed, signal } from '@angular/core';
-import { KatexComponent } from '../calculus/components/katex/katex.component';
+import { KatexComponent } from '@shared/katex';
 import { ProcessVisualizationComponent } from './process-visualization.component';
 import { RC_CHARGING_PROCESS } from './process-data';
 import { computeMetrics } from './process-engine';

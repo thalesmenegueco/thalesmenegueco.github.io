@@ -9,7 +9,14 @@ import { render } from 'katex';
 
 /**
  * Renders a single LaTeX expression into its host element using KaTeX.
- * KaTeX CSS/fonts are loaded globally (see styles.scss).
+ *
+ * KaTeX's stylesheet and web fonts must be loaded **globally**, not as component
+ * styles: `katex.render` builds its DOM imperatively, so the generated elements
+ * never receive Angular's emulated-encapsulation `_ngcontent` attribute and a
+ * scoped stylesheet would not match them (and KaTeX's ~25 kB stylesheet also
+ * exceeds the per-component style budget). Each app therefore registers
+ * `node_modules/katex/dist/katex.min.css` in its `angular.json` `styles` array;
+ * see `libs/shared-katex/README.md`.
  */
 @Component({
   selector: 'app-katex',

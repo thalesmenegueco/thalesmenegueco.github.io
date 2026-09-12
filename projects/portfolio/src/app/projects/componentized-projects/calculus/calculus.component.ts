@@ -3,7 +3,7 @@ import { LESSONS } from './lesson-data';
 import { Lesson } from './calculus.types';
 import { validateStep, validationMessage } from './calculus.engine';
 import { CalculusProgressService } from './services/calculus-progress.service';
-import { RichMathTextComponent } from './components/rich-math-text/rich-math-text.component';
+import { RichMathTextComponent } from '@shared/katex';
 import { LimitExplorerComponent } from './components/limit-explorer/limit-explorer.component';
 import { DiscontinuityExplorerComponent } from './components/discontinuity-explorer/discontinuity-explorer.component';
 import { ContinuityExplorerComponent } from './components/continuity-explorer/continuity-explorer.component';
