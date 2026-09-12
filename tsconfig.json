@@ -30,6 +30,12 @@
     },
     {
       "path": "./projects/portfolio/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/ml-platform/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/ml-platform/tsconfig.spec.json"
     }
   ]
 }
