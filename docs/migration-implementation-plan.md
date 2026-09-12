@@ -17,14 +17,34 @@ Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](
 | Phase | Status | Commit(s) |
 |---|---|---|
 | 0 — Baseline & hygiene | ✅ Done | `55f1e09` (+ `1324dee`, `24f7f79`) |
-| 1 — Workspace conversion | ⚠️ Code done, live-deploy gate pending | `439cc66`, `8e092d1` |
-| 2 — Extract shared libs | Not started | — |
-| 3 — Build ml-platform content | Not started | — |
+| 1 — Workspace conversion | ✅ Done, live-deploy confirmed green in Vercel | `439cc66`, `8e092d1`, `d184237` |
+| 2 — Extract shared libs | ✅ Done — 4 libs extracted; one manual browser check outstanding | `05bf585`, `3d64c46`, `7410119`, `34f5d07`, `0a42f10` |
+| 3 — Build ml-platform content | Next | — |
 | 4 — Redirects & cross-links | Not started | — |
 | 5 — Deploy split | Partly done ahead of schedule (`vercel.json`, project created) | `24f7f79` |
 | 6 — Cleanup | Partly done early (docs moved to `docs/`) | — |
 
-**Phase 1 outstanding item:** the plan's gate requires pushing and confirming the portfolio still deploys to its live URL. `.github/workflows/deploy.yml` triggers only on pushes to `main`, so this cannot be verified from a feature branch — it needs a merge to `main`, which is a production change and therefore a deliberate decision rather than a step to take automatically.
+**Phase 1:** complete. The live-deploy gate was confirmed green in Vercel after the
+branch was pushed.
+
+**Phase 2:** complete, with two plan corrections that Phases 3–5 depend on —
+read them before continuing:
+
+1. **The hash gate is unsound** (§ Phase 1 gate correction, and
+   `migration-baseline.md` §9). The pre-migration reference hashes are not
+   reproducible and an exact hash comparison reports false drift. Gate on
+   `node tools/bundle-diff.mjs <baselineDir> dist/portfolio/browser` instead.
+2. **The KaTeX stylesheet cannot live in a component stylesheet** (§ Phase 2
+   step 2). It must be a seeded global style in each app's `angular.json`;
+   `ml-platform` needs that entry in Phase 3, and the portfolio's should be
+   removed in Phase 4.
+
+**Phase 2 outstanding item:** the gate's "all three Cálculo routes render
+pixel-identically" was **not** verified in a browser — no browser-automation
+harness is available here. It is supported by byte-identical component CSS,
+byte-identical palette token blocks and identical canvas drawing constants, but a
+human pass over `/estudos/calculo/teoria`, `/aplicada` and `/processo` is worth
+doing before Phase 3 moves those routes. See `migration-baseline.md` §10.4.
 
 ---
 
@@ -203,20 +223,76 @@ Gate: build and tests pass; baseline sizes recorded. (`google-chrome` is present
 
 Gate (baseline recorded in [`migration-baseline.md`](./migration-baseline.md)):
 - `npx ng build portfolio` — **content hashes identical to the baseline**. The build is byte-reproducible (verified in Phase 0), so an exact hash comparison is a stronger and cheaper check than a size comparison. Reference hashes: `main-CTXD2HQZ.js` 194,949 B, `chunk-POHH5IVY.js` 5,970,750 B, `worker-JBXFQEKZ.js` 6,026,498 B; initial payload 240,723 B.
+
+  > ⚠️ **Corrected during Phase 2 — do not use this gate.** Neither claim holds:
+  > 1. The reference hashes above are **not reproducible**. Rebuilding the
+  >    pre-migration commit today yields `main-JZCIFOK5.js`, not
+  >    `main-CTXD2HQZ.js`, and rebuilding the Phase 1 commit yields
+  >    `main-F322HZ5U.js`. Each build is internally reproducible (a cache-cleared
+  >    rebuild reproduces its own hashes byte-for-byte), but hashes are not
+  >    stable across source-tree changes or build environments.
+  > 2. An exact hash comparison is therefore **not** a valid gate: Angular's
+  >    `outputHashing: "all"` makes each chunk depend on the emitted names of the
+  >    chunks it imports, so one real change renames a cascade and moves every
+  >    hash — including `main`'s, whose bytes change even when its own code did
+  >    not.
+  >
+  > Phase 1 was nonetheless verified sound by a stronger method: a normalised
+  > bundle diff (`tools/bundle-diff.mjs`) showed the only difference from
+  > pre-migration was minified identifier naming, with all 923 string literals
+  > and every asset size identical. See [`migration-baseline.md`](./migration-baseline.md) §9.
+  > **Phases 2–5 should gate on `tools/bundle-diff.mjs` plus the size table, not
+  > on raw hashes.**
 - `npx ng build ml-platform` — empty shell builds.
 - Push the branch and confirm the portfolio still deploys and serves at the existing URL. **Do not proceed until this is confirmed** — this is the one step that can silently break the live site.
 
 ### Phase 2 — Extract shared libs
 
-Five extractions, all moves rather than rewrites except where noted.
+Four lib extractions, all moves rather than rewrites except where noted, plus the
+`@shared/*` path mapping that lets both apps consume them.
 
 1. **`libs/shared-plotting`** — from `calculus/components/plot-canvas/**`, `calculus/plotting.ts`, `calculus/calculus.palette.ts`.
    *Required change, not a plain move:* the extraction is where the two current identity leakages get fixed, or the platform inherits the portfolio's theme.
    - `plot-canvas.component.scss` hardcodes `border: 1px solid #263432` and `background: #0c1213`.
    - `calculus.palette.ts` hardcodes the full palette, and its own comment admits `calculus.component.scss` duplicates those values as CSS custom properties.
    Export `DEFAULT_PLOT_THEME` from the lib plus an optional theme input on `PlotCanvasComponent`, so the platform can restyle without forking. Collapse the acknowledged SCSS/TS duplication into that single source.
+
+   > **Done in Phase 2 — the duplication was wider than recorded here: five
+   > copies, not two.** Four stylesheets each carried their own thirteen
+   > `--color-*` declarations — `calculus.component.scss`,
+   > `calculus-practice.component.scss`, `calculus-process-lab.component.scss` and
+   > **`studies.component.scss`**, which this plan missed — plus
+   > `calculus.palette.ts`. Two had already drifted apart (`calculus-practice`
+   > had its own `#dc8585` red). They now all consume a single
+   > `_plot-tokens.scss` partial in the lib via a `color-tokens($danger)` mixin,
+   > which makes the one real divergence an explicit argument instead of an
+   > accident. All four emitted token blocks were verified byte-identical
+   > afterwards, so the collapse is pixel-neutral.
 2. **`libs/shared-katex`** — from `calculus/components/katex/**` and `calculus/components/rich-math-text/**`.
    *Required change:* KaTeX's stylesheet is currently loaded globally from a CDN by `src/styles.scss` (`@import 'https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css'`). A shared lib must not depend on the host app's global styles — import `katex/dist/katex.min.css` inside the lib's own component so it is self-contained (and drops the CDN dependency for both apps).
+
+   > ⚠️ **Corrected in Phase 2 — the mechanism specified above does not work.**
+   > Importing KaTeX's stylesheet inside the lib's component stylesheet fails
+   > twice over, both verified by building it:
+   > 1. **Emulated encapsulation breaks the styling.** `katex.render()` builds its
+   >    output DOM imperatively, so those elements never receive Angular's
+   >    `_ngcontent-*` attribute, while Angular rewrote **427 KaTeX selectors** to
+   >    `.katex[_ngcontent-xyz]`. Maths would have rendered unstyled with fallback
+   >    fonts — a silent regression, not a build error.
+   > 2. **It blows the component-style budget.** KaTeX's stylesheet is ~25 kB;
+   >    inlining it produced a **25.5 kB** component style against a 12 kB error
+   >    limit, failing the build.
+   >
+   > The CDN dependency was still removed, by registering
+   > `node_modules/katex/dist/katex.min.css` as a **seeded global style** in each
+   > app's `angular.json`, listed *after* the app's own `styles.scss`. KaTeX's CSS
+   > must stay global because it styles DOM the lib does not own. Measured cost:
+   > `styles-*.css` 11,195 → 36,619 B (+25,424) and 60 hashed font files
+   > (~1.2 MB) emitted to `media/`, replacing a render-blocking third-party
+   > request. **This is the one intentional behaviour change in Phase 2**, and it
+   > is transient: Phase 4 removes Cálculo from the portfolio entirely, at which
+   > point the style entry belongs to `ml-platform` (see Phase 3).
+   > Details in `libs/shared-katex/README.md`.
 3. **`libs/shared-progress`** — replace three byte-identical services with one keyed store. Verified: `calculus/services/calculus-progress.service.ts`, `calculus-practice/services/calculus-practice-progress.service.ts` and `calculus-process-lab/services/process-progress.service.ts` differ **only** in the `STORAGE_KEY` constant. Expose `ProgressStore` with the key supplied by the caller, and keep the three keys byte-identical.
 4. **`libs/shared-learning`** — `studies/study.types.ts` (`StudySubject`, `StudyModule`, `ModuleKind`, `ModuleStatus`) and the module-kind label map currently inlined in `studies.component.ts`. This is what makes the platform's four courses × two modules each a **data** problem rather than a routing problem.
    *Conditional:* only promote `explore-data/lessons/lesson.types.ts` and its pure validators into this lib if the ML courses will actually reuse the EDA lesson engine. If the ML courses get a new engine, define the shared lesson contract fresh and leave the EDA engine where it is — do not merge two engines speculatively.
@@ -230,13 +306,46 @@ Five extractions, all moves rather than rewrites except where noted.
    }
    ```
    Each lib gets a barrel `index.ts`, and an optional `tsconfig.lib.json` for editor scoping.
+
+   > **Done in Phase 2 — one addition was required:** `"baseUrl": "."` alongside
+   > `paths`. Without it the esbuild-based builder does not resolve path mappings
+   > declared in an *extended* tsconfig (`tsconfig.app.json` extends the root
+   > one), and every `@shared/*` import fails with "Could not resolve".
 6. Rewrite the ~20 import sites. The complete consumer set (verified by grep):
    - `PlotCanvasComponent`: average-slope-explorer, continuity-explorer, derivative-function-explorer, discontinuity-explorer, limit-explorer, tangent-line-explorer.
    - `plotting.ts` (`drawGrid`/`drawCurve`/`drawPoint`/`PlotSize`): the same six plus `calculus-practice/{visualizations.ts,problem-visualization.component.ts}` and `calculus-process-lab/{process-visualizations.ts,process-visualization.component.ts}`.
    - `KatexComponent`: formula-match, rule-playground, rich-math-text, `calculus-practice.component.ts`, `calculus-process-lab.component.ts`.
    - `RichMathTextComponent`: `calculus.component.ts`.
 
+   > **Done in Phase 2:** 20 import sites, matching this list exactly.
+   > Note `rich-math-text` is now *inside* `libs/shared-katex` (it is a
+   > `@shared/katex` consumer, not a portfolio file), so its import was an
+   > internal one; `studies/{study-catalog.ts,studies.component.ts}` were the two
+   > `@shared/learning` sites.
+
 Gate: `npx ng build portfolio` and `npx ng test`; all three Cálculo routes render pixel-identically; the initial chunk is unchanged within noise. Leave selectors (`app-plot-canvas`, `app-katex`) as they are — renaming them is Phase 6 optional polish, not migration work.
+
+> ⚠️ **Gate corrected in Phase 2.** "Initial chunk unchanged" holds for three of
+> the four libs but **not** for `libs/shared-learning`: `estudos` is an *eager*
+> route, so the hoisted module-kind helper lands in `main`, moving it
+> 194,949 → 195,027 B (+78 B, +0.04%). A bounded diff of the normalised `main`
+> confirmed the only difference is the import-alias list (one extra binding plus
+> the resulting minifier renaming), not any code change. Treat the gate as:
+>
+> ```bash
+> node tools/bundle-diff.mjs <baselineDir> dist/portfolio/browser   # expect drift
+>                                                                    # only in chunks
+>                                                                    # that hold the
+>                                                                    # refactored code
+> npx ng build portfolio --configuration production
+> CHROME_BIN=/usr/bin/google-chrome npx ng test portfolio --watch=false --browsers=ChromeHeadless
+> ```
+>
+> **Phase 2 result:** 23 JS/CSS assets before and after, drift confined to the 4
+> lazy Cálculo chunks, `main` +78 B (explained above), the 4 component-style
+> warnings unchanged to the byte, and tests at **2 FAILED, 190 SUCCESS** — the
+> documented baseline. The one intentional behaviour change is the KaTeX
+> stylesheet, above.
 
 > "Tests pass" means **190 passing / 2 known failures** throughout — see `migration-baseline.md` §4. The suite was never green; the two stale specs are not caused by, and not fixed by, this migration.
 
@@ -244,6 +353,13 @@ Gate: `npx ng build portfolio` and `npx ng test`; all three Cálculo routes rend
 
 1. Move (not copy) the study surface into `projects/ml-platform/src/app/`: `studies/**`, `calculus/**`, `calculus-practice/**`, `calculus-process-lab/**`.
 2. Give the app its own shell: `index.html` (own title/description/OG tags), `styles.scss` (own design tokens — do **not** import the portfolio's `--color-*` set; the doc's point is a different visual identity), nav/footer, `app.config.ts` with `provideRouter(routes)`.
+
+   > **Carry the KaTeX style entry over.** `ml-platform` needs
+   > `node_modules/katex/dist/katex.min.css` in its `angular.json` `styles` array
+   > (after its own `styles.scss`), and the portfolio's entry should be removed in
+   > Phase 4 once Cálculo leaves. See the Phase 2 correction above and
+   > `libs/shared-katex/README.md`. This is the one piece of Phase 2 state that
+   > lives in `angular.json` rather than in the libs.
 3. Routing: a hub at `/` rendering `STUDY_SUBJECTS`, plus a generalised module route such as `/curso/:subjectId/:moduleKind/:moduleId` so four courses × two modules are data-driven. Keep the familiar Cálculo paths (`/calculo/teoria`, `/calculo/aplicada`, `/calculo/processo`) resolvable.
 4. Expand `STUDY_SUBJECTS` from the single `calculo` subject to the four-course catalog. Keep unbuilt courses as `status: 'coming-soon'` so the hub can ship before all four exist — the type already models this.
 5. Every module route must be `loadComponent`-lazy. This is the constraint that keeps TF.js/D3/Plotly out of the platform shell, and it is also what makes the future weights survivable.

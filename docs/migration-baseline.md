@@ -186,3 +186,192 @@ Note the split: three of the four are **Cálculo** files that Phase 3 moves to `
 | Tests pass | ⚠️ 190 pass / 2 **pre-existing** failures (recorded above, §4) |
 
 **Cleared to proceed to Phase 1.** The one gate that is not fully green is the test suite, and it was never green — the two failures predate this work and are now documented instead of unknown.
+
+---
+
+## 9. Correction — the hash gate is unsound (found in Phase 2)
+
+§3 claims the build is byte-reproducible, and §8 records Phase 1 passing an exact
+hash comparison against the §3 reference hashes. **Both claims are wrong.** They
+were discovered while setting up the Phase 2 baseline, and they matter because
+Phases 2–5 were all scheduled to gate on hash identity.
+
+### 9.1 What was measured
+
+| Build | Source | `main` | Size |
+|---|---|---|---|
+| §3 reference | pre-migration, recorded in Phase 0 | `main-CTXD2HQZ.js` | 194,949 B |
+| Rebuilt | pre-migration commit `a3b315a` | `main-JZCIFOK5.js` | 194,949 B |
+| Rebuilt | Phase 1 tip `d184237` | `main-F322HZ5U.js` | 194,949 B |
+
+Three different hashes, three identical sizes. The same pattern holds across the
+chunk set: a fresh build of `a3b315a` produces `chunk-KHDGQ7EC.js` where §3 lists
+`chunk-YQIZLLSC.js` for the same 46,312-byte asset — while a fresh Phase 1 build
+*does* produce `chunk-YQIZLLSC.js`. **The §3 reference hashes cannot be
+reproduced from any commit in this repository.**
+
+Individual builds *are* internally reproducible: a cache-cleared rebuild of the
+same tree reproduced all 23 assets byte-for-byte (checked with `md5sum`, not just
+names). So this is not build flakiness. Hashes are simply not stable across
+source-tree changes or build environments.
+
+### 9.2 Why hashes move when code does not
+
+Angular's `outputHashing: "all"` makes a chunk's bytes depend on the emitted
+names of the chunks it imports. One real change therefore renames a cascade of
+chunks, and every chunk referencing a renamed chunk changes too — **including
+`main`**, whose size stays identical only because chunk names are fixed-width
+(`chunk-XXXXXXXX.js` is always 8 hash characters). An exact hash comparison reads
+that cascade as drift.
+
+### 9.3 Phase 1 was nevertheless sound
+
+Verified with `tools/bundle-diff.mjs`, which normalises every
+`chunk-XXXXXXXX.js` / `worker-XXXXXXXX.js` reference to a placeholder before
+comparing:
+
+- 23 assets before and after; **only 2** differ once references are normalised.
+- Both differences are pure minified-identifier renaming — `lb as o` becoming
+  `lb as n`, with the matching usage sites renamed consistently. A mangler
+  artifact of the module path change (`src/` → `projects/portfolio/src/`), not a
+  code change.
+- Every asset size identical, all 16 entries matching §3 exactly.
+- **All 923 string literals identical** apart from chunk-name references, and the
+  number multiset identical. (The one apparent extra `63` was the extraction
+  regex reading the new `chunk-63C5T2LC` name.)
+- `git diff a3b315a d184237` confirms **no application source file was modified**
+  — only `angular.json`, the tsconfigs, CI, `.gitignore` and `vercel.json`.
+
+**Conclusion: Phase 1 shipped no semantic change.** The live site serves the same
+application. But the gate that was supposed to establish that was invalid, and it
+passed for the wrong reason.
+
+### 9.4 The gate to use instead
+
+```bash
+node tools/bundle-diff.mjs <baselineDir> dist/portfolio/browser
+```
+
+Expect drift only in chunks that actually contain the refactored code. Combine it
+with the asset size table. **Do not gate on raw content hashes.**
+
+---
+
+## 10. Phase 2 gate result — four libs extracted
+
+Branch `migration/monorepo`, commits `05bf585` … `0a42f10`.
+
+| # | Lib | Commit |
+|---|---|---|
+| — | `tools/bundle-diff.mjs` (the gate itself) | `05bf585` |
+| 1 | `libs/shared-plotting` (+ theme decoupling) | `3d64c46` |
+| 2 | `libs/shared-katex` (CDN dropped) | `7410119` |
+| 3 | `libs/shared-progress` (3 services → 1 store) | `34f5d07` |
+| 4 | `libs/shared-learning` | `0a42f10` |
+
+20 import sites rewritten, matching the plan's consumer list exactly.
+
+**Baseline for the comparison** was rebuilt from `d184237` (the Phase 1 tip) into
+`dist/baseline-pre-phase2`, which is gitignored; regenerate it with
+`git stash`/checkout + `npx ng build portfolio --configuration production` if it
+is missing.
+
+### 10.1 Bundle outcome, cumulative across all four libs
+
+| Measure | Before | After | Δ |
+|---|---|---|---|
+| JS/CSS assets | 23 | 23 | 0 |
+| `main-*.js` | 194,949 B | 195,027 B | **+78 B** (+0.04%) |
+| `styles-*.css` | 11,195 B | 36,619 B | +25,424 B (KaTeX, intended) |
+| Total JS + CSS | 15,665,896 B | 15,691,581 B | +25,685 B (+0.16%) |
+| Initial payload | 240,723 B | 266,147 B | +25,424 B (+10.6%) |
+| Hashed KaTeX font files | 0 (CDN) | 60 (~1.2 MB, in `media/`) | +60 |
+| Component-style warnings | 4 | 4 | unchanged to the byte |
+| Tests | 2 F / 190 P | 2 F / 190 P | unchanged |
+
+Drift is confined to the 4 lazy Cálculo chunks plus the stylesheet. No asset was
+added or removed, no palette literal is duplicated more than before, and the
+KaTeX CSS is not duplicated into any JS chunk.
+
+The **+78 B on `main`** is the only unexpected number and it is explained:
+`estudos` is an *eager* route (route inventory, §2 row 10), so the module-kind
+label helper hoisted in §10 lib 4 lands in the initial chunk. A bounded diff of
+the normalised `main` shows the sole difference is the import-alias list — one
+extra binding plus the resulting minifier renaming.
+
+The **+25,424 B on `styles`** is the one intentional behaviour change in Phase 2:
+KaTeX's stylesheet and fonts are now bundled locally instead of fetched from
+`cdn.jsdelivr.net`. See §10.3.
+
+### 10.2 Behaviour-preservation evidence
+
+- **Storage keys.** All three `localStorage` keys (`calculus-completed-lessons`,
+  `calculus-practice-completed`, `calculus-process-completed`) occur exactly once
+  in the emitted bundle before and after. No student's saved progress is
+  orphaned. `localStorage` is origin-scoped, which is what the plan's risk R2 is
+  about.
+- **Palette CSS.** All **four** emitted `--color-*` token blocks are
+  byte-identical to before, so collapsing five copies of the palette into one
+  `_plot-tokens.scss` partial is pixel-neutral.
+- **Canvas drawing.** `drawGrid` / `drawPoint` read `DEFAULT_PLOT_THEME`, whose
+  values are the exact literals they previously hardcoded
+  (`#0c1213`, `rgba(151, 166, 161, 0.12)`, `rgba(231, 236, 233, 0.5)`), and the
+  statement order is unchanged. No palette literal is duplicated more than before
+  (`rgba(151, 166, 161, 0.12)` and `rgba(231, 236, 233, 0.5)` still occur once;
+  `#0c1213` still twice).
+- **`PlotCanvasComponent`** now emits
+  `border:1px solid var(--plot-border-color, #263432)` /
+  `background:var(--plot-bg, #0c1213)` with host bindings supplying the defaults,
+  so an unthemed use renders identically while a host app can restyle without
+  forking.
+
+### 10.3 The one intentional change: KaTeX's stylesheet
+
+The plan specified importing `katex/dist/katex.min.css` inside the lib's own
+component stylesheet. **That does not work**, verified by building it:
+
+1. **Emulated encapsulation breaks it.** `katex.render()` builds its DOM
+   imperatively, so those elements never get Angular's `_ngcontent-*` attribute,
+   while Angular rewrote **427 KaTeX selectors** to `.katex[_ngcontent-xyz]`.
+   Maths would have rendered unstyled with fallback fonts — a silent regression,
+   not a build error.
+2. **It blows the component-style budget.** Inlining produced a **25.5 kB**
+   component style against a 12 kB error limit, failing the build.
+
+KaTeX's CSS must therefore stay **global** — it styles DOM the lib does not own.
+The CDN dependency was still removed by seeding
+`node_modules/katex/dist/katex.min.css` into each app's `angular.json` `styles`
+array, after the app's own `styles.scss`. Verified: 0 scoped KaTeX selectors, both
+`body` rules preserved, no `cdn.jsdelivr` reference left, and every font URL
+rewritten to a hashed `./media/KaTeX_*` asset.
+
+The cost is +25,424 B on the initial stylesheet, replacing a render-blocking
+third-party request. It is **transient**: Phase 4 removes Cálculo from the
+portfolio entirely, at which point the style entry belongs to `ml-platform`.
+
+### 10.4 Phase 2 gate result
+
+| Gate criterion | Result |
+|---|---|
+| `npx ng build portfolio --configuration production` | ✅ exit 0 |
+| `npx ng build ml-platform` | ✅ exit 0 (9.3 s) |
+| Asset inventory unchanged | ✅ 23 JS/CSS assets before and after |
+| Drift confined to refactored code | ✅ 4 lazy Cálculo chunks + the stylesheet |
+| Initial chunk | ⚠️ +78 B, explained in §10.1 (`estudos` is eager) |
+| Palette/CSS pixel-neutral | ✅ four token blocks byte-identical |
+| Storage keys preserved | ✅ all three, byte-identical |
+| Component-style warnings | ✅ the same 4, unchanged to the byte |
+| Tests | ⚠️ **2 FAILED, 190 SUCCESS** — the documented baseline, same two specs |
+| Cálculo routes render identically | ⚠️ **not verified in a browser** — see below |
+
+**The one gate criterion not met is the browser check.** No browser-automation
+harness is available in this environment, so "the three Cálculo routes render
+pixel-identically" was not confirmed visually. It is instead supported by
+byte-identical component CSS, byte-identical palette token blocks, identical
+canvas drawing constants in identical statement order, and a bundle whose only
+real drift is in the chunks that were deliberately refactored. A human pass over
+`/estudos/calculo/teoria`, `/aplicada` and `/processo` is still worth doing before
+Phase 3 moves those routes.
+
+**Cleared to proceed to Phase 3**, with that manual check outstanding and with
+`ml-platform`'s `angular.json` needing the KaTeX style entry.
