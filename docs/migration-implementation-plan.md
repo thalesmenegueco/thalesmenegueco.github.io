@@ -10,6 +10,22 @@ Implementation plan for [`structure-migration.md`](./structure-migration.md).
 | Dependency strategy | **Single root `package.json`**, two build targets. One install, one lockfile. |
 | Where does `ml-platform` deploy? | **Vercel or Netlify + custom domain**, from this same repository. |
 
+## Progress
+
+Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](./migration-baseline.md).
+
+| Phase | Status | Commit(s) |
+|---|---|---|
+| 0 — Baseline & hygiene | ✅ Done | `55f1e09` (+ `1324dee`, `24f7f79`) |
+| 1 — Workspace conversion | ⚠️ Code done, live-deploy gate pending | `439cc66`, `8e092d1` |
+| 2 — Extract shared libs | Not started | — |
+| 3 — Build ml-platform content | Not started | — |
+| 4 — Redirects & cross-links | Not started | — |
+| 5 — Deploy split | Partly done ahead of schedule (`vercel.json`, project created) | `24f7f79` |
+| 6 — Cleanup | Partly done early (docs moved to `docs/`) | — |
+
+**Phase 1 outstanding item:** the plan's gate requires pushing and confirming the portfolio still deploys to its live URL. `.github/workflows/deploy.yml` triggers only on pushes to `main`, so this cannot be verified from a feature branch — it needs a merge to `main`, which is a production change and therefore a deliberate decision rather than a step to take automatically.
+
 ---
 
 ## 0. Reality check before committing to this
@@ -260,7 +276,7 @@ Gate: every old URL resolves to something sensible (real content or a redirect);
    - `base href="/"` (root of the custom domain)
    Both hosts support a monorepo "root directory" setting, so no repo split is needed.
 
-   ✅ **These are already codified in [`vercel.json`](../../../vercel.json) at the repo root** (added ahead of Phase 5 because the rewrite cannot be set from the dashboard's New Project screen). It sets `buildCommand`, `outputDirectory`, `installCommand: "npm ci"` and the SPA `rewrites`.
+   ✅ **These are already codified in [`vercel.json`](../vercel.json) at the repo root** (added ahead of Phase 5 because the rewrite cannot be set from the dashboard's New Project screen). It sets `buildCommand`, `outputDirectory`, `installCommand: "npm ci"` and the SPA `rewrites`.
 
    **Precedence warning:** values in `vercel.json` **override** the Vercel dashboard. If you change the build command or output directory in the UI and nothing happens, this file is why. Keeping it authoritative is deliberate — the project rename in Phase 1 changes both values, and a reviewed commit is safer than a remembered dashboard edit.
 
