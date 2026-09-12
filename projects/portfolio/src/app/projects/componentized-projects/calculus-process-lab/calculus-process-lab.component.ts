@@ -4,7 +4,7 @@ import { ProcessVisualizationComponent } from './process-visualization.component
 import { RC_CHARGING_PROCESS } from './process-data';
 import { computeMetrics } from './process-engine';
 import { Metric, ProcessStage } from './process.types';
-import { ProcessProgressService } from './services/process-progress.service';
+import { PROGRESS_KEYS, ProgressStore } from '@shared/progress';
 
 @Component({
   selector: 'app-calculus-process-lab',
@@ -56,8 +56,10 @@ export class CalculusProcessLabComponent {
     );
   });
 
-  constructor(private progress: ProcessProgressService) {
-    this.completedIds.set(this.progress.load());
+  private readonly progressKey = PROGRESS_KEYS.calculusProcess;
+
+  constructor(private progress: ProgressStore) {
+    this.completedIds.set(this.progress.load(this.progressKey));
   }
 
   isCompleted(stage: ProcessStage): boolean {
@@ -89,7 +91,7 @@ export class CalculusProcessLabComponent {
     const stage = this.currentStage();
     if (!this.completedIds().includes(stage.id)) {
       this.completedIds.update((ids) => [...ids, stage.id]);
-      this.progress.save(this.completedIds());
+      this.progress.save(this.progressKey, this.completedIds());
     }
   }
 
@@ -98,7 +100,7 @@ export class CalculusProcessLabComponent {
       return;
     }
     this.completedIds.set([]);
-    this.progress.save([]);
+    this.progress.save(this.progressKey, []);
     this.currentStageIndex.set(0);
     this.time.set(3);
     this.h.set(1);

@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@shared/plotting": ["libs/shared-plotting/index.ts"],
-      "@shared/katex": ["libs/shared-katex/index.ts"]
+      "@shared/katex": ["libs/shared-katex/index.ts"],
+      "@shared/progress": ["libs/shared-progress/index.ts"]
     }
   },
   "angularCompilerOptions": {

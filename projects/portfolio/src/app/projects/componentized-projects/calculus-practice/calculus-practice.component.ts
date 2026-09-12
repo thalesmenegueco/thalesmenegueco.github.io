@@ -4,7 +4,7 @@ import { KatexComponent } from '@shared/katex';
 import { ProblemVisualizationComponent } from './problem-visualization.component';
 import { AREA_LABELS, AppliedProblem, ProblemArea } from './calculus-practice.types';
 import { APPLIED_PROBLEMS } from './problem-data';
-import { CalculusPracticeProgressService } from './services/calculus-practice-progress.service';
+import { PROGRESS_KEYS, ProgressStore } from '@shared/progress';
 
 type AreaFilter = ProblemArea | 'all';
 
@@ -56,8 +56,10 @@ export class CalculusPracticeComponent {
     () => (this.completedIds().length / this.problems.length) * 100,
   );
 
-  constructor(private progress: CalculusPracticeProgressService) {
-    this.completedIds.set(this.progress.load());
+  private readonly progressKey = PROGRESS_KEYS.calculusPractice;
+
+  constructor(private progress: ProgressStore) {
+    this.completedIds.set(this.progress.load(this.progressKey));
   }
 
   areaLabel(area: ProblemArea): string {
@@ -112,7 +114,7 @@ export class CalculusPracticeComponent {
     if (correct) {
       if (!this.completedIds().includes(problem.id)) {
         this.completedIds.update((ids) => [...ids, problem.id]);
-        this.progress.save(this.completedIds());
+        this.progress.save(this.progressKey, this.completedIds());
       }
       this.feedback.set({
         kind: 'success',
@@ -136,7 +138,7 @@ export class CalculusPracticeComponent {
       return;
     }
     this.completedIds.set([]);
-    this.progress.save([]);
+    this.progress.save(this.progressKey, []);
     this.currentIndex.set(0);
     this.resetExerciseState();
   }

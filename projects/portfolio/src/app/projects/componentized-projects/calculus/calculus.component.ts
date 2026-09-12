@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild, computed, signal } from '@angular/cor
 import { LESSONS } from './lesson-data';
 import { Lesson } from './calculus.types';
 import { validateStep, validationMessage } from './calculus.engine';
-import { CalculusProgressService } from './services/calculus-progress.service';
+import { PROGRESS_KEYS, ProgressStore } from '@shared/progress';
 import { RichMathTextComponent } from '@shared/katex';
 import { LimitExplorerComponent } from './components/limit-explorer/limit-explorer.component';
 import { DiscontinuityExplorerComponent } from './components/discontinuity-explorer/discontinuity-explorer.component';
@@ -70,8 +70,10 @@ export class CalculusComponent {
     return [...groups.entries()].map(([unit, items]) => ({ unit, items }));
   });
 
-  constructor(private progress: CalculusProgressService) {
-    this.completedIds.set(this.progress.load());
+  private readonly progressKey = PROGRESS_KEYS.calculus;
+
+  constructor(private progress: ProgressStore) {
+    this.completedIds.set(this.progress.load(this.progressKey));
   }
 
   selectLesson(index: number): void {
@@ -110,7 +112,7 @@ export class CalculusComponent {
 
     if (!this.completedIds().includes(lesson.id)) {
       this.completedIds.update((ids) => [...ids, lesson.id]);
-      this.progress.save(this.completedIds());
+      this.progress.save(this.progressKey, this.completedIds());
     }
 
     this.showSummary.set(true);
@@ -122,7 +124,7 @@ export class CalculusComponent {
       return;
     }
     this.completedIds.set([]);
-    this.progress.save([]);
+    this.progress.save(this.progressKey, []);
     this.currentLessonIndex.set(0);
     this.currentStepIndex.set(0);
     this.resetStepState();
