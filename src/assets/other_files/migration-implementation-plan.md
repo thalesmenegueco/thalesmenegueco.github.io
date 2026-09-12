@@ -88,6 +88,63 @@ Angular project names: `learning-gallery` → **`portfolio`**, plus new **`ml-pl
 
 ---
 
+## 2a. Hosting & CDN strategy — Vercel vs Cloudflare
+
+**Short answer: pick one edge, don't stack them.** Vercel-alone is the default; Cloudflare-Pages-as-host is the fallback if bandwidth becomes the binding constraint. Proxying Vercel through Cloudflare is the wrong fix for almost every problem it appears to solve.
+
+### The premise to correct
+
+"Vercel + a CDN" assumes Vercel is only an app host. It isn't — Vercel *is* a global edge network, and it serves hashed assets with immutable cache headers from PoPs automatically. The doc's requirement ("edge caching global, importante para os 1.2MB de TF.js") is already met by Vercel alone. Adding Cloudflare doesn't add a CDN; it adds a **second** CDN in front of the first.
+
+### What a double CDN actually costs
+
+- **Extra hop** on anything not cached at Cloudflare — uncached requests get slower, not faster.
+- **Two caches to invalidate** → stale HTML after deploys unless HTML is explicitly bypassed.
+- **Vercel features degrade**: firewall and rate limiting see Cloudflare's IPs instead of the real client's; Deployment Protection can break; analytics/Web Vitals misreport.
+- **Second failure domain** in the request path.
+- **SSL misconfiguration** (anything other than Full (strict)) produces redirect loops.
+
+Vercel publishes guidance on exactly this: [Should I use Cloudflare in front of Vercel?](https://vercel.com/kb/guide/cloudflare-with-vercel) and [Reverse Proxy Servers and Vercel](https://vercel.com/docs/security/reverse-proxy).
+
+### The one real pressure: bandwidth economics
+
+Vercel Hobby includes a monthly fast-data-transfer allowance (on the order of 100 GB/month — confirm current figures at [Vercel Limits](https://vercel.com/docs/limits) and [Fair Use Guidelines](https://vercel.com/docs/limits/fair-use-guidelines)). This project is unusually bandwidth-hungry: the measured build contains a **5.75 MB worker** and a **5.69 MB chunk** (see `migration-baseline.md` §3). On the order of 100 GB is roughly 9,000 loads of that pair.
+
+So the pressure is real — but the fix is to change *who serves the bytes*, not to insert a proxy.
+
+### Option A — Vercel alone, Cloudflare for DNS only (recommended)
+
+Keeps the DX you know, no double-CDN problems, and consolidates DNS with the Cloudflare account you already have for `cloudflare-worker/test-llms`.
+
+1. **Vercel** → import the GitHub repo. Root Directory `.` (the Angular workspace is at the repo root), Build Command `npx ng build ml-platform --configuration production`, Output Directory `dist/ml-platform/browser`, plus an SPA rewrite (all → `/index.html`).
+2. **Cloudflare DNS** → add the custom domain as a CNAME to `cname.vercel-dns.com` with proxy status **DNS only (grey cloud)**.
+3. **Vercel → Domains** → add the domain; Vercel issues the certificate.
+4. Deploy from the same repo. Vercel doesn't care about the repo name, so `thalesmenegueco.github.io` can host both apps: GitHub Actions keeps publishing the portfolio to `gh-pages`, Vercel independently builds the platform. **No repo split needed.**
+
+Watch: the Hobby plan is for non-commercial use. If the platform is ever monetised, that becomes a Pro conversation.
+
+### Option B — Cloudflare Pages *as the host* (fallback)
+
+If Vercel bandwidth or cost becomes binding, switch hosts — do not proxy.
+
+- **Unlimited bandwidth on the free tier**, which is precisely the axis this project stresses.
+- Same account and zone as the existing Worker → platform and LLM API share a zone, no CORS, one `wrangler` workflow.
+- Per-PR previews and custom domains are equivalent to Vercel's.
+- The roadmap's "datasets + modelos treinados" has a natural home: **R2, which has zero egress fees**.
+- Trade-off: less familiar, and a less flexible build image than Vercel's.
+
+### Option C — Cloudflare proxy in front of Vercel (only for Cloudflare-specific features)
+
+Justified only if you specifically need edge WAF / bot management / rate limiting that Vercel's own firewall doesn't cover. If you do it, all five of these are mandatory:
+
+1. SSL/TLS mode **Full (strict)**.
+2. **Bypass cache for HTML** (`Content-Type: text/html`) — the single most important setting, or you serve stale deploys.
+3. Cache the hashed immutable assets (`/chunk-*`, `/worker-*`, `/main-*`, `/styles-*`, `/polyfills-*`) with long TTLs.
+4. Forward the real client IP (`CF-Connecting-IP`) so Vercel's firewall and analytics behave.
+5. Accept that Vercel Deployment Protection and some edge features will misbehave.
+
+---
+
 ## 3. Phases
 
 Each phase ends at a gate. Phases 1 and 2 are behaviour-preserving; 3–5 change product surface.
@@ -202,8 +259,9 @@ Gate: every old URL resolves to something sensible (real content or a redirect);
    - SPA rewrite: all paths → `/index.html`
    - `base href="/"` (root of the custom domain)
    Both hosts support a monorepo "root directory" setting, so no repo split is needed.
-3. **Domain** — set it on the platform only. The doc's `ml.thalesmenegueco.dev` is a good default; a short ownable name (`visualml.dev`, `seeml.dev`) is the alternative. The portfolio keeps `thalesmenegueco.github.io` untouched.
-4. **PR build guard** — a new workflow that builds **both** apps on every pull request:
+3. **Do not stack Cloudflare in front of Vercel** — see §2a. Use Cloudflare for DNS only (proxy off), or host the platform on Cloudflare Pages instead. Vercel alone is a global CDN and already satisfies the doc's "edge caching" requirement.
+4. **Domain** — set it on the platform only. The doc's `ml.thalesmenegueco.dev` is a good default; a short ownable name (`visualml.dev`, `seeml.dev`) is the alternative. The portfolio keeps `thalesmenegueco.github.io` untouched.
+5. **PR build guard** — a new workflow that builds **both** apps on every pull request:
    ```bash
    npx ng build portfolio --configuration production
    npx ng build ml-platform --configuration production
@@ -229,7 +287,7 @@ Gate: pushing to `main` deploys the portfolio to its existing URL; the platform 
 | R1 | Renaming the GitHub repo to match a new workspace name | Breaks the user site: `<user>.github.io` must keep that exact repo name | Only rename local directories. Never the remote repo. |
 | R2 | `localStorage` is origin-scoped: a student's progress on `thalesmenegueco.github.io` is unreadable from the new domain | Silent loss of a student's saved work — directly contradicts the platform's reason to exist | Do not jump straight to redirects. Keep the old Cálculo routes serving in the portfolio through at least one release, then offer a one-time export (JSON via URL hash or copy-paste) before adding the redirect stub. Decide this deliberately. |
 | R3 | Files moving outside `src/` collide with `rootDir: "./src"` in the per-project tsconfigs | Build/editor errors mid-Phase-2 | Handled in Phase 1 step 4 — drop `rootDir` before the libs exist. |
-| R4 | Dual lockfiles (`package-lock.json` + `pnpm-lock.yaml`), invalid `pnpm-workspace.yaml`, CI using `npm install` instead of `npm ci` | Non-reproducible installs; a workspace file that breaks if pnpm is ever run | Phase 0: standardise on npm, delete the pnpm artefacts, switch CI to `npm ci`. |
+| R4 | ~~Dual lockfiles, invalid `pnpm-workspace.yaml`, CI using `npm install`~~ | ~~Non-reproducible installs~~ | ✅ **Resolved in Phase 0** (commit `55f1e09`): npm standardised, pnpm artefacts removed, CI on `npm ci`. |
 | R5 | `cloudflare-worker/test-llms/` is a third deployable with its own `package.json`, outside the workspace and outside CI | Untracked deploy drift | Unchanged under the chosen scope (it serves a tool that stays in the portfolio), but flag it: it deserves its own workflow eventually. |
 | R6 | The platform is where TF.js/D3/Plotly will land; without budgets the shell chunk creeps | The exact problem this migration exists to prevent, reintroduced in the new app | Per-app budgets in Phase 3 plus the bundle check in the Phase 5 PR workflow. |
 | R7 | Karma needs a test target per app; the `@angular/build:karma` builder infers config implicitly today | Tests silently stop covering one app after the split | Confirm both `ng test portfolio` and `ng test ml-platform` targets exist and run in the Phase 5 workflow. Chrome is available locally at `/usr/bin/google-chrome`. |
