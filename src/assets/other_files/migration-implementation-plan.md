@@ -259,6 +259,12 @@ Gate: every old URL resolves to something sensible (real content or a redirect);
    - SPA rewrite: all paths → `/index.html`
    - `base href="/"` (root of the custom domain)
    Both hosts support a monorepo "root directory" setting, so no repo split is needed.
+
+   ✅ **These are already codified in [`vercel.json`](../../../vercel.json) at the repo root** (added ahead of Phase 5 because the rewrite cannot be set from the dashboard's New Project screen). It sets `buildCommand`, `outputDirectory`, `installCommand: "npm ci"` and the SPA `rewrites`.
+
+   **Precedence warning:** values in `vercel.json` **override** the Vercel dashboard. If you change the build command or output directory in the UI and nothing happens, this file is why. Keeping it authoritative is deliberate — the project rename in Phase 1 changes both values, and a reviewed commit is safer than a remembered dashboard edit.
+
+   **Post-deploy check (do this on the first green deployment):** load a deep link such as `/curso/calculo/teoria` directly, then confirm in DevTools that `chunk-*.js` and `worker-*.js` return JavaScript and **not** `index.html`. The `/(.*)` rewrite relies on Vercel checking the filesystem before applying rewrites; if assets ever come back as HTML, replace the rewrite source with `/((?!.*\\.).*)` (paths without a dot) so asset requests are never rewritten.
 3. **Do not stack Cloudflare in front of Vercel** — see §2a. Use Cloudflare for DNS only (proxy off), or host the platform on Cloudflare Pages instead. Vercel alone is a global CDN and already satisfies the doc's "edge caching" requirement.
 4. **Domain** — set it on the platform only. The doc's `ml.thalesmenegueco.dev` is a good default; a short ownable name (`visualml.dev`, `seeml.dev`) is the alternative. The portfolio keeps `thalesmenegueco.github.io` untouched.
 5. **PR build guard** — a new workflow that builds **both** apps on every pull request:
