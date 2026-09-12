@@ -21,7 +21,7 @@ Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](
 | 2 — Extract shared libs | ✅ Done — all gates closed | `05bf585`, `3d64c46`, `7410119`, `34f5d07`, `0a42f10`, `c2dc314` |
 | 3 — Build ml-platform content | **Next** — readiness audited, see § Phase 3 | — |
 | 4 — Redirects & cross-links | Not started | — |
-| 5 — Deploy split | Partly done ahead of schedule (`vercel.json`, project created) | `24f7f79` |
+| 5 — Deploy split | Partly done ahead of schedule (`vercel.json`, project created, Node pinned) | `24f7f79` |
 | 6 — Cleanup | Partly done early (docs moved to `docs/`) | — |
 
 **Phase 1:** complete. The live-deploy gate was confirmed green in Vercel after the
@@ -439,14 +439,26 @@ deliberately. Options, cheapest first:
 
 - **Deploy the platform early** (it is only a Vercel import and it inherits
   `vercel.json`), so the platform URL exists *before* the routes are removed.
-  This is the cheapest fix and removes H2 almost entirely.
+  This is the cheapest fix and removes H2 almost entirely. **Decided: this one.**
 - **Keep the portfolio serving Cálculo for one release** after the platform is
   live, then redirect (the plan's R2 mitigation).
 - **Add a one-time progress export/import** (JSON via copy-paste or URL hash)
   before the routes are removed, so progress survives the origin change.
 
-Recommend deciding on the third option's necessity while doing Phase 3, since
-that is the last point at which the portfolio origin still serves the data.
+⚠️ **Deploying the platform early does not by itself close H2.** A platform
+deploy *before Phase 3* serves the placeholder shell, not Cálculo — so it
+validates the pipeline (build command, output dir, SPA rewrite, DNS) but leaves
+Cálculo on the portfolio origin. H2 closes only once Phase 3 has put the Cálculo
+modules on the platform **and that deploy is verified**. The safe sequence is:
+
+1. Deploy the placeholder platform → validate the pipeline, get the URL.
+2. Do Phase 3 on the branch (fold in the route removal — H1).
+3. Deploy the branch → verify Cálculo actually works on the platform URL.
+4. **Then** merge to `main`, which is what removes the routes from the portfolio.
+   No window, no dead URLs.
+
+Progress-loss decision (R2): accepted, on the basis that the data is per-lesson
+completion checkmarks. The two mitigations above were not taken.
 
 #### Steps
 
@@ -512,6 +524,35 @@ Gate: every old URL resolves to something sensible (real content or a redirect);
    **Precedence warning:** values in `vercel.json` **override** the Vercel dashboard. If you change the build command or output directory in the UI and nothing happens, this file is why. Keeping it authoritative is deliberate — the project rename in Phase 1 changes both values, and a reviewed commit is safer than a remembered dashboard edit.
 
    **Post-deploy check (do this on the first green deployment):** load a deep link such as `/curso/calculo/teoria` directly, then confirm in DevTools that `chunk-*.js` and `worker-*.js` return JavaScript and **not** `index.html`. The `/(.*)` rewrite relies on Vercel checking the filesystem before applying rewrites; if assets ever come back as HTML, replace the rewrite source with `/((?!.*\\.).*)` (paths without a dot) so asset requests are never rewritten.
+
+   **Deploy-config readiness (audited before the first deploy):**
+
+   | Check | Result |
+   |---|---|
+   | Exact Vercel command `npx ng build ml-platform --configuration production` (no `--base-href`) | ✅ exit 0; `dist/ml-platform/browser/` has `index.html` + assets |
+   | Emitted `<base href>` | ✅ `/`, which is what a root-domain deploy needs |
+   | `outputDirectory` matches real output | ✅ `dist/ml-platform/browser` |
+   | `installCommand: npm ci` viable | ✅ lockfile in sync (`npm ci --dry-run` clean) |
+
+   ⚠️ **Two things that could still break the first deploy, both now handled or
+   needing a dashboard setting:**
+
+   1. **Node version was unpinned.** `@angular/core` 20.1.0 requires
+      `^20.19.0 || ^22.12.0 || >=24.0.0`, and the repo had no `engines` field and
+      no version file, so Vercel would have used its own default — with local on
+      22.22.0 and CI on 24, that is a third version and a real "works locally,
+      fails on Vercel" risk. **Fixed:** `engines.node: "22.x"` in
+      `package.json` plus a `.nvmrc` of `22`, matching the version Phases 0–2
+      were verified on. Vercel also exposes a Node.js Version dropdown in
+      Settings; `engines.node` should govern, but make them agree.
+      (CI remains on Node 24 — aligning it is optional cleanup, not a blocker.)
+   2. **Root Directory must be the repo root.** `angular.json`, `package-lock.json`
+      and `node_modules` all live at the root, so a Vercel *Root Directory* of
+      `projects/ml-platform` would fail `npx ng build ml-platform`. This is a
+      dashboard setting `vercel.json` cannot express — **verify it is `.`/empty.**
+
+   Note also that `package.json`'s `name` is still `learning-gallery`, stale since
+   the Phase 1 rename. Harmless, but misleading in a two-app workspace.
 3. **Do not stack Cloudflare in front of Vercel** — see §2a. Use Cloudflare for DNS only (proxy off), or host the platform on Cloudflare Pages instead. Vercel alone is a global CDN and already satisfies the doc's "edge caching" requirement.
 4. **Domain** — set it on the platform only. The doc's `ml.thalesmenegueco.dev` is a good default; a short ownable name (`visualml.dev`, `seeml.dev`) is the alternative. The portfolio keeps `thalesmenegueco.github.io` untouched.
 5. **PR build guard** — a new workflow that builds **both** apps on every pull request:
