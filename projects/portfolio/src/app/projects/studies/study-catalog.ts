@@ -1,4 +1,4 @@
-import { StudySubject } from './study.types';
+import { StudySubject } from '@shared/learning';
 
 /**
  * The study catalogue for "Exatas em Movimento".

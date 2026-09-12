@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
+import {
+  ModuleKind,
+  moduleKindLabel as labelForModuleKind,
+} from '@shared/learning';
 import { HeroMotionComponent } from './hero-motion.component';
 import { STUDY_SUBJECTS } from './study-catalog';
-import { ModuleKind } from './study.types';
 
 @Component({
   selector: 'app-studies',
@@ -13,13 +16,7 @@ import { ModuleKind } from './study.types';
 export class StudiesComponent {
   readonly subjects = STUDY_SUBJECTS;
 
-  private readonly kindLabels: Record<ModuleKind, string> = {
-    teoria: 'Teoria',
-    aplicada: 'Matemática aplicada',
-    processo: 'Processo',
-  };
-
   moduleKindLabel(kind: ModuleKind): string {
-    return this.kindLabels[kind];
+    return labelForModuleKind(kind);
   }
 }

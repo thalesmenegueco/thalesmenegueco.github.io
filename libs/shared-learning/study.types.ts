@@ -6,6 +6,10 @@
  * and a process module (one problem walked through the full mathematical
  * chain). New mini-courses only need to add a subject to the catalog — the
  * container renders them automatically.
+ *
+ * This is what makes "four courses x two modules each" a **data** problem
+ * rather than a routing problem: the container reads the catalog, and a new
+ * course is a new entry rather than a new route.
  */
 
 export type ModuleKind = 'teoria' | 'aplicada' | 'processo';
