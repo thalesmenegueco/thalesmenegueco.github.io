@@ -3,6 +3,11 @@
   "buildCommand": "npx ng build ml-platform --configuration production",
   "outputDirectory": "dist/ml-platform/browser",
   "installCommand": "npm ci",
+  "git": {
+    "deploymentEnabled": {
+      "gh-pages": false
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",

@@ -17,15 +17,16 @@ Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](
 | Phase | Status | Commit(s) |
 |---|---|---|
 | 0 — Baseline & hygiene | ✅ Done | `55f1e09` (+ `1324dee`, `24f7f79`) |
-| 1 — Workspace conversion | ✅ Done, live-deploy confirmed green in Vercel | `439cc66`, `8e092d1`, `d184237` |
+| 1 — Workspace conversion | ✅ Done, live-deploy confirmed green on GitHub Pages | `439cc66`, `8e092d1`, `d184237` |
 | 2 — Extract shared libs | ✅ Done — all gates closed | `05bf585`, `3d64c46`, `7410119`, `34f5d07`, `0a42f10`, `c2dc314` |
 | 3 — Build ml-platform content | **Next** — readiness audited, see § Phase 3 | — |
 | 4 — Redirects & cross-links | Not started | — |
-| 5 — Deploy split | Partly done ahead of schedule (`vercel.json`, project created, Node pinned) | `24f7f79` |
+| 5 — Deploy split | Partly done ahead of schedule — `vercel.json`, project created, Node pinned, **first production deploy green** | `24f7f79`, `bedd845` |
 | 6 — Cleanup | Partly done early (docs moved to `docs/`) | — |
 
-**Phase 1:** complete. The live-deploy gate was confirmed green in Vercel after the
-branch was pushed.
+**Phase 1:** complete. The live-deploy gate was confirmed green on GitHub Pages
+after the branch was pushed — the portfolio is published to `gh-pages` by
+`.github/workflows/deploy.yml`; Vercel builds the platform, not the portfolio.
 
 **Phase 2:** complete, with two plan corrections that Phases 3–5 depend on —
 read them before continuing:
@@ -456,6 +457,21 @@ modules on the platform **and that deploy is verified**. The safe sequence is:
 3. Deploy the branch → verify Cálculo actually works on the platform URL.
 4. **Then** merge to `main`, which is what removes the routes from the portfolio.
    No window, no dead URLs.
+
+> **Status at `bedd845` — step 1 is done.** `main` and `migration/monorepo` are
+> both at `bedd845`, and the Vercel production deploy of `main` built green in
+> 43 s, so the install command, build command, output directory and SPA rewrite
+> are all validated and a platform URL exists. Steps 2–4 are unchanged; because
+> the two branches are already level, step 4 is simply the Phase 3 work reaching
+> `main`, and the constraint that matters is unchanged — it must land only after
+> step 3 has verified Cálculo on the platform URL.
+>
+> `vercel.json` now also sets `git.deploymentEnabled: { "gh-pages": false }`.
+> Vercel auto-deploys every branch, and `gh-pages` contains only build output
+> (no `package-lock.json`), so `npm ci` failed there on every portfolio publish —
+> a red preview deployment with no effect on either live site. **Branch previews
+> for every other branch stay enabled on purpose**: they are the mechanism step 3
+> verifies on.
 
 Progress-loss decision (R2): accepted, on the basis that the data is per-lesson
 completion checkmarks. The two mitigations above were not taken.
