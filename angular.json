@@ -125,6 +125,9 @@
             ],
             "tsConfig": "projects/ml-platform/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["libs/shared-plotting/styles"]
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -132,7 +135,8 @@
               }
             ],
             "styles": [
-              "projects/ml-platform/src/styles.scss"
+              "projects/ml-platform/src/styles.scss",
+              "node_modules/katex/dist/katex.min.css"
             ]
           },
           "configurations": {
@@ -145,8 +149,13 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "6kB",
+                  "maximumError": "12kB"
+                },
+                {
+                  "type": "any",
+                  "maximumWarning": "1.5MB",
+                  "maximumError": "3MB"
                 }
               ],
               "outputHashing": "all"
@@ -183,6 +192,9 @@
             ],
             "tsConfig": "projects/ml-platform/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["libs/shared-plotting/styles"]
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -190,7 +202,8 @@
               }
             ],
             "styles": [
-              "projects/ml-platform/src/styles.scss"
+              "projects/ml-platform/src/styles.scss",
+              "node_modules/katex/dist/katex.min.css"
             ]
           }
         }
