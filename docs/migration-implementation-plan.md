@@ -305,6 +305,13 @@ Four lib extractions, all moves rather than rewrites except where noted, plus th
    > is transient: Phase 4 removes Cálculo from the portfolio entirely, at which
    > point the style entry belongs to `ml-platform` (see Phase 3).
    > Details in `libs/shared-katex/README.md`.
+   >
+   > ✅ **Resolved early, and measured.** The portfolio's copy was removed as soon
+   > as nothing in that app imported `@shared/katex` any more: `styles-*.css`
+   > back to **11,125 B**, **0** `.katex` selectors, and `media/` **not emitted
+   > at all** (it had been 60 font files / 1,076,572 B). The entry now exists
+   > only in `ml-platform`'s `angular.json`. The portfolio's tests still report
+   > the documented 2 FAILED / 190 SUCCESS afterwards.
 3. **`libs/shared-progress`** — replace three byte-identical services with one keyed store. Verified: `calculus/services/calculus-progress.service.ts`, `calculus-practice/services/calculus-practice-progress.service.ts` and `calculus-process-lab/services/process-progress.service.ts` differ **only** in the `STORAGE_KEY` constant. Expose `ProgressStore` with the key supplied by the caller, and keep the three keys byte-identical.
 4. **`libs/shared-learning`** — `studies/study.types.ts` (`StudySubject`, `StudyModule`, `ModuleKind`, `ModuleStatus`) and the module-kind label map currently inlined in `studies.component.ts`. This is what makes the platform's four courses × two modules each a **data** problem rather than a routing problem.
    *Conditional:* only promote `explore-data/lessons/lesson.types.ts` and its pure validators into this lib if the ML courses will actually reuse the EDA lesson engine. If the ML courses get a new engine, define the shared lesson contract fresh and leave the EDA engine where it is — do not merge two engines speculatively.
@@ -575,12 +582,16 @@ Gate: `ng build ml-platform` succeeds; the shell chunk contains no `katex`/`echa
 > If the intent was four ML courses *in addition* to Cálculo, that is one more
 > entry and nothing else changes.
 >
-> **Two deliberate deviations from the step list.** The three Cálculo icons were
+> **Three deliberate deviations from the step list.** The three Cálculo icons were
 > *moved* rather than copied: the portfolio no longer references them, so copying
 > would have left three dead assets behind (`measure-it.svg` is now the only icon
-> the portfolio still uses). And the platform footer's portfolio cross-link —
+> the portfolio still uses). The platform footer's portfolio cross-link —
 > Phase 4 step 4's platform half — landed here instead, because that footer was
-> being written anyway. Also worth flagging for a content pass, not fixed here:
+> being written anyway. And the portfolio's now-dead KaTeX style entry (Phase 2's
+> transient cost, above) was removed rather than left for Phase 4, once nothing
+> in the app imported `@shared/katex`: `styles-*.css` 36,619 → **11,125 B** and
+> `media/` stopped being emitted, dropping 60 font files / 1,076,572 B from every
+> portfolio deploy. Also worth flagging for a content pass, not fixed here:
 > the hub's hero copy still says "Cada disciplina tem dois momentos" and its
 > "Como funciona" strip shows two steps, while Cálculo has three modules.
 

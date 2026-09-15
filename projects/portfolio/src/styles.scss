@@ -1,8 +1,10 @@
 @import 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap';
 
-// KaTeX's stylesheet is no longer loaded globally: `@shared/katex` bundles it
-// (and its web fonts) from the installed package, so the lib is self-contained
-// and the app no longer depends on the CDN at runtime.
+// KaTeX is gone from this app entirely. It was loaded here from a CDN, then
+// from the installed package as a global style entry in `angular.json`; the
+// Cálculo modules that rendered maths moved to the `ml-platform` app in Phase 3
+// and nothing here imports `@shared/katex` any more. The platform's own
+// `angular.json` carries that style entry now.
 
 :root {
   --color-bg: rgb(5, 5, 5);

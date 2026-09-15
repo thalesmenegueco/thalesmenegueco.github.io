@@ -35,8 +35,7 @@
               }
             ],
             "styles": [
-              "projects/portfolio/src/styles.scss",
-              "node_modules/katex/dist/katex.min.css"
+              "projects/portfolio/src/styles.scss"
             ]
           },
           "configurations": {
@@ -97,8 +96,7 @@
               }
             ],
             "styles": [
-              "projects/portfolio/src/styles.scss",
-              "node_modules/katex/dist/katex.min.css"
+              "projects/portfolio/src/styles.scss"
             ]
           }
         }
