@@ -19,7 +19,7 @@ Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](
 | 0 — Baseline & hygiene | ✅ Done | `55f1e09` (+ `1324dee`, `24f7f79`) |
 | 1 — Workspace conversion | ✅ Done, live-deploy confirmed green on GitHub Pages | `439cc66`, `8e092d1`, `d184237` |
 | 2 — Extract shared libs | ✅ Done — all gates closed | `05bf585`, `3d64c46`, `7410119`, `34f5d07`, `0a42f10`, `c2dc314` |
-| 3 — Build ml-platform content | **Next** — readiness audited, see § Phase 3 | — |
+| 3 — Build ml-platform content | ✅ Done on the branch — see § Phase 3 results | `4a3cef5`, `1075e01` |
 | 4 — Redirects & cross-links | Not started | — |
 | 5 — Deploy split | Partly done ahead of schedule — `vercel.json`, project created, Node pinned, **first production deploy green** | `24f7f79`, `bedd845` |
 | 6 — Cleanup | Partly done early (docs moved to `docs/`) | — |
@@ -44,10 +44,19 @@ The gate's browser check has since been **confirmed by hand**: the author served
 the portfolio and reports the three Cálculo pages render normally with styling
 intact. See `migration-baseline.md` §10.4.
 
-**Phase 3 prerequisites:** a readiness audit and five must-fix items are recorded
-under § Phase 3. Two sequencing hazards there (H1: the move breaks the portfolio
-build unless the route removal travels with it; H2: the portfolio stops serving
-Cálculo before the platform is deployed) should be resolved before starting.
+**Phase 3:** complete on the branch, in two commits — the move (`4a3cef5`) and
+the shell, routing and catalogue (`1075e01`). The readiness audit was right about
+five prerequisites and **missed a sixth that fails the build**, and its
+"`lazy` chunk budget" cannot be expressed in Angular at all. Both corrections are
+recorded under § Phase 3. The move and the portfolio-side route removal shipped
+in the same commit, so hazard **H1 is closed by construction**.
+
+**The gate that is still open is H2 step 3:** Cálculo has not been exercised on a
+deployed platform URL. Component rendering, routing and the global reset are all
+covered by Karma, but the deployed wiring — Vercel's build command, output
+directory, SPA rewrite, and deep links — needs the branch pushed. **Do not merge
+to `main` until a Vercel preview has served all three Cálculo modules**: merging
+is what removes Cálculo from the portfolio, which is the live site.
 
 ---
 
@@ -369,7 +378,7 @@ Verified against the tree at `c2dc314`:
 | Study surface template selectors | ✅ all 14 are components inside the surface; no portfolio-only component |
 | Study surface CSS custom properties | ✅ all 14 `var(--x)` accounted for — 13 from `_plot-tokens.scss`, `--shadow`/`--radius` declared locally. **No dependency on the portfolio's `:root` tokens** |
 
-#### Six prerequisites that will break the build (or the layout) if missed
+#### Seven prerequisites that will break the build (or the layout) if missed
 
 1. **`ml-platform` has no `stylePreprocessorOptions`.** The four stylesheets that
    move (`calculus`, `calculus-practice`, `calculus-process-lab`, `studies`) all
@@ -415,6 +424,26 @@ Verified against the tree at `c2dc314`:
    `studies.component.scss` and `calculus.component.scss` each carry a
    "neutralize the site's global heading hover colors" rule. So only the reset
    and the font need reproducing — not the portfolio's `--color-*` tokens.
+
+   > **Confirmed in Phase 3, with one addition.** The reset now lives in
+   > `projects/ml-platform/src/styles.scss` and is asserted by
+   > `projects/ml-platform/src/global-styles.spec.ts` — this failure mode is
+   > invisible to the compiler, so it gets a test rather than a hand-check. The
+   > list above is short by one rule: the portfolio's reset also carried
+   > `ul li { list-style: none }`. On inspection that one is **not** load-bearing
+   > here — the hub's list is a flex container (its items are blockified, so
+   > markers disappear anyway) and both other lists set `list-style` explicitly.
+   > It was reproduced regardless, for parity with the portfolio rather than to
+   > fix anything.
+7. **`ml-platform`'s `anyComponentStyle` budget cannot hold the stylesheets being
+   moved into it. The readiness audit missed this, and it fails the build.**
+   The Angular scaffold sets `4 kB` warning / **`8 kB` error**; the moved
+   components compile to **8.78 kB** (`calculus`), **8.44 kB**
+   (`calculus-process-lab`) and 7.75 kB (`calculus-practice`). Observed, not
+   inferred: restoring the scaffold values and rebuilding exits 1 with
+   *"Budget 8.00 kB was not met by 782 bytes"* and *"…not met by 437 bytes"*.
+   The portfolio's ceiling is 12 kB, and that is the ceiling these stylesheets
+   were written against — `ml-platform` now matches it.
 
 #### Two sequencing hazards
 
@@ -493,9 +522,67 @@ completion checkmarks. The two mitigations above were not taken.
 6. Budgets, in `angular.json`:
    - `portfolio` — keep the existing strict `initial` 700 KB warn / 1 MB error. Its job is to stay light; let it fail the build if it stops being light.
    - `ml-platform` — `initial` warn 500 KB / error 1 MB, plus a `lazy` chunk budget. Heavy widgets are expected, so bound them rather than the total.
+
+   > ⚠️ **Corrected in Phase 3 — there is no `lazy` budget type.** The Angular
+   > schema allows `all`, `allScript`, `any`, `anyScript`, `anyComponentStyle`,
+   > `bundle` and `initial` only, and a `"type": "lazy"` budget fails schema
+   > validation before a single file is compiled. The intent — *bound each heavy
+   > widget rather than the total* — is expressed as **`any`** ("the size of any
+   > emitted file"), set to 1.5 MB warn / 3 MB error. That catches the accident
+   > this project has actually had (the portfolio's 5.97 MB chunk and 6.03 MB
+   > worker) while leaving room for a TF.js-scale widget of ~1.2 MB.
+   >
+   > `anyComponentStyle` had to move as well: see prerequisite 7.
 7. Progress: inject `ProgressStore` per module with the three existing keys; surface an aggregate progress read on the hub.
 
 Gate: `ng build ml-platform` succeeds; the shell chunk contains no `katex`/`echarts`/`tfjs` marker (verify by grepping `dist/ml-platform/browser`); every route loads lazily.
+
+> **Phase 3 result — gate closed, observed.**
+>
+> | Check | Result |
+> |---|---|
+> | `ng build ml-platform --configuration production` | ✅ exit 0 |
+> | `ng build portfolio --configuration production` | ✅ exit 0; Cálculo's three lazy chunks *and* its three component-style warnings leave the app |
+> | Initial payload | ✅ 316.47 kB raw / 85.45 kB transfer, against the 500 kB warning |
+> | Module chunks are lazy | ✅ `calculus-component` 78.77 kB, `calculus-practice-component` 57.10 kB, `calculus-process-lab-component` 33.15 kB |
+> | Heavy libraries kept out of the shell | ✅ no `katex`/`echarts`/`tfjs`/`plotly` marker in `main` or any other initial chunk; KaTeX's 272.70 kB sits in a lazy chunk |
+> | Every route lazy | ✅ **asserted, not grepped** — `app.routes.spec.ts` fails if any module route gains an eager `component` |
+> | Routing works at runtime | ✅ `app.routing.spec.ts` drives the real router: both path forms resolve to `CalculusComponent` through its lazy import, and an unknown path lands on the hub |
+> | Tests | `ml-platform` 2 → **21 SUCCESS**; `portfolio` **2 FAILED / 190 SUCCESS**, the documented baseline, unchanged by the move |
+> | KaTeX stylesheet | global by design — 549 `.katex` selectors in `styles-*.css` (36.07 kB), per the Phase 2 correction |
+>
+> **What this gate does not cover:** nothing above exercises the platform at a
+> `*.vercel.app` URL. Component rendering is covered by Karma, but the deployed
+> wiring — Vercel's build command, output directory, SPA rewrite, and deep links —
+> is H2 step 3 and needs the branch pushed. **Do not merge to `main` before that
+> check passes:** merging is what removes Cálculo from the live portfolio.
+>
+> **Interim state, deliberate:** the portfolio's nav still carries
+> `<a href="/estudos">` (`app.component.html`), which now falls through to the
+> `**` wildcard and lands on the project gallery. Phase 4 step 2 re-homes that
+> entry as a landing page for the platform. In the meantime the portfolio serves
+> neither `/estudos` nor any Cálculo route — which is precisely why the H2
+> sequencing exists.
+>
+> **Catalog naming is provisional — read before launch.** Three ML subjects were
+> added as `coming-soon` with `route: null` and working titles, each carrying a
+> "Título provisório" chip in the UI as well as a warning comment in
+> `study-catalog.ts`. `docs/structure-migration.md` specifies "4 cursos, cada com
+> 2 módulos" but never names them. Note also that this plan's own step 4 wording
+> ("expand from the single `calculo` subject to the four-course catalog") does not
+> say whether Cálculo counts as one of the four: the catalogue reads it as four
+> subjects in total — Cálculo plus three — and records that reading in the file.
+> If the intent was four ML courses *in addition* to Cálculo, that is one more
+> entry and nothing else changes.
+>
+> **Two deliberate deviations from the step list.** The three Cálculo icons were
+> *moved* rather than copied: the portfolio no longer references them, so copying
+> would have left three dead assets behind (`measure-it.svg` is now the only icon
+> the portfolio still uses). And the platform footer's portfolio cross-link —
+> Phase 4 step 4's platform half — landed here instead, because that footer was
+> being written anyway. Also worth flagging for a content pass, not fixed here:
+> the hub's hero copy still says "Cada disciplina tem dois momentos" and its
+> "Como funciona" strip shows two steps, while Cálculo has three modules.
 
 > **DNS is not needed for Phase 3.** `ng serve ml-platform --port 4300` and a
 > Vercel `*.vercel.app` URL both work without any Cloudflare change. The custom
@@ -506,7 +593,7 @@ Gate: `ng build ml-platform` succeeds; the shell chunk contains no `katex`/`echa
 
 ### Phase 4 — Portfolio-side redirects and cross-links
 
-1. Remove the moved routes from `projects/portfolio/src/app/app-routing.module.ts` (lines 28–32 today: `estudos`, the three `estudos/calculo/*` lazy routes, and the `tools/calculus` redirect).
+1. ~~Remove the moved routes from `projects/portfolio/src/app/app-routing.module.ts`~~ — **done in Phase 3 (`4a3cef5`)**, because hazard H1 required the removal to travel with the move. The file carries a comment where those routes were. What remains in this step's territory is the `/estudos` landing page (step 2) and the deep-URL stubs (step 3): `/estudos/calculo/teoria|aplicada|processo` and `/tools/calculus` currently fall through to the `**` wildcard.
 2. **Keep `/estudos` as a thin landing page in the portfolio** that presents the platform and links out. It costs almost nothing, it is genuinely good portfolio content ("I built an interactive ML learning platform"), and it preserves the nav entry's meaning.
 3. Add redirect stubs for the three old deep URLs → absolute platform URLs. GitHub Pages cannot issue real 301s, so use a component that calls `window.location.replace(...)`; the existing `404.html` SPA fallback keeps those paths resolving.
 
@@ -516,9 +603,19 @@ Gate: `ng build ml-platform` succeeds; the shell chunk contains no `katex`/`echa
    > rewriting. Decide the domain before this lands, then follow §2a Option A
    > (Cloudflare CNAME to `cname.vercel-dns.com`, **proxy off**).
    >
+   > **Checked while closing Phase 3: `ml.thalesmenegueco.dev` does not exist.**
+   > Registry RDAP returns 404 ("not found") and `dig NS` returns NXDOMAIN while
+   > control queries resolve normally — so this is not a resolver artefact, the
+   > domain is unregistered. The plan's "good default" therefore turns "set up
+   > Cloudflare DNS" into "buy a domain first": a purchase with lead time, not a
+   > DNS record. Two cheap ways to drop the coupling — keep the platform's base
+   > URL in a single constant so re-pointing the stubs is a one-line edit, or
+   > settle the domain now. Neither is a Phase 3 blocker: DNS is not needed to
+   > verify Cálculo on a `*.vercel.app` URL.
+   >
    > **Both stubs and the removal itself must not precede the platform's first
    > deploy** — see Phase 3 hazard H2.
-4. Cross-link: add a "Plataforma de ML interativa" card in `learning-gallery.component.ts` (the `interests: CardItem[]` array) pointing at the platform; add "feito por Thales Menegueço" in the platform footer pointing at the portfolio. Both apps already have the data shapes for this (`CardItem`).
+4. Cross-link: add a "Plataforma de ML interativa" card in `learning-gallery.component.ts` (the `interests: CardItem[]` array) pointing at the platform. The platform half — "Feito por Thales Menegueço" in its footer, linking back to the portfolio — **landed early in Phase 3 (`1075e01`)**, because that footer was being written then and writing it twice would have been silly. Both apps already have the data shapes for this (`CardItem`).
 5. Opportunistic cleanup while touching these files:
    - `src/app/app.module.ts` is dead — `main.ts` bootstraps via `bootstrapApplication(AppComponent, appConfig)` and never references the NgModule. Delete it.
    - `app-routing.module.ts` exports a plain `Routes` array, not a module. Rename to `app.routes.ts` and fix the two importers (`app.config.ts`, and the NgModule being deleted).
