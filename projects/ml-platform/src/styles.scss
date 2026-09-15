@@ -1,1 +1,71 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'plot-tokens' as plot;
+
+// VisualML's global stylesheet.
+//
+// The study surface that moved here from the portfolio was written on top of
+// the portfolio's global stylesheet and declares none of this for itself — see
+// docs/migration-implementation-plan.md § Phase 3, prerequisite 6. Without the
+// reset below, widgets that combine `width: 100%` with padding (`.widget` has
+// `padding: 17px`), the auto-fit grids, and every heading/paragraph/list regain
+// browser-default metrics. That is a visible layout break, not a compile error.
+//
+// Deliberately NOT reproduced: the portfolio's `--color-*` palette, its heading
+// colours and its link styling. The platform has its own identity, and the
+// moved surface carries both its own tokens (from `_plot-tokens.scss`) and its
+// own neutralising rules. The chrome below reuses the study palette so that the
+// nav, the footer and the course content agree on one set of colours instead of
+// two.
+
+// Same family the moved stylesheets were authored against, and the same source
+// the portfolio uses. A third-party render-blocking request is the price of
+// identical typography; self-hosting the font is an optimisation for later, not
+// migration work.
+@import 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap';
+
+// One source of truth for the platform's colours: the nav, the footer and the
+// course surface all read these. If the platform ever needs an identity
+// distinct from the study surface, this is the line to change.
+:root {
+  @include plot.color-tokens();
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  // Nothing in the moved surface declares a font-family, so the platform must.
+  font-family: 'Roboto', Helvetica, sans-serif;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// The hub renders its meta chips as a `<ul>`; the portfolio's reset is what
+// removed those bullets. Reproduced for parity rather than because it is
+// load-bearing here (the hub's list is a flex container, so its items are
+// blockified, and the two module lists set `list-style` explicitly).
+ul li {
+  list-style: none;
+}

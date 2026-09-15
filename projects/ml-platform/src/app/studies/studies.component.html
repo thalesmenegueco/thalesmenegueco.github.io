@@ -32,6 +32,12 @@
   </section>
 
   <main class="subjects">
+    @if (completedTotal > 0) {
+      <p class="hub-progress">
+        {{ completedTotal }} itens concluídos até agora, salvos neste navegador.
+      </p>
+    }
+
     @for (subject of subjects; track subject.id) {
       <section class="subject">
         <header class="subject-header">
@@ -64,10 +70,15 @@
                 @for (item of module.meta; track $index) {
                   <li>{{ item }}</li>
                 }
+                @if (completedFor(module.id) > 0) {
+                  <li class="module-meta__done">
+                    {{ completedFor(module.id) }} concluídos
+                  </li>
+                }
               </ul>
 
               @if (module.status === 'available' && module.route) {
-                <a class="module-cta" [href]="module.route">Começar →</a>
+                <a class="module-cta" [routerLink]="module.route">Começar →</a>
               } @else {
                 <span class="module-cta module-cta--disabled">Em breve</span>
               }

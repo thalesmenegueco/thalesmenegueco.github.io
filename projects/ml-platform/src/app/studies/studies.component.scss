@@ -262,6 +262,20 @@ h3 {
   cursor: default;
 }
 
+// The completion chip reuses `.module-meta li`'s shape, with the study teal so
+// "you have done this" cannot be mistaken for "this is what it costs". The
+// selector repeats `li` because `.module-meta li` sets the same two properties.
+.module-meta li.module-meta__done {
+  border-color: var(--color-study-teal);
+  color: var(--color-study-teal);
+}
+
+.hub-progress {
+  margin: 0 0 26px;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
 @media (max-width: 720px) {
   .path {
     flex-direction: column;
