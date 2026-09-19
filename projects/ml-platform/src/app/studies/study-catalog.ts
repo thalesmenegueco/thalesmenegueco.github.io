@@ -12,26 +12,36 @@ import { StudySubject } from '@shared/learning';
  *
  * ---
  *
- * ⚠️ **PLACEHOLDER CONTENT — read before launch.**
+ * **The four ML courses are now named.** The provisional working titles that
+ * used to live here are gone; the curriculum below is the author's:
  *
- * `docs/structure-migration.md` specifies the platform as "4 cursos, cada com 2
- * módulos" but never names them, and naming a curriculum is product work rather
- * than container work. The three ML subjects below are **working titles**, added
- * to exercise the data model end to end: a subject with modules, `coming-soon`
- * status, `route: null`, and one icon per subject. Their names, taglines, titles
- * and descriptions carry no authority — replace them.
+ *   1. Fundamentos Matemáticos para ML
+ *   2. Aprendizado Supervisionado
+ *   3. Redes Neurais do Zero
+ *   4. Aprendizado Não-Supervisionado
  *
- * `calculo` is the one real course. It moved here from the portfolio in Phase 3
- * and is live.
+ * Naming them also settles the ambiguity this file used to flag.
+ * `docs/structure-migration.md` specifies "4 cursos, cada com 2 módulos" without
+ * saying whether Cálculo counts as one of the four. All four named courses are
+ * **ML** courses, so the plan's "4 cursos × 2 módulos" describes the ML half of
+ * the catalogue and `calculo` is a fifth, pre-existing subject with three
+ * modules of its own. If the intent was four subjects in total, delete one ML
+ * entry and nothing else changes.
  *
- * The plan's wording ("expand from the single `calculo` subject to the
- * four-course catalog") is ambiguous about whether Cálculo counts as one of the
- * four. This file reads it as four subjects in total — Cálculo plus three ML
- * courses. If the intent was four ML courses *in addition* to Cálculo, add one
- * more entry and nothing else changes.
+ * The course **names** are the author's. The module titles, taglines and
+ * descriptions wrapped around them were authored in the same pass and are still
+ * the softest part of this file — treat the prose as a first draft to revise.
  *
- * Icons: one per subject is enough while the modules are placeholders, unlike
- * Cálculo, where each module is a different activity and carries its own.
+ * **Ids are deliberately unchanged.** They are internal keys rather than display
+ * text, and the three surviving ML ids still describe their subject accurately
+ * (`regressao-classificacao` *is* supervised learning). Only the three
+ * `calculo-*` ids are bound to persisted progress keys — see
+ * `PROGRESS_KEY_BY_MODULE` in `studies.component.ts` — so renaming an ML subject
+ * cannot orphan anyone's saved progress.
+ *
+ * Icons: one per subject is enough, since a module that does not exist yet has
+ * no activity of its own to depict. Cálculo is the exception — each of its
+ * modules is a different activity and carries its own icon.
  */
 export const STUDY_SUBJECTS: StudySubject[] = [
   {
@@ -75,39 +85,38 @@ export const STUDY_SUBJECTS: StudySubject[] = [
     ],
   },
 
-  // --- Everything below is provisional. See the warning above. ---
   {
     id: 'fundamentos',
-    name: 'Fundamentos de ML',
-    tagline: 'O que significa aprender a partir de dados.',
+    name: 'Fundamentos Matemáticos para ML',
+    tagline: 'A matemática que o ML reusa, sem decorar notação.',
     modules: [
       {
         id: 'fundamentos-teoria',
         kind: 'teoria',
         status: 'coming-soon',
-        title: 'Do dado ao modelo',
+        title: 'Vetores, matrizes e derivadas',
         description:
-          'O que é um dataset, o que é aprender, e por que um modelo erra — construindo a intuição antes da matemática.',
+          'Um exemplo é um vetor, um dataset é uma matriz, e o erro tem uma direção. Explore as três ideias antes de encarar a notação.',
         route: null,
         icon: 'icons/fundamentals.svg',
-        meta: ['Em breve', 'Título provisório'],
+        meta: ['Em breve'],
       },
       {
         id: 'fundamentos-aplicada',
         kind: 'aplicada',
         status: 'coming-soon',
-        title: 'Primeiras decisões com dados',
+        title: 'Do problema à conta',
         description:
-          'Escolher variáveis, separar treino e teste, e ler um resultado sem se enganar.',
+          'Traduzir uma pergunta sobre dados em produto de matrizes e gradiente — e conferir o resultado na mão.',
         route: null,
         icon: 'icons/fundamentals.svg',
-        meta: ['Em breve', 'Título provisório'],
+        meta: ['Em breve'],
       },
     ],
   },
   {
     id: 'regressao-classificacao',
-    name: 'Regressão e classificação',
+    name: 'Aprendizado Supervisionado',
     tagline: 'Prever um número e prever uma categoria.',
     modules: [
       {
@@ -119,7 +128,7 @@ export const STUDY_SUBJECTS: StudySubject[] = [
           'A reta que melhor explica os dados e a fronteira que melhor divide as classes.',
         route: null,
         icon: 'icons/regression.svg',
-        meta: ['Em breve', 'Título provisório'],
+        meta: ['Em breve'],
       },
       {
         id: 'regressao-classificacao-aplicada',
@@ -130,13 +139,13 @@ export const STUDY_SUBJECTS: StudySubject[] = [
           'Erro médio, acurácia, precisão e recall: o que cada número esconde.',
         route: null,
         icon: 'icons/regression.svg',
-        meta: ['Em breve', 'Título provisório'],
+        meta: ['Em breve'],
       },
     ],
   },
   {
     id: 'redes-neurais',
-    name: 'Redes neurais',
+    name: 'Redes Neurais do Zero',
     tagline: 'Camadas, pesos e o que acontece entre elas.',
     modules: [
       {
@@ -148,7 +157,7 @@ export const STUDY_SUBJECTS: StudySubject[] = [
           'Da soma ponderada à função de ativação, montando a rede peça por peça.',
         route: null,
         icon: 'icons/neural-networks.svg',
-        meta: ['Em breve', 'Título provisório'],
+        meta: ['Em breve'],
       },
       {
         id: 'redes-neurais-aplicada',
@@ -159,7 +168,36 @@ export const STUDY_SUBJECTS: StudySubject[] = [
           'Gradiente, épocas e overfitting vistos acontecendo, não só definidos.',
         route: null,
         icon: 'icons/neural-networks.svg',
-        meta: ['Em breve', 'Título provisório'],
+        meta: ['Em breve'],
+      },
+    ],
+  },
+  {
+    id: 'nao-supervisionado',
+    name: 'Aprendizado Não-Supervisionado',
+    tagline: 'Encontrar estrutura quando ninguém deu a resposta.',
+    modules: [
+      {
+        id: 'nao-supervisionado-teoria',
+        kind: 'teoria',
+        status: 'coming-soon',
+        title: 'Grupos que ninguém rotulou',
+        description:
+          'Como o algoritmo percebe que existem grupos nos dados quando nenhuma coluna diz a qual grupo cada ponto pertence.',
+        route: null,
+        icon: 'icons/unsupervised.svg',
+        meta: ['Em breve'],
+      },
+      {
+        id: 'nao-supervisionado-aplicada',
+        kind: 'aplicada',
+        status: 'coming-soon',
+        title: 'Reduzir para enxergar',
+        description:
+          'Comprimir dezenas de variáveis em duas para revelar padrões que a tabela esconde.',
+        route: null,
+        icon: 'icons/unsupervised.svg',
+        meta: ['Em breve'],
       },
     ],
   },
