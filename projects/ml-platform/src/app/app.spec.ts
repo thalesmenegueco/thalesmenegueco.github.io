@@ -26,7 +26,7 @@ describe('App', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('.site-nav__brand')?.textContent).toContain('VisualML');
+    expect(compiled.querySelector('.site-nav__brand')?.textContent).toContain('VisuaLab');
     expect(compiled.querySelector('.site-footer')?.textContent).toContain('Thales Menegueço');
   });
 });

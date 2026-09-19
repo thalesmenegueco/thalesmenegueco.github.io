@@ -1,7 +1,7 @@
 import { StudySubject } from '@shared/learning';
 
 /**
- * The VisualML study catalogue.
+ * The VisuaLab study catalogue.
  *
  * Each subject exposes its learning moments — Teoria, Matemática aplicada and
  * Processo — so a student understands the concept, applies it, and then follows

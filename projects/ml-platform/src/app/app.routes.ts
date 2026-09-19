@@ -74,7 +74,7 @@ export const routes: Routes = [
   {
     path: '',
     component: StudiesComponent,
-    title: 'VisualML — Aprender Machine Learning visualmente',
+    title: 'VisuaLab — Aprender exatas visualmente',
   },
   ...moduleRoutes,
   { path: '**', redirectTo: '' },

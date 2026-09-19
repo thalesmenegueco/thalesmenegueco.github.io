@@ -2,26 +2,35 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>VisualML — Aprender Machine Learning visualmente</title>
+  <title>VisuaLab — Aprender exatas visualmente</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <meta
     name="description"
-    content="Cursos interativos de Machine Learning: entenda o conceito explorando, aplique em problemas reais e acompanhe seu progresso."
+    content="Cursos interativos de exatas: entenda o conceito explorando, aplique em problemas reais e acompanhe seu progresso."
   >
   <meta property="og:type" content="website">
-  <meta property="og:title" content="VisualML — Aprender Machine Learning visualmente">
+  <meta property="og:title" content="VisuaLab — Aprender exatas visualmente">
   <meta
     property="og:description"
-    content="Cursos interativos de Machine Learning: entenda o conceito explorando, aplique em problemas reais e acompanhe seu progresso."
+    content="Cursos interativos de exatas: entenda o conceito explorando, aplique em problemas reais e acompanhe seu progresso."
   >
   <!--
-    og:url and a canonical link are deliberately absent: the platform's domain
-    is not decided yet (see docs/migration-implementation-plan.md § Phase 4), and
-    pointing search engines at a provisional *.vercel.app address is worse than
-    pointing at nothing.
+    `og:url` and `canonical` were deliberately absent while the domain was
+    undecided: pointing search engines at a provisional `*.vercel.app` address is
+    worse than pointing at nothing. The domain is now settled — `visualab.dev`,
+    with `www` as the canonical host, since the apex 308-redirects here — so both
+    are declared below.
+
+    The hostname is written literally rather than shared from a constant: this is
+    a static HTML file and nothing injects values into it at build time.
+    `PLATFORM_BASE_URL` in `projects/portfolio/src/app/platform-links.ts` is the
+    copy the portfolio's redirect stubs use. If the domain ever moves, that is
+    two edits, not one — grep for `visualab.dev`.
   -->
+  <meta property="og:url" content="https://www.visualab.dev/">
+  <link rel="canonical" href="https://www.visualab.dev/">
 </head>
 <body>
   <app-root></app-root>
