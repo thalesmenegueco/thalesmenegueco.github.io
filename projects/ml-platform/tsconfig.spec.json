@@ -4,6 +4,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/spec",
+    // Same reason as `tsconfig.app.json`: the `@shared/*` aliases pull `libs/`
+    // into the program, so the common source directory is the repository root.
+    "rootDir": "../..",
     "types": [
       "jasmine"
     ]

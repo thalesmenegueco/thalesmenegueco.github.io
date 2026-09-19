@@ -15,12 +15,11 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2022",
     "module": "preserve",
-    "baseUrl": ".",
     "paths": {
-      "@shared/plotting": ["libs/shared-plotting/index.ts"],
-      "@shared/katex": ["libs/shared-katex/index.ts"],
-      "@shared/progress": ["libs/shared-progress/index.ts"],
-      "@shared/learning": ["libs/shared-learning/index.ts"]
+      "@shared/plotting": ["./libs/shared-plotting/index.ts"],
+      "@shared/katex": ["./libs/shared-katex/index.ts"],
+      "@shared/progress": ["./libs/shared-progress/index.ts"],
+      "@shared/learning": ["./libs/shared-learning/index.ts"]
     }
   },
   "angularCompilerOptions": {

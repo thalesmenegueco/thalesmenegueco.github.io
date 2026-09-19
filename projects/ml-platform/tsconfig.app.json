@@ -4,6 +4,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/app",
+    // The `@shared/*` aliases resolve into `libs/`, which sits outside this
+    // project directory, so the common source directory of the program is the
+    // repository root rather than `projects/ml-platform`. Declaring it keeps
+    // TypeScript from inferring a `rootDir` that does not contain those files
+    // (TS6059) and silences the "common source directory" warning on TS 6+.
+    "rootDir": "../..",
     "types": []
   },
   "include": [
