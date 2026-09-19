@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CardComponent } from '../shared/card/card';
 import { CardItem } from '../../models/card-item';
+import { PLATFORM_LINKS } from '../platform-links';
 import { PageTranslation } from '../../models/pageTranslation';
 import { SignLanguageTranslation } from '../shared/sign-language-translation/sign-language-translation';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -32,6 +33,20 @@ export class LearningGalleryComponent {
     description: 'Laboratório de ferramentas (aleatórias) 🧪',
     image: 'https://www.svgrepo.com/show/489243/creativity-1.svg',
     link: '/tools'
+  },
+  // Phase 4 step 4 — the portfolio half of the cross-link. The platform's own
+  // footer already points back here, so these two are what tie the sites
+  // together once Cálculo stops being reachable from this origin.
+  //
+  // The icon is a local asset rather than another svgrepo URL: every other card
+  // borrows a remote image, and adding one more dependency for a card about
+  // *this* project seemed like the wrong trade. `public/` is what
+  // `angular.json` actually ships, so this resolves under `<base href="/">`.
+  {
+    name: "VisuaLab",
+    description: 'Cursos interativos de exatas: entenda explorando, aplique em problemas reais 📐',
+    image: 'icons/visualab.svg',
+    link: PLATFORM_LINKS.hub
   }
 ];
 

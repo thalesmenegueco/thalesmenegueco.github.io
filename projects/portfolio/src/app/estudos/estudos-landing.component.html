@@ -1,0 +1,45 @@
+<div class="estudos">
+  <div class="page-header">
+    <div class="welcome">
+      <h3>Conheça a</h3>
+      <br>
+      <h2>🧪 VisuaLab</h2>
+    </div>
+  </div>
+
+  <p class="estudos__lead">
+    A plataforma de cursos interativos de exatas: você entende o conceito
+    explorando, aplica em problemas reais e acompanha o seu progresso. O Cálculo
+    que ficava neste site mudou-se para lá.
+  </p>
+
+  <p class="estudos__cta">
+    <a class="estudos__cta-link" [href]="platformHub">Abrir a VisuaLab →</a>
+  </p>
+
+  <h3 class="estudos__heading">No ar agora</h3>
+  <ul class="estudos__courses">
+    @for (course of courses; track course.url) {
+      <li class="estudos__course">
+        <a [href]="course.url">{{ course.name }}</a>
+        <span>{{ course.description }}</span>
+      </li>
+    }
+  </ul>
+
+  <h3 class="estudos__heading">A caminho</h3>
+  <p class="estudos__note">
+    A VisuaLab também está montando quatro cursos de Machine Learning —
+    Fundamentos Matemáticos, Aprendizado Supervisionado, Redes Neurais do Zero e
+    Aprendizado Não-Supervisionado. Eles já aparecem no catálogo de lá, marcados
+    como “em breve”.
+  </p>
+
+  <h3 class="estudos__heading">Sobre o seu progresso</h3>
+  <p class="estudos__note">
+    Se você fez as aulas de Cálculo por aqui antes, o progresso salvo
+    <strong>não</strong> vem junto. Cada site guarda essa informação no próprio
+    endereço, e a VisuaLab é um endereço novo — então a contagem de aulas
+    concluídas recomeça do zero por lá. O conteúdo é exatamente o mesmo.
+  </p>
+</div>

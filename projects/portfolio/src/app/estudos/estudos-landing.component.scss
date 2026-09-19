@@ -1,0 +1,72 @@
+// The `/estudos` landing page. Uses only the design tokens the portfolio's
+// global stylesheet already defines, so it needs no new colour decisions.
+
+.estudos {
+  max-width: 860px;
+}
+
+.estudos__lead {
+  margin-top: 8px;
+  margin-bottom: 28px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.estudos__cta {
+  margin-bottom: 40px;
+}
+
+.estudos__cta-link {
+  display: inline-block;
+  padding: 14px 26px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 700;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    color: var(--color-text);
+    text-decoration: none;
+    box-shadow: var(--shadow-card-hover) var(--color-text-accent);
+    transform: translate(-2px, -2px);
+  }
+}
+
+.estudos__heading {
+  margin-top: 32px;
+  margin-bottom: 12px;
+  font-size: 1.15rem;
+}
+
+.estudos__courses {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.estudos__course {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+
+  a {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  span {
+    color: var(--color-text);
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+}
+
+.estudos__note {
+  line-height: 1.6;
+  opacity: 0.9;
+}
