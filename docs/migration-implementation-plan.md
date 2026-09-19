@@ -20,8 +20,8 @@ Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](
 | 1 — Workspace conversion | ✅ Done, live-deploy confirmed green on GitHub Pages | `439cc66`, `8e092d1`, `d184237` |
 | 2 — Extract shared libs | ✅ Done — all gates closed | `05bf585`, `3d64c46`, `7410119`, `34f5d07`, `0a42f10`, `c2dc314` |
 | 3 — Build ml-platform content | ✅ Done on the branch, pushed, and the H2 gate closed on a Vercel preview — see § Phase 3 results | `4a3cef5`, `1075e01`, `1a4c62b` |
-| 4 — Redirects & cross-links | Not started | — |
-| 5 — Deploy split | Partly done ahead of schedule — `vercel.json`, project created, Node pinned, **first production deploy green** | `24f7f79`, `bedd845` |
+| 4 — Redirects & cross-links | ✅ Done — landing page, four redirect stubs, cross-link card and the dead-NgModule cleanup; gate closed, see § Phase 4 | `75aea4a`, `ec1aac6` |
+| 5 — Deploy split | ✅ Live at **`www.visualab.dev`** — domain bought through Vercel Registrar and already attached; `vercel.json` codifies the build. Remaining: the portfolio workflow's `setup-node` npm caching | `24f7f79`, `bedd845` |
 | 6 — Cleanup | Partly done early (docs moved to `docs/`) | — |
 
 **Phase 1:** complete. The live-deploy gate was confirmed green on GitHub Pages
@@ -67,12 +67,43 @@ never run.
 > as a broken deploy — and because it is the reason that check cannot be
 > automated as written.
 
-**Both decisions left open at the previous handover are now taken.**
+**Every decision the migration was waiting on is now taken.**
 
 | Question | Decision |
 |---|---|
 | Names for the placeholder ML courses | **Settled, and one course larger than expected.** The author named four ML courses — *Fundamentos Matemáticos para ML*, *Aprendizado Supervisionado*, *Redes Neurais do Zero*, *Aprendizado Não-Supervisionado* — so the catalogue now holds five subjects and the plan's "4 cursos" reads as the ML half. See § Phase 3 and commit `dbaf2be`. |
-| The platform's domain | **Deferred on purpose; the platform stays on its `*.vercel.app` URL.** This keeps R2 open rather than breaking it: the platform has never had a public origin, so no student holds progress there and deferring costs nothing today. It does **not** unblock Phase 4 step 3 — those stubs hardcode absolute URLs, so they stay parked until the domain is bought, exactly as step 3's note says. |
+| The platform's domain | **Settled: `visualab.dev`, with `www` canonical.** Bought through Vercel Registrar, so it is already on Vercel's own nameservers and already answering in production — which makes §2a step 2's Cloudflare CNAME moot; see the correction there. The apex 308-redirects to `www`, so `www.visualab.dev` is what the redirect targets, `og:url` and `canonical` all use. Buying it also made R2 *due* rather than deferred, and R2 is answered below. |
+| The platform's name | **Renamed `VisualML` → `VisuaLab`** (`9fdcf7e`). The domain is for learning and experimenting across exatas, not Machine Learning alone, so the old name had outgrown the product it named. Applied everywhere a visitor sees it: the nav brand, both page titles, `og:title`, the `og:description` (which promised "Cursos interativos de Machine Learning"), two source comments, and the spec that asserts the nav text. `docs/structure-migration.md` keeps its original title — it is the request as it was made, and this plan is what supersedes it. |
+
+> **One rename deliberately not done: the Angular project is still `ml-platform`.**
+> That is a codename rather than a product name, and renaming it is not a text
+> change — it moves `angular.json`'s project key, the `dist/ml-platform` output
+> path, and `vercel.json`'s `outputDirectory`, which is the same file that decides
+> what production deploys. Worth doing on a quiet day, not in the same release
+> that changes the domain, the brand and four redirects at once.
+
+> **What production serves today, and therefore what merging changes.** Vercel
+> deploys production from `main`, and `main` still carries the Phase 1 skeleton —
+> so `www.visualab.dev` currently answers with the generated placeholder
+> (`<title>MlPlatform</title>`, `lang="en"`, `title = signal('ml-platform')`), not
+> with Cálculo. Merging this branch replaces that placeholder with the real
+> platform *and* removes Cálculo from the portfolio origin in the same act. The two
+> halves cannot be separated, which is the entire reason Phase 4 had to land first.
+>
+> **Previews are protected; production is not.** An unauthenticated request to a
+> `*.vercel.app` preview is answered `302` to `vercel.com/sso-api`, while
+> `www.visualab.dev` serves `200` to anyone. Both halves of that matter: it is why
+> the preview check needed a signed-in browser, and it is why the redirect stubs
+> can safely send the public to `www.visualab.dev`.
+>
+> ⚠️ **One rewrite caveat, already observed in production.** `vercel.json`
+> rewrites `/(.*)` to `/index.html`, and Vercel checks the filesystem first — so a
+> path with no file behind it is answered with the HTML shell and a `200`, **not a
+> 404**. Verified: `https://www.visualab.dev/icons/calculus.svg` currently returns
+> `200 text/html`, because that icon exists on this branch but not yet on `main`.
+> It will serve the real SVG once this merges, since the platform's icons ship from
+> `projects/ml-platform/public/icons/`. Until then, anything probing production for
+> a missing asset gets a misleadingly cheerful `200`.
 
 ---
 
@@ -147,7 +178,7 @@ Angular project names: `learning-gallery` → **`portfolio`**, plus new **`ml-pl
 
 - **Never rename the GitHub repository.** `thalesmenegueco.github.io` only serves the user site at the domain root while the repo keeps that exact name. Directory renames are free; repo renames are not.
 - **Two sites cannot be served from one GitHub Pages repo.** The portfolio keeps `gh-pages`; the platform must live on Vercel/Netlify (or a second repo). This is not a preference, it's a platform limit.
-- **`localStorage` is origin-scoped.** Progress saved on `thalesmenegueco.github.io` is unreadable from a new domain. See R2 — this needs a deliberate answer, not a silent break.
+- **`localStorage` is origin-scoped.** Progress saved on `thalesmenegueco.github.io` is unreadable from a new domain. See R2 — now answered: the loss is accepted and stated plainly on the `/estudos` landing page, rather than broken silently.
 - **Do not change existing storage keys** (`calculus-completed-lessons`, `calculus-practice-completed`, `calculus-process-completed`) during the refactor.
 
 ---
@@ -181,7 +212,7 @@ So the pressure is real — but the fix is to change *who serves the bytes*, not
 Keeps the DX you know, no double-CDN problems, and consolidates DNS with the Cloudflare account you already have for `cloudflare-worker/test-llms`.
 
 1. **Vercel** → import the GitHub repo. Root Directory `.` (the Angular workspace is at the repo root), Build Command `npx ng build ml-platform --configuration production`, Output Directory `dist/ml-platform/browser`, plus an SPA rewrite (all → `/index.html`).
-2. **Cloudflare DNS** → add the custom domain as a CNAME to `cname.vercel-dns.com` with proxy status **DNS only (grey cloud)**.
+2. ~~**Cloudflare DNS** → add the custom domain as a CNAME to `cname.vercel-dns.com` with proxy status **DNS only (grey cloud)**.~~ — **not needed: the domain was bought through Vercel Registrar.** `visualab.dev` resolves to `ns1.vercel-dns.com` and `ns2.vercel-dns.com` and answers from Vercel's anycast IPs, so its DNS already *is* Vercel's. There is no Cloudflare zone in the path and no proxy setting to get wrong — which also means Option C's proxy hazards below simply cannot arise on this zone. Attaching the domain to the project in Vercel → Domains was the whole of step 3, and it is already done: production answers at `www.visualab.dev`.
 3. **Vercel → Domains** → add the domain; Vercel issues the certificate.
 4. Deploy from the same repo. Vercel doesn't care about the repo name, so `thalesmenegueco.github.io` can host both apps: GitHub Actions keeps publishing the portfolio to `gh-pages`, Vercel independently builds the platform. **No repo split needed.**
 
@@ -688,34 +719,76 @@ Gate: `ng build ml-platform` succeeds; the shell chunk contains no `katex`/`echa
 
 ### Phase 4 — Portfolio-side redirects and cross-links
 
-1. ~~Remove the moved routes from `projects/portfolio/src/app/app-routing.module.ts`~~ — **done in Phase 3 (`4a3cef5`)**, because hazard H1 required the removal to travel with the move. The file carries a comment where those routes were. What remains in this step's territory is the `/estudos` landing page (step 2) and the deep-URL stubs (step 3): `/estudos/calculo/teoria|aplicada|processo` and `/tools/calculus` currently fall through to the `**` wildcard.
-2. **Keep `/estudos` as a thin landing page in the portfolio** that presents the platform and links out. It costs almost nothing, it is genuinely good portfolio content ("I built an interactive ML learning platform"), and it preserves the nav entry's meaning.
-3. Add redirect stubs for the three old deep URLs → absolute platform URLs. GitHub Pages cannot issue real 301s, so use a component that calls `window.location.replace(...)`; the existing `404.html` SPA fallback keeps those paths resolving.
+1. ~~Remove the moved routes from `projects/portfolio/src/app/app-routing.module.ts`~~ — **done in Phase 3 (`4a3cef5`)**, because hazard H1 required the removal to travel with the move. Both remainders of this step — the `/estudos` landing page and the deep-URL stubs — are now done too; see steps 2 and 3.
+2. ~~**Keep `/estudos` as a thin landing page in the portfolio** that presents the platform and links out.~~ — **done**, as `estudos/estudos-landing.component.ts`. It names the three live Cálculo courses as direct links, says the four ML courses are on the way, and — because R2 resolved to accepting the loss — tells the reader plainly that saved progress does not follow them to the new domain. It is deliberately not a second catalogue: restating the course list here would mean two lists to keep in sync.
+3. ~~Add redirect stubs for the three old deep URLs → absolute platform URLs.~~ — **done**, and there are four: the three `/estudos/calculo/*` paths plus `/tools/calculus`, which already forwarded to `/estudos/calculo/teoria` before the move and so inherits that destination rather than getting one of its own. GitHub Pages cannot issue real 301s, so a single `ExternalRedirectComponent` performs the hand-off client-side, reading its target from the route's `data.redirectTo` — which means `/estudos/calculo/aplicada` cannot quietly begin pointing elsewhere without `app.routes.spec.ts` failing.
 
-   > **This step needs the platform's final domain settled first.** The stub
-   > targets are absolute URLs, so if the platform is initially deployed at a
-   > `*.vercel.app` address and moved to a custom domain later, every stub needs
-   > rewriting. Decide the domain before this lands, then follow §2a Option A
-   > (Cloudflare CNAME to `cname.vercel-dns.com`, **proxy off**).
+   > ✅ **The domain is settled, so this step was unblocked and its coupling is
+   > gone.** Every target reads from `PLATFORM_LINKS` in
+   > `projects/portfolio/src/app/platform-links.ts` — the single constant this
+   > note asked for. `ml-platform`'s `index.html` repeats the hostname for its
+   > `og:url` and `canonical` tags, because a static HTML file has no way to
+   > import a constant; that is the one mirror to remember if the domain moves.
    >
-   > **Checked while closing Phase 3: `ml.thalesmenegueco.dev` does not exist.**
-   > Registry RDAP returns 404 ("not found") and `dig NS` returns NXDOMAIN while
-   > control queries resolve normally — so this is not a resolver artefact, the
-   > domain is unregistered. The plan's "good default" therefore turns "set up
-   > Cloudflare DNS" into "buy a domain first": a purchase with lead time, not a
-   > DNS record. Two cheap ways to drop the coupling — keep the platform's base
-   > URL in a single constant so re-pointing the stubs is a one-line edit, or
-   > settle the domain now. Neither is a Phase 3 blocker: DNS is not needed to
-   > verify Cálculo on a `*.vercel.app` URL.
+   > ⚠️ **The fallback is not `src/404.html` — that file is dead.** This step as
+   > written credited "the existing `404.html` SPA fallback" with keeping deep
+   > paths alive. The real mechanism lives in the deploy workflow:
+   >
+   > ```yaml
+   > - name: Copy index.html to 404.html for SPA routing
+   >   run: cp ./dist/portfolio/browser/index.html ./dist/portfolio/browser/404.html
+   > ```
+   >
+   > CI copies the built `index.html` **over** `404.html` in the publish
+   > directory, so `projects/portfolio/src/404.html` — the little
+   > `sessionStorage` + meta-refresh stub that `angular.json` still lists as an
+   > asset — is overwritten on every deploy. Confirmed against the live site:
+   > `/tools/calculus` answers `404` with the full SPA shell and the path
+   > preserved, so the router boots *at* the deep URL and the stub route matches.
+   > The giveaway that it stopped being the mechanism some time ago is that
+   > nothing anywhere reads the `sessionStorage.redirect` it sets.
+   >
+   > This is worth more than tidiness: it is *why* client-side stubs work here at
+   > all, and it means `src/404.html` can be deleted whenever someone wants to.
+   >
+   > ⚠️ **Order inside `app.routes.ts` is load-bearing.** Angular's default
+   > `pathMatch` is `'prefix'`, so `{ path: 'tools' }` also matches
+   > `tools/calculus`. The stub is therefore declared *before* the generic
+   > `tools` route rather than leaning on router specificity, and
+   > `app.routes.spec.ts` asserts both halves — `/tools` renders the tools index
+   > and `/tools/calculus` redirects — so reordering the file fails the suite
+   > instead of silently misrouting visitors.
    >
    > **Both stubs and the removal itself must not precede the platform's first
-   > deploy** — see Phase 3 hazard H2.
-4. Cross-link: add a "Plataforma de ML interativa" card in `learning-gallery.component.ts` (the `interests: CardItem[]` array) pointing at the platform. The platform half — "Feito por Thales Menegueço" in its footer, linking back to the portfolio — **landed early in Phase 3 (`1075e01`)**, because that footer was being written then and writing it twice would have been silly. Both apps already have the data shapes for this (`CardItem`).
-5. Opportunistic cleanup while touching these files:
-   - `src/app/app.module.ts` is dead — `main.ts` bootstraps via `bootstrapApplication(AppComponent, appConfig)` and never references the NgModule. Delete it.
-   - `app-routing.module.ts` exports a plain `Routes` array, not a module. Rename to `app.routes.ts` and fix the two importers (`app.config.ts`, and the NgModule being deleted).
+   > deploy** — see Phase 3 hazard H2. That is satisfied: production has been
+   > serving since before Phase 3, and it is what answers at `www.visualab.dev`.
+4. ~~Cross-link: add a card in `learning-gallery.component.ts`.~~ — **done**, a "VisuaLab" entry in `interests: CardItem[]` whose link reads from `PLATFORM_LINKS.hub`. Its icon is a **local** asset (`public/icons/visualab.svg`) rather than another svgrepo URL: every other card borrows a remote image, and adding one more external dependency for the card about this very project seemed like the wrong trade. The platform half — "Feito por Thales Menegueço" in its footer, linking back here — **landed early in Phase 3 (`1075e01`)**, because that footer was being written then and writing it twice would have been silly.
+5. ~~Opportunistic cleanup while touching these files.~~ — **done** (`75aea4a`).
+   - `src/app/app.module.ts` deleted, after confirming by grep that nothing referenced `AppModule`.
+   - `app-routing.module.ts` → `app.routes.ts` via `git mv` (history follows the file), with the `@NgModule` wrapper and a stale commented-out header block removed, and `app.config.ts` re-pointed at `./app.routes`.
+   - The wrapper turned out not to be free to keep: removing it let `RouterModule` fall out of the dependency graph, taking the portfolio's initial total from **426.91 kB to 416.69 kB (−10.22 kB)**.
 
 Gate: every old URL resolves to something sensible (real content or a redirect); no 404 regressions; portfolio initial chunk drops (Cálculo's KaTeX-bound chunks leave the app entirely).
+
+> **Gate result — closed.**
+>
+> | Check | Result |
+> |---|---|
+> | `/estudos` | ✅ renders the landing page |
+> | `/estudos/calculo/teoria`, `/aplicada`, `/processo` | ✅ each redirects to its platform counterpart |
+> | `/tools/calculus` | ✅ redirects to the platform's teoria module — **and `/tools` still renders the tools index**, which is the ordering claim |
+> | Unknown paths | ✅ still land on the gallery via `**`; no new 404s |
+> | Portfolio initial total | ✅ 426.91 → **422.39 kB** net: −10.22 kB from step 5, with 5.70 kB added back for the stubs, the landing page and the card |
+> | Tests | `portfolio` 190 → **203 SUCCESS** — exactly the 13 assertions added here — with the same 2 pre-existing failures; `ml-platform` 21 SUCCESS |
+> | Type-checks | ✅ all four configs clean on 5.8.3, 6.0.3 and 7.0.2 |
+>
+> The landing page and the stubs are eager routes, matching this app's existing
+> convention: it lazy-loads the heavy tools (`ocr`, `test-llms`, `explore-data`,
+> `measure-it`) and keeps the core surfaces eager. They pull in no heavy library,
+> so the 5.70 kB is template and styles rather than a widget. If the initial chunk
+> ever needs to come down again, those two are the first candidates to move behind
+> `loadComponent` — with the trade-off that a lazy stub buys a network round trip
+> before a redirect, on exactly the URLs that most want to be instant.
 
 ### Phase 5 — Deploy split
 
@@ -787,7 +860,7 @@ Gate: pushing to `main` deploys the portfolio to its existing URL; the platform 
 | # | Risk | Impact | Mitigation |
 |---|---|---|---|
 | R1 | Renaming the GitHub repo to match a new workspace name | Breaks the user site: `<user>.github.io` must keep that exact repo name | Only rename local directories. Never the remote repo. |
-| R2 | `localStorage` is origin-scoped: a student's progress on `thalesmenegueco.github.io` is unreadable from the new domain | Silent loss of a student's saved work — directly contradicts the platform's reason to exist | Do not jump straight to redirects. Keep the old Cálculo routes serving in the portfolio through at least one release, then offer a one-time export (JSON via URL hash or copy-paste) before adding the redirect stub. Decide this deliberately. **Decided: deferred along with the domain.** The platform stays on its `*.vercel.app` URL — an origin no student has ever used — so nothing is orphaned today and the deferral is free. The obligation it creates: this answer becomes due in the *same* release that introduces a custom domain, not after it, and Phase 4 step 3's stubs stay parked until then. |
+| R2 | `localStorage` is origin-scoped: a student's progress on `thalesmenegueco.github.io` is unreadable from the new domain | Silent loss of a student's saved work — directly contradicts the platform's reason to exist | **Decided: the loss is accepted, and it is documented where a visitor will actually see it.** Note the original mitigation — "keep the old Cálculo routes serving through at least one release" — was already foreclosed by hazard H1, which forced those routes out of the portfolio in Phase 3 so the app would still compile. The real choice was therefore an export path versus accepting it, not redirect versus don't. Accepted because the stored data is per-lesson completion flags, the platform has never had a public origin, and an export/import flow would be real work to recover data that in all likelihood nobody holds. Crucially it is **not silent**: the `/estudos` landing page says plainly that saved progress does not follow to the new domain. Revisit if the platform ever gains users before these redirects ship. |
 | R3 | Files moving outside `src/` collide with `rootDir: "./src"` in the per-project tsconfigs | Build/editor errors mid-Phase-2 | ✅ **Closed, in two moves.** Phase 1 step 4 dropped `rootDir` before the libs existed. TypeScript 6 then rejected the *implicit* `rootDir` (TS6059), and `ml-platform` set `"rootDir": "../.."` — the common source directory, which contains every file rather than excluding any (`828d665`). See the correction under Phase 1 step 4. |
 | R4 | ~~Dual lockfiles, invalid `pnpm-workspace.yaml`, CI using `npm install`~~ | ~~Non-reproducible installs~~ | ✅ **Resolved in Phase 0** (commit `55f1e09`): npm standardised, pnpm artefacts removed, CI on `npm ci`. |
 | R5 | `cloudflare-worker/test-llms/` is a third deployable with its own `package.json`, outside the workspace and outside CI | Untracked deploy drift | Unchanged under the chosen scope (it serves a tool that stays in the portfolio), but flag it: it deserves its own workflow eventually. |
