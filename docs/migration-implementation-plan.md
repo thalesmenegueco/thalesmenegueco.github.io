@@ -19,7 +19,7 @@ Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](
 | 0 — Baseline & hygiene | ✅ Done | `55f1e09` (+ `1324dee`, `24f7f79`) |
 | 1 — Workspace conversion | ✅ Done, live-deploy confirmed green on GitHub Pages | `439cc66`, `8e092d1`, `d184237` |
 | 2 — Extract shared libs | ✅ Done — all gates closed | `05bf585`, `3d64c46`, `7410119`, `34f5d07`, `0a42f10`, `c2dc314` |
-| 3 — Build ml-platform content | ✅ Done on the branch — see § Phase 3 results | `4a3cef5`, `1075e01` |
+| 3 — Build ml-platform content | ✅ Done on the branch, pushed, and the H2 gate closed on a Vercel preview — see § Phase 3 results | `4a3cef5`, `1075e01`, `1a4c62b` |
 | 4 — Redirects & cross-links | Not started | — |
 | 5 — Deploy split | Partly done ahead of schedule — `vercel.json`, project created, Node pinned, **first production deploy green** | `24f7f79`, `bedd845` |
 | 6 — Cleanup | Partly done early (docs moved to `docs/`) | — |
@@ -51,12 +51,28 @@ five prerequisites and **missed a sixth that fails the build**, and its
 recorded under § Phase 3. The move and the portfolio-side route removal shipped
 in the same commit, so hazard **H1 is closed by construction**.
 
-**The gate that is still open is H2 step 3:** Cálculo has not been exercised on a
-deployed platform URL. Component rendering, routing and the global reset are all
-covered by Karma, but the deployed wiring — Vercel's build command, output
-directory, SPA rewrite, and deep links — needs the branch pushed. **Do not merge
-to `main` until a Vercel preview has served all three Cálculo modules**: merging
-is what removes Cálculo from the portfolio, which is the live site.
+**H2 step 3 is closed.** The branch was pushed, and all three Cálculo modules —
+`/calculo/teoria`, `/calculo/aplicada`, `/calculo/processo` — were opened and
+confirmed working on the Vercel preview, so the deployed wiring (Vercel's build
+command, output directory, SPA rewrite and deep links) is no longer the
+unverified link. Merging to `main` still removes Cálculo from the live portfolio
+and remains the author's call, but it is no longer blocked on a check that has
+never run.
+
+> **Reading a preview needs a session.** The deployment sits behind Vercel
+> deployment protection: an unauthenticated request is answered `302` to
+> `vercel.com/sso-api`, so `curl` against a preview URL returns a login redirect
+> rather than any evidence about the app. The check above was made in a signed-in
+> browser. Recorded because "the preview URL 302s" is otherwise easy to misread
+> as a broken deploy — and because it is the reason that check cannot be
+> automated as written.
+
+**Both decisions left open at the previous handover are now taken.**
+
+| Question | Decision |
+|---|---|
+| Names for the placeholder ML courses | **Settled, and one course larger than expected.** The author named four ML courses — *Fundamentos Matemáticos para ML*, *Aprendizado Supervisionado*, *Redes Neurais do Zero*, *Aprendizado Não-Supervisionado* — so the catalogue now holds five subjects and the plan's "4 cursos" reads as the ML half. See § Phase 3 and commit `dbaf2be`. |
+| The platform's domain | **Deferred on purpose; the platform stays on its `*.vercel.app` URL.** This keeps R2 open rather than breaking it: the platform has never had a public origin, so no student holds progress there and deferring costs nothing today. It does **not** unblock Phase 4 step 3 — those stubs hardcode absolute URLs, so they stay parked until the domain is bought, exactly as step 3's note says. |
 
 ---
 
@@ -225,6 +241,46 @@ Gate: build and tests pass; baseline sizes recorded. (`google-chrome` is present
 2. Rewrite `angular.json`: project key `learning-gallery` → `portfolio`; `root: "projects/portfolio"`; `sourceRoot: "projects/portfolio/src"`; `outputPath: "dist/portfolio"`; update the `assets` entry `src/404.html` → `projects/portfolio/src/404.html`, the `browser` entry, `styles`, and `tsConfig` paths for both `build` and `test` targets.
 3. Update root `tsconfig.json` `references` to the new spec/app paths.
 4. **Remove `rootDir` from both per-project tsconfigs.** They currently set `"rootDir": "./src"`, which will reject path-mapped files living under `libs/` once Phase 2 lands. `@angular/build` compiles with esbuild and does not need `rootDir` for emit; rely on `include` plus transitive inclusion of imported files.
+
+   > ⚠️ **Half-reversed later — `rootDir` returns, wider (`828d665`).** Dropping it
+   > was right for Phase 1 and remains right for `@angular/build`: esbuild never
+   > needed it for emit. But that reasoning stops holding the moment a compiler
+   > which is *not* esbuild reads the same file, and on this machine two of them
+   > do. An implicit `rootDir` is rejected as soon as the program spans
+   > directories outside the project — TS6059, *"is not under 'rootDir'"* — and
+   > `ml-platform` imports `@shared/*` in 28 places, so `libs/` is permanently in
+   > its program. Its app and spec configs therefore set `"rootDir": "../.."`
+   > again.
+   >
+   > This is not a return to `"rootDir": "./src"`. That value was too narrow — it
+   > excluded exactly the files Phase 2 was about to add, which is why step 4
+   > exists. `"../.."` is the **common source directory** of the program, so it
+   > contains every file rather than excluding any. `portfolio` needs no
+   > equivalent, because it no longer imports anything from `@shared/*`: its
+   > program never leaves `projects/portfolio`, which is also why only
+   > `ml-platform` ever reported the second of the two warnings.
+   >
+   > **Two warnings, two compilers — and neither is the pinned one.** Worth
+   > separating, because it is easy to blame both on "the newer TypeScript" and
+   > then fix the wrong half. Three compilers are in play:
+   >
+   > | Compiler | Where it came from | What it said about the original config |
+   > |---|---|---|
+   > | **5.8.3** | `devDependencies` — what `ng build` and `ng test` actually use | **Nothing.** All four configs type-check clean. |
+   > | **6.0.3** | bundled with DSH | Accepted `baseUrl`; rejected the implicit `rootDir` — **TS6059** |
+   > | **7.0.2** | nvm global | `baseUrl` is **gone** — **TS5102** + **TS5090** |
+   >
+   > So the `baseUrl` complaint belongs to **7.x**, where the option was *removed*
+   > rather than deprecated. That is exactly why `"ignoreDeprecations": "6.0"` —
+   > the remedy the message itself proposes — does nothing: verified against
+   > 7.0.2, both errors survive it. There is no deprecation left to silence. The
+   > `rootDir` complaint belongs to **6.x**.
+   >
+   > The root `tsconfig.json` now declares its `@shared/*` targets as `./libs/...`
+   > with no `baseUrl`, and `ml-platform` states its `rootDir`: verified clean on
+   > all three compilers — 5.8.3, 6.0.3 and 7.0.2. The first row of that table is
+   > also why none of this ever failed CI, so the lesson to keep is **do not read
+   > a silent CI as evidence of a clean config.**
 5. Generate the second app skeleton (verify flags with `npx ng generate application --help` first, then accept generated defaults):
    ```bash
    npx ng generate application ml-platform --style=scss --routing \
@@ -525,6 +581,13 @@ completion checkmarks. The two mitigations above were not taken.
    > lives in `angular.json` rather than in the libs.
 3. Routing: a hub at `/` rendering `STUDY_SUBJECTS`, plus a generalised module route such as `/curso/:subjectId/:moduleKind/:moduleId` so four courses × two modules are data-driven. Keep the familiar Cálculo paths (`/calculo/teoria`, `/calculo/aplicada`, `/calculo/processo`) resolvable.
 4. Expand `STUDY_SUBJECTS` from the single `calculo` subject to the four-course catalog. Keep unbuilt courses as `status: 'coming-soon'` so the hub can ship before all four exist — the type already models this.
+
+   > **How this resolved, for the record (`1075e01`, `dbaf2be`).** "The four-course
+   > catalog" turned out to mean four **ML** courses — named by the author — added
+   > alongside `calculo` rather than replacing it, so the catalogue holds five
+   > subjects. Only `calculo` is built; the four ML courses are `coming-soon` with
+   > `route: null` and no entry in `MODULE_COMPONENTS`, which is precisely the
+   > state this step asked for. See the fuller note under § Phase 3 results.
 5. Every module route must be `loadComponent`-lazy. This is the constraint that keeps TF.js/D3/Plotly out of the platform shell, and it is also what makes the future weights survivable.
 6. Budgets, in `angular.json`:
    - `portfolio` — keep the existing strict `initial` 700 KB warn / 1 MB error. Its job is to stay light; let it fail the build if it stops being light.
@@ -558,11 +621,15 @@ Gate: `ng build ml-platform` succeeds; the shell chunk contains no `katex`/`echa
 > | Tests | `ml-platform` 2 → **21 SUCCESS**; `portfolio` **2 FAILED / 190 SUCCESS**, the documented baseline, unchanged by the move |
 > | KaTeX stylesheet | global by design — 549 `.katex` selectors in `styles-*.css` (36.07 kB), per the Phase 2 correction |
 >
-> **What this gate does not cover:** nothing above exercises the platform at a
-> `*.vercel.app` URL. Component rendering is covered by Karma, but the deployed
-> wiring — Vercel's build command, output directory, SPA rewrite, and deep links —
-> is H2 step 3 and needs the branch pushed. **Do not merge to `main` before that
-> check passes:** merging is what removes Cálculo from the live portfolio.
+> **What this gate did not cover — since closed.** Nothing in the table above
+> exercises the platform at a `*.vercel.app` URL. Component rendering is covered
+> by Karma, but the deployed wiring — Vercel's build command, output directory,
+> SPA rewrite, and deep links — was H2 step 3, and it needed the branch pushed.
+> **That check has now been made** in a signed-in browser: all three Cálculo
+> modules serve and work on the Vercel preview. Merging to `main` still removes
+> Cálculo from the live portfolio and remains the author's call, but the
+> sequencing no longer rests on a check that has not run. See the note at the top
+> of this document.
 >
 > **Interim state, deliberate:** the portfolio's nav still carries
 > `<a href="/estudos">` (`app.component.html`), which now falls through to the
@@ -571,16 +638,33 @@ Gate: `ng build ml-platform` succeeds; the shell chunk contains no `katex`/`echa
 > neither `/estudos` nor any Cálculo route — which is precisely why the H2
 > sequencing exists.
 >
-> **Catalog naming is provisional — read before launch.** Three ML subjects were
-> added as `coming-soon` with `route: null` and working titles, each carrying a
-> "Título provisório" chip in the UI as well as a warning comment in
-> `study-catalog.ts`. `docs/structure-migration.md` specifies "4 cursos, cada com
-> 2 módulos" but never names them. Note also that this plan's own step 4 wording
-> ("expand from the single `calculo` subject to the four-course catalog") does not
-> say whether Cálculo counts as one of the four: the catalogue reads it as four
-> subjects in total — Cálculo plus three — and records that reading in the file.
-> If the intent was four ML courses *in addition* to Cálculo, that is one more
-> entry and nothing else changes.
+> **Catalog naming is settled — and the catalogue grew a course (`dbaf2be`).**
+> The three provisional ML subjects now carry the author's names and are joined
+> by a fourth, so the catalogue holds **five subjects**: `calculo` (three modules,
+> live and verified) plus four ML courses with two `coming-soon` modules each.
+>
+> This closes the ambiguity the previous revision of this note flagged. This
+> plan's step 4 wording ("expand from the single `calculo` subject to the
+> four-course catalog") never said whether Cálculo counts among the four. All four
+> named courses are ML courses, so "4 cursos, cada com 2 módulos" describes the
+> **ML** half and Cálculo is a fifth, pre-existing subject. The other reading —
+> four subjects in total — is now one deletion away rather than one addition.
+>
+> Absorbing the fourth course needed **no routing, component or template work**:
+> it is one array entry that the hub renders and `app.routes.ts` correctly
+> declines to route, because a `coming-soon` module has `route: null` and no
+> entry in `MODULE_COMPONENTS`. That is the this-file-is-data claim doing what it
+> advertises. Course ids were deliberately left alone — they are internal keys,
+> and only the three `calculo-*` ids bind to persisted `localStorage` keys, so no
+> student's saved progress was reachable by the rename.
+>
+> The **names** are the author's. The taglines, module titles and descriptions
+> around them were authored in the same pass and are a first draft.
+>
+> Still open, unchanged by this pass and flagged here rather than fixed: the hub's
+> hero copy says "Cada disciplina tem dois momentos" and its "Como funciona" strip
+> shows two steps, while Cálculo has three modules. With five subjects now on the
+> page, that copy is the next content pass.
 >
 > **Three deliberate deviations from the step list.** The three Cálculo icons were
 > *moved* rather than copied: the portfolio no longer references them, so copying
@@ -703,8 +787,8 @@ Gate: pushing to `main` deploys the portfolio to its existing URL; the platform 
 | # | Risk | Impact | Mitigation |
 |---|---|---|---|
 | R1 | Renaming the GitHub repo to match a new workspace name | Breaks the user site: `<user>.github.io` must keep that exact repo name | Only rename local directories. Never the remote repo. |
-| R2 | `localStorage` is origin-scoped: a student's progress on `thalesmenegueco.github.io` is unreadable from the new domain | Silent loss of a student's saved work — directly contradicts the platform's reason to exist | Do not jump straight to redirects. Keep the old Cálculo routes serving in the portfolio through at least one release, then offer a one-time export (JSON via URL hash or copy-paste) before adding the redirect stub. Decide this deliberately. |
-| R3 | Files moving outside `src/` collide with `rootDir: "./src"` in the per-project tsconfigs | Build/editor errors mid-Phase-2 | Handled in Phase 1 step 4 — drop `rootDir` before the libs exist. |
+| R2 | `localStorage` is origin-scoped: a student's progress on `thalesmenegueco.github.io` is unreadable from the new domain | Silent loss of a student's saved work — directly contradicts the platform's reason to exist | Do not jump straight to redirects. Keep the old Cálculo routes serving in the portfolio through at least one release, then offer a one-time export (JSON via URL hash or copy-paste) before adding the redirect stub. Decide this deliberately. **Decided: deferred along with the domain.** The platform stays on its `*.vercel.app` URL — an origin no student has ever used — so nothing is orphaned today and the deferral is free. The obligation it creates: this answer becomes due in the *same* release that introduces a custom domain, not after it, and Phase 4 step 3's stubs stay parked until then. |
+| R3 | Files moving outside `src/` collide with `rootDir: "./src"` in the per-project tsconfigs | Build/editor errors mid-Phase-2 | ✅ **Closed, in two moves.** Phase 1 step 4 dropped `rootDir` before the libs existed. TypeScript 6 then rejected the *implicit* `rootDir` (TS6059), and `ml-platform` set `"rootDir": "../.."` — the common source directory, which contains every file rather than excluding any (`828d665`). See the correction under Phase 1 step 4. |
 | R4 | ~~Dual lockfiles, invalid `pnpm-workspace.yaml`, CI using `npm install`~~ | ~~Non-reproducible installs~~ | ✅ **Resolved in Phase 0** (commit `55f1e09`): npm standardised, pnpm artefacts removed, CI on `npm ci`. |
 | R5 | `cloudflare-worker/test-llms/` is a third deployable with its own `package.json`, outside the workspace and outside CI | Untracked deploy drift | Unchanged under the chosen scope (it serves a tool that stays in the portfolio), but flag it: it deserves its own workflow eventually. |
 | R6 | The platform is where TF.js/D3/Plotly will land; without budgets the shell chunk creeps | The exact problem this migration exists to prevent, reintroduced in the new app | Per-app budgets in Phase 3 plus the bundle check in the Phase 5 PR workflow. |
