@@ -1,0 +1,54 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-aplicada-04",
+  "moduleId": "fundamentos-aplicada",
+  "order": 4,
+  "title": "A equação normal: a solução sem iteração",
+  "objective": "O aluno entende que a regressão linear tem solução analítica fechada (mínimo único) e compara com a solução iterativa do GD.",
+  "prerequisites": [
+    "fundamentos-aplicada-02",
+    "fundamentos-teoria-04"
+  ],
+  "sourceRefs": [
+    "mml-9.2"
+  ],
+  "sourceFiles": [
+    "mml/09-linear-regression.md"
+  ],
+  "widget": "NormalEquationWidget",
+  "widgetConfig": {
+    "showGDSideBySide": true
+  },
+  "keyFormulas": [
+    "\\boldsymbol{\\theta}_{\\text{ML}} = (\\boldsymbol{X}^\\top\\boldsymbol{X})^{-1}\\boldsymbol{X}^\\top\\boldsymbol{y}"
+  ],
+  "numericExample": {
+    "description": "X = [[1,1],[1,2]], y = [1,3]. X^TX = [[2,3],[3,5]], X^Ty = [4,7], invertendo: θ = [-1, 2]",
+    "inputs": {
+      "X": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "y": [
+        1,
+        3
+      ]
+    },
+    "expected": "θ* = (-1, 2)",
+    "expectedValues": [
+      -1,
+      2
+    ],
+    "sourceRef": "mml-9.2"
+  },
+  "completionCriterion": "O aluno computa manualmente a equação normal no exemplo de 2 pontos e confirma que a widget GD chega ao mesmo θ (≈ d=~ pontos decimais).",
+  "estimatedMinutes": 15,
+  "status": "draft",
+  "knownGaps": []
+}

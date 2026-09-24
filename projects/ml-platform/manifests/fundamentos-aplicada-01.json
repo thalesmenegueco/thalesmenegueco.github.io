@@ -1,0 +1,52 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-aplicada-01",
+  "moduleId": "fundamentos-aplicada",
+  "order": 1,
+  "title": "O problema: prever preço de casas",
+  "objective": "O aluno formula o problema como busca de parâmetros (θ₀, θ₁) que minimizam erro entre previsão e observação, e reconhece o dataset como pares (área, preço).",
+  "prerequisites": [],
+  "sourceRefs": [
+    "mml-9.1",
+    "mml-9.2"
+  ],
+  "sourceFiles": [
+    "mml/09-linear-regression.md"
+  ],
+  "widget": "DatasetExplorerWidget",
+  "widgetConfig": {
+    "dataset": "houses-synthetic",
+    "n": 50
+  },
+  "keyFormulas": [
+    "y = \\boldsymbol{x}^\\top\\boldsymbol{\\theta} + \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0, \\sigma^2)",
+    "\\mathcal{L}(\\boldsymbol{\\theta}) = \\frac{1}{2\\sigma^2} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\theta}\\|^2",
+    "\\text{RMSE} = \\sqrt{\\frac{1}{N} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\theta}\\|^2}"
+  ],
+  "numericExample": {
+    "description": "3 casos com y={100,200,300}, ŷ={110,190,290}: MSE = (100+100+100)/3 ≈ 100",
+    "inputs": {
+      "y": [
+        100,
+        200,
+        300
+      ],
+      "yhat": [
+        110,
+        190,
+        290
+      ]
+    },
+    "expected": "MSE ≈ 100",
+    "expectedValues": [
+      100
+    ],
+    "sourceRef": "mml-9.2"
+  },
+  "completionCriterion": "O aluno formula MSE e interpreta visualmente que a melhor reta é a de menor 'soma das distâncias ao quadrado'.",
+  "estimatedMinutes": 10,
+  "status": "draft",
+  "knownGaps": [
+    "MML §9.1 trata suposições generosas (linear, ruído). Dataset é sintético embutido — sem fonte no livro."
+  ]
+}

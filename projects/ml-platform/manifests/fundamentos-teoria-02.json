@@ -1,0 +1,62 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-teoria-02",
+  "moduleId": "fundamentos-teoria",
+  "order": 2,
+  "title": "Produto escalar, ângulos e projeções",
+  "objective": "O aluno interpreta o produto escalar como medida de alinhamento entre vetores, e projeções como 'melhor aproximação' de um vetor na direção de outro.",
+  "prerequisites": [
+    "fundamentos-teoria-01"
+  ],
+  "sourceRefs": [
+    "mml-3.2",
+    "mml-3.4",
+    "mml-3.8"
+  ],
+  "sourceFiles": [
+    "mml/03-analytic-geometry.md"
+  ],
+  "widget": "ProjectionWidget",
+  "widgetConfig": {
+    "vectorA": [
+      3,
+      4
+    ],
+    "vectorB": [
+      1,
+      1
+    ],
+    "allowDrag": true
+  },
+  "keyFormulas": [
+    "\\boldsymbol{x}^\\top \\boldsymbol{y} = \\sum_{i=1}^n x_i y_i",
+    "\\cos \\omega = \\frac{\\langle \\boldsymbol{x}, \\boldsymbol{y} \\rangle}{\\|\\boldsymbol{x}\\| \\|\\boldsymbol{y}\\|}",
+    "\\pi_U(\\boldsymbol{x}) = \\frac{\\boldsymbol{b}^\\top \\boldsymbol{x}}{\\|\\boldsymbol{b}\\|^2}\\boldsymbol{b}"
+  ],
+  "numericExample": {
+    "description": "Projeção de (3,4) em (1,1): dot=7, |b|²=2, então proj=(3.5, 3.5)",
+    "inputs": {
+      "x": [
+        3,
+        4
+      ],
+      "y": [
+        1,
+        1
+      ]
+    },
+    "expected": "proj = (3.5, 3.5); cosθ ≈ 0.9899",
+    "expectedValues": [
+      3.5,
+      3.5,
+      0.9899
+    ],
+    "sourceRef": "mml-3.2"
+  },
+  "completionCriterion": "Ao arrastar b, o aluno vê a projeção mudar de magnitude (b→horiz = proj grande em x) e prever quando cos θ = 0 (perpendicular ⇒ projeção nula).",
+  "estimatedMinutes": 14,
+  "status": "draft",
+  "knownGaps": [
+    "mml-3.2 tem a linha de dot prodt; a interpretação de projeção como 'melhor aproximação' que minimiza erros aparecem apenas nas notas do autor — gerador deve citar mml-3.2 e a observação footer do livro."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-teoria-07",
+  "moduleId": "fundamentos-teoria",
+  "order": 7,
+  "title": "Probabilidade: incerteza dos dados",
+  "objective": "O aluno entende variáveis aleatórias, média, variância e distribuição gaussiana como linguagem do ruído que sempre acompanha dados reais.",
+  "prerequisites": [],
+  "sourceRefs": [
+    "mml-6.4",
+    "mml-6.5",
+    "mml-6.6"
+  ],
+  "sourceFiles": [
+    "mml/06-probability.md"
+  ],
+  "widget": "DistributionWidget",
+  "widgetConfig": {
+    "type": "gaussian",
+    "draggableMuAndSigma": true,
+    "showSamples": true
+  },
+  "keyFormulas": [
+    "\\mathbb{E}[f(\\boldsymbol{x})] = \\int f(\\boldsymbol{x})p(\\boldsymbol{x})d\\boldsymbol{x}",
+    "\\text{Cov}[\\boldsymbol{x}, \\boldsymbol{y}] = \\mathbb{E}[\\boldsymbol{x}\\boldsymbol{y}^\\top] - \\mathbb{E}[\\boldsymbol{x}]\\mathbb{E}[\\boldsymbol{y}]^\\top",
+    "p(\\boldsymbol{x}|\\boldsymbol{\\mu}, \\boldsymbol{\\Sigma}) = (2\\pi)^{-\\frac{D}{2}} |\\boldsymbol{\\Sigma}|^{-\\frac{1}{2}} \\exp\\left(-\\frac{1}{2}(\\boldsymbol{x}-\\boldsymbol{\\mu})^\\top \\boldsymbol{\\Sigma}^{-1}(\\boldsymbol{x}-\\boldsymbol{\\mu})\\right)"
+  ],
+  "numericExample": {
+    "description": "Para N(2, 1): P(|x-2| ≤ 2) ≈ 95% (regra dos 2σ aplicada)",
+    "inputs": {
+      "mu": 2,
+      "sigma": 1,
+      "range": [
+        0,
+        4
+      ]
+    },
+    "expected": "≈ 0.954",
+    "expectedValues": [
+      0.954
+    ],
+    "sourceRef": "mml-6.5"
+  },
+  "completionCriterion": "O aluno ajusta μ e σ para reproduzir 'botas de vendas com ruído' (média 100, desvio 15) e justifica escolha da distribuição.",
+  "estimatedMinutes": 12,
+  "status": "draft",
+  "knownGaps": []
+}

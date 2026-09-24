@@ -1,0 +1,50 @@
+{
+  "description": "Vocabulário fechado compartilhado pelos manifests: nomes de widget e IDs de dataset. O validador usa este arquivo como fonte de verdade, então um typo (GradientDescendantWidget) falha o gate em vez de virar uma widget fantasma no runtime. Quando o registro de widgets do runtime existir em TS, este JSON deve passar a ser gerado a partir dele.",
+  "sourceOfTruth": "projects/ml-platform/syllabus-content/methodology.md (tabelas de passo→widget), revisado em 2026-09-20",
+  "widgets": [
+    "BackpropFlowWidget",
+    "BayesWidget",
+    "BiasVarianceWidget",
+    "BinaryClassifierWidget",
+    "ClusterPCAWidget",
+    "ConfusionMatrixWidget",
+    "CustomerSegmentationWidget",
+    "DatasetExplorerWidget",
+    "DecisionBoundaryWidget",
+    "DepthWidget",
+    "DistributionWidget",
+    "EMWidget",
+    "EigenWidget",
+    "ForwardPassWidget",
+    "GradientDescentWidget",
+    "GradientWidget",
+    "HyperparamWidget",
+    "KMeansWidget",
+    "LinearRegressionWidget",
+    "LossSurfaceWidget",
+    "MatrixTransformWidget",
+    "MixtureWidget",
+    "MNISTHyperparamWidget",
+    "MNISTRegularizedWidget",
+    "MNISTTrainerWidget",
+    "MulticlassWidget",
+    "NetworkTopologyWidget",
+    "NeuronWidget",
+    "NormalEquationWidget",
+    "OverfittingWidget",
+    "PCAWidget",
+    "ProjectionWidget",
+    "SigmoidWidget",
+    "TrainingStepWidget",
+    "VectorSpaceWidget"
+  ],
+  "datasets": [
+    "houses-synthetic",
+    "standard-5pt",
+    "customers-synthetic"
+  ],
+  "notes": {
+    "DatasetExplorerWidget": "não está em methodology.md: entrou pelos manifests de fundamentos-aplicada (passo 1). Confirmar se substitui o LossSurfaceWidget previsto no plano.",
+    "datasets": "só o que aparece até agora: houses-synthetic (fundamentos-aplicada-01), standard-5pt (exemplo do schema) e customers-synthetic (Curso 4, dados de clientes). Cada dataset embutido precisa de ID aqui porque widgets e testes compartilham a referência."
+  }
+}

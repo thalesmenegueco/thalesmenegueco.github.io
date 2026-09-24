@@ -1,0 +1,72 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-teoria-03",
+  "moduleId": "fundamentos-teoria",
+  "order": 3,
+  "title": "Matrizes como transformações do plano",
+  "objective": "O aluno vê uma matriz como função que leva vetores para vetores, entende colunas como imagens dos vetores base, e prevê transformações (rotação, escala, shear) pela leitura da matriz.",
+  "prerequisites": [
+    "fundamentos-teoria-01",
+    "fundamentos-teoria-02"
+  ],
+  "sourceRefs": [
+    "mml-2.7",
+    "mml-2.7.1"
+  ],
+  "sourceFiles": [
+    "mml/02-linear-algebra.md"
+  ],
+  "widget": "MatrixTransformWidget",
+  "widgetConfig": {
+    "gradie": true,
+    "showEigenvectors": false,
+    "presets": [
+      "identity",
+      "rotation45",
+      "scale2x",
+      "shear"
+    ]
+  },
+  "keyFormulas": [
+    "\\Phi(\\lambda \\boldsymbol{x} + \\psi \\boldsymbol{y}) = \\lambda \\Phi(\\boldsymbol{x}) + \\psi \\Phi(\\boldsymbol{y})",
+    "\\hat{\\boldsymbol{y}} = \\boldsymbol{A}_\\Phi \\hat{\\boldsymbol{x}}",
+    "\\dim(\\text{ker}(\\Phi)) + \\dim(\\text{Im}(\\Phi)) = \\dim(V) \\quad"
+  ],
+  "numericExample": {
+    "description": "Rotação 90° de e₁=(1,0) e e₂=(0,1) pela matriz R = [[0,-1],[1,0]]",
+    "inputs": {
+      "matrix": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "vectors": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "expected": "R e₁ = (0,1); R e₂ = (-1,0)",
+    "expectedValues": [
+      0,
+      1,
+      -1,
+      0
+    ],
+    "sourceRef": "mml-2.7.1"
+  },
+  "completionCriterion": "Na widget, o aluno vira a malha com shear/rotação e identifica as colunas da matriz como as novas posições dos e₁, e₂.",
+  "estimatedMinutes": 13,
+  "status": "draft",
+  "knownGaps": []
+}

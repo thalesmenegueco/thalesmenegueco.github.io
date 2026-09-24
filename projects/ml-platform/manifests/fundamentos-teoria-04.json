@@ -1,0 +1,66 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-teoria-04",
+  "moduleId": "fundamentos-teoria",
+  "order": 4,
+  "title": "Autovalores e autovetores: direções que não mudam",
+  "objective": "O aluno identifica autovetores como direções que a transformação apenas estica/comprime e autovalores como o fator de esticamento, ligando isso à covariância dos dados (semente do PCA).",
+  "prerequisites": [
+    "fundamentos-teoria-03"
+  ],
+  "sourceRefs": [
+    "mml-4.2"
+  ],
+  "sourceFiles": [
+    "mml/04-matrix-decompositions.md"
+  ],
+  "widget": "EigenWidget",
+  "widgetConfig": {
+    "showEigenvectors": true,
+    "colorEigenvectors": "d2a8ff"
+  },
+  "keyFormulas": [
+    "\\boldsymbol{A}\\boldsymbol{x} = \\lambda \\boldsymbol{x}",
+    "\\det(\\boldsymbol{A} - \\lambda \\boldsymbol{I}) = 0",
+    "\\text{tr}(\\boldsymbol{A}) = \\sum_{i=1}^n \\lambda_i"
+  ],
+  "numericExample": {
+    "description": "Para A = [[4,1],[2,3]], autovalores são λ=5 (v=(1,1)) e λ=2 (v=(1,-2))",
+    "inputs": {
+      "matrix": [
+        [
+          4,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "probes": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          -2
+        ]
+      ]
+    },
+    "expected": "λ = {5, 2}; A(1,1) = (5,5); A(1,-2) = (2,-4)",
+    "expectedValues": [
+      5,
+      2,
+      5,
+      5,
+      2,
+      -4
+    ],
+    "sourceRef": "mml-4.2"
+  },
+  "completionCriterion": "Na widget, o aluno arrasta pontos e identifica que só direções específicas ficam na mesma linha após a transformação.",
+  "estimatedMinutes": 14,
+  "status": "draft",
+  "knownGaps": []
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-teoria-06",
+  "moduleId": "fundamentos-teoria",
+  "order": 6,
+  "title": "Gradiente descendente: descendo a ladeira",
+  "objective": "O aluno formula o passo do GD (x ← x − λ∇f) e prevê o efeito do learning rate: pequeno demais é lento, grande demais diverge.",
+  "prerequisites": [
+    "fundamentos-teoria-05"
+  ],
+  "sourceRefs": [
+    "mml-7.1"
+  ],
+  "sourceFiles": [
+    "mml/07-continuous-optimization.md"
+  ],
+  "widget": "GradientDescentWidget",
+  "widgetConfig": {
+    "surface": "banana",
+    "lr": 0.1,
+    "start": [
+      -1.5,
+      1.8
+    ],
+    "regimesTrainable": [
+      "lento",
+      "converge",
+      "differe",
+      "diverge"
+    ]
+  },
+  "keyFormulas": [
+    "x_{i+1} = x_i - \\gamma_i ((\\nabla f)(x_i))^\\top",
+    "\\theta_{i+1} = \\theta_i - \\gamma_i \\sum_{n=1}^N (\\nabla L_n(\\theta_i))^\\top"
+  ],
+  "numericExample": {
+    "description": "Em f(x)=x², x₀=2, lr=0.3: x₁=2−0.3·4=0.8; x₂=0.8−0.3·1.6=0.32; x₃≈0.128",
+    "inputs": {
+      "f": "x^2",
+      "x0": 2,
+      "lr": 0.3,
+      "iterations": 3
+    },
+    "expected": "[2, 0.8, 0.32, 0.128]",
+    "expectedValues": [
+      2,
+      0.8,
+      0.32,
+      0.128
+    ],
+    "sourceRef": "mml-7.1"
+  },
+  "completionCriterion": "O aluno experimenta lr = 0.01, 0.3, 1.2 na widget e classifica cada regime (lento / convergente / divergente) corretamente.",
+  "estimatedMinutes": 15,
+  "status": "draft",
+  "knownGaps": []
+}

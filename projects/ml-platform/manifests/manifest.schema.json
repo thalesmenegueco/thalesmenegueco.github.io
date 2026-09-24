@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thalesmenegueco.github.io/projects/ml-platform/manifests/manifest.schema.json",
+  "title": "ML Platform — manifesto de lição",
+  "description": "Contrato de uma lição do ml-platform (Camada 2 do PIPELINE.md). Descreve o que a lição precisa ter antes de qualquer geração de conteúdo. O conteúdo gerado é derivado deste manifesto e da fonte citada em sourceRefs/sourceFiles — nunca de conhecimento externo ao modelo.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lessonId",
+    "moduleId",
+    "order",
+    "title",
+    "objective",
+    "prerequisites",
+    "sourceRefs",
+    "sourceFiles",
+    "widget",
+    "keyFormulas",
+    "completionCriterion"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Caminho do próprio schema, para editores que validam JSON."
+    },
+    "lessonId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9]{2}$",
+      "description": "Id estável da lição. Convenção: `<moduleId>-<order com 2 dígitos>` — ex. `fundamentos-teoria-05`. É o id citado nos testes de exemplo numérico e nas prerequisites das outras lições."
+    },
+    "moduleId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-(teoria|aplicada|processo)$",
+      "description": "Módulo do catálogo (`STUDY_SUBJECTS` em projects/ml-platform/src/app/studies/study-catalog.ts). `processo` existe de verdade no catálogo (calculo-processo), então fica no pattern."
+    },
+    "order": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 99,
+      "description": "Posição da lição dentro do módulo. Entra no lessonId."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Id legível para o runtime (o app de Cálculo usa slugs como `what-is-a-limit`). Opcional: o pipeline continua endereçando a lição por `lessonId`."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Título exibido ao aluno."
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 20,
+      "description": "O que o aluno deve entender ao fim da lição, em termos observáveis. É o alvo que a geração precisa acertar."
+    },
+    "prerequisites": {
+      "type": "array",
+      "description": "lessonIds que o aluno precisa ter concluído antes. É a espinha dorsal do encadeamento discovery: [] só para a primeira lição de uma cadeia. O validador exige que cada id exista como manifesto e que não haja ciclo.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9]{2}$"
+      }
+    },
+    "sourceRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "IDs de seção de content-source/ que sustentam a lição. Cada ref precisa existir como heading no arquivo correspondente. Array vazio é legítimo apenas em lição sem fonte (sandbox), e nesse caso sourceFiles também fica vazio.",
+      "items": {
+        "type": "string",
+        "pattern": "^(mml|nndl)-[0-9]+(\\.[0-9]+)*(-[a-z][a-z0-9-]*)?$"
+      }
+    },
+    "sourceFiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Arquivos passados ao prompt de geração (contexto mínimo). Todo sourceRef precisa ser coberto por um destes arquivos — um ref cujo capítulo não é entregue ao gerador não pode ser honrado.",
+      "items": {
+        "type": "string",
+        "pattern": "^(mml|nndl)/[0-9]{2}-[a-z0-9-]+\\.md$"
+      }
+    },
+    "widget": {
+      "type": ["string", "null"],
+      "pattern": "^[A-Z][A-Za-z0-9]*$",
+      "description": "Widget interativa em PascalCase, conforme `registries.json`. `null` para lições conceituais, sem widget (ex. passo \"Dados, modelos, tomada de decisão\" do Curso 2)."
+    },
+    "widgetConfig": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "description": "Hiperparâmetros iniciais da widget para esta lição — ex. { lr: 0.5 } ensina divergência, { lr: 0.01 } ensina convergência lenta; o mesmo widget ensina coisas diferentes conforme a configuração. Ausente ou null = a widget abre com os defaults documentados dela. Usado pelo runtime e pelos testes da widget."
+    },
+    "keyFormulas": {
+      "type": "array",
+      "description": "Fórmulas centrais em LaTeX do KaTeX, **cortadas literalmente** da fonte: os mesmos caracteres que estão no arquivo de content-source, na notação do livro. O manifesto guarda a intenção (quais fórmulas a lição ensina); a fonte define a notação. Decisão de 2026-09-22: notação do livro, porque é a única verificável mecanicamente (o gate confere cada fórmula contra os sourceFiles), renderiza no KaTeX sem tradução e é LaTeX padrão para o gerador. Array vazio é válido para lições sem fórmula.",
+      "items": {
+        "type": "string",
+        "minLength": 3
+      }
+    },
+    "numericExample": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Exemplo verificável à mão (regra 3). `inputs` é praticamente o argumento da função no teste unitário do nível 2, então o custo de virar teste é copiar o objeto em vez de traduzir prosa.",
+      "required": ["description", "inputs", "expected", "sourceRef"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 10
+        },
+        "inputs": {
+          "type": "object",
+          "description": "Parâmetros que alimentam o ml-engine direto (ex: { lr: 0.1, iterations: 3 }).",
+          "additionalProperties": true
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Resultado esperado, curto e conferível, em prosa (`θ = [0.4, 0.7]`)."
+        },
+        "expectedValues": {
+          "type": "array",
+          "description": "Os mesmos números do `expected`, na ordem em que o motor os devolve — é o que o teste compara (nível 2 de verificação). Ausente = exemplo qualitativo, que o gate apenas anota como não verificável automaticamente.",
+          "items": {
+            "type": "number"
+          }
+        },
+        "sourceRef": {
+          "type": "string",
+          "pattern": "^(mml|nndl)-[0-9]+(\\.[0-9]+)*(-[a-z][a-z0-9-]*)?$",
+          "description": "Seção de onde o exemplo foi copiado. Precisa estar em sourceRefs."
+        }
+      }
+    },
+    "completionCriterion": {
+      "type": "string",
+      "minLength": 20,
+      "description": "Como saber que o aluno completou a lição — observável na widget, não em prova."
+    },
+    "estimatedMinutes": {
+      "type": "integer",
+      "minimum": 3,
+      "maximum": 25,
+      "description": "Tempo alvo. Ideal ≤ 15 minutos (checklist humano do PIPELINE.md); 25 é o teto e acima de 15 o validador avisa."
+    },
+    "status": {
+      "enum": ["draft", "generated", "audited", "published"],
+      "description": "Onde a lição está no fluxo. `draft` = só o manifesto; `generated` = conteúdo escrito; `audited` = passou pelos 3 níveis de verificação; `published` = no app."
+    },
+    "knownGaps": {
+      "type": "array",
+      "description": "Buraco conhecido entre o que o manifesto pede e o que a fonte cobre. É o destino do `{ \"gap\": \"…\" }` devolvido pela geração (regra 4). Gap declarado aqui é decidido pelo autor antes de gerar; gap silencioso vira invenção do modelo.",
+      "items": {
+        "type": "string",
+        "minLength": 10
+      }
+    }
+  }
+}

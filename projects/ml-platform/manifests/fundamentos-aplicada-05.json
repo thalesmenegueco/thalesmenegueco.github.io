@@ -1,0 +1,28 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-aplicada-05",
+  "moduleId": "fundamentos-aplicada",
+  "order": 5,
+  "title": "Sandbox: explore sua regressão",
+  "objective": "O aluno experimenta livremente o regressor treinado: muda lr, dataset, initialization, e interere o efeito de cada mudança.",
+  "prerequisites": [
+    "fundamentos-aplicada-02",
+    "fundamentos-aplicada-03",
+    "fundamentos-aplicada-04"
+  ],
+  "sourceRefs": [],
+  "sourceFiles": [],
+  "widget": "LinearRegressionWidget",
+  "widgetConfig": {
+    "mode": "sandbox",
+    "datasetSwitcher": true,
+    "allowAddPoints": true
+  },
+  "keyFormulas": [],
+  "completionCriterion": "O aluno cria um problema impossível de resolver (outliers extremos) e explica (chat, 2 frases) por que o MSE sobe mesmo com a melhor reta.",
+  "estimatedMinutes": 15,
+  "status": "draft",
+  "knownGaps": [
+    "Conceito de outliers não está no MML cap 9 — referência é autônoma (nota embutida na lição)."
+  ]
+}

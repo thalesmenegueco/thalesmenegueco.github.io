@@ -1,0 +1,48 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-aplicada-03",
+  "moduleId": "fundamentos-aplicada",
+  "order": 3,
+  "title": "Learning rate: o parâmetro mais importante",
+  "objective": "O aluno embarca a curva de loss para regimes divergentes vs convergentes e entende por que lr precisa dependir da escala dos dados.",
+  "prerequisites": [
+    "fundamentos-aplicada-02"
+  ],
+  "sourceRefs": [
+    "mml-7.1",
+    "mml-9.2"
+  ],
+  "sourceFiles": [
+    "mml/07-continuous-optimization.md",
+    "mml/09-linear-regression.md"
+  ],
+  "widget": "LinearRegressionWidget",
+  "widgetConfig": {
+    "lr": 0.01,
+    "thetaInit": [
+      0,
+      0
+    ],
+    "showLossCurve": true,
+    "regimesTest": [
+      0.0005,
+      0.001,
+      0.01,
+      0.1
+    ]
+  },
+  "keyFormulas": [],
+  "numericExample": {
+    "description": "Mesmo dataset de casas com lr=0.1 → loss explode; lr=0.001 → converge lento; lr=0.01 → ótimo",
+    "inputs": {
+      "lr": 0.01,
+      "iterations": 50
+    },
+    "expected": "converge em ~50 épocas com MSE < 0.01",
+    "sourceRef": "mml-7.1"
+  },
+  "completionCriterion": "O aluno identifica 3 regimes experimentais e descreve o trade-off qualidade/velocidade.",
+  "estimatedMinutes": 12,
+  "status": "draft",
+  "knownGaps": []
+}

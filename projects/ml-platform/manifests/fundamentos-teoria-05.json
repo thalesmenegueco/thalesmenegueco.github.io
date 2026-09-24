@@ -1,0 +1,63 @@
+{
+  "$schema": "./manifest.schema.json",
+  "lessonId": "fundamentos-teoria-05",
+  "moduleId": "fundamentos-teoria",
+  "order": 5,
+  "title": "O gradiente: para onde a função cresce",
+  "objective": "O aluno entende derivadas parciais e o gradiente ∇f como o vetor apontando na direção de maior crescimento, e a liga com a inclinação visual da superfície.",
+  "prerequisites": [
+    "fundamentos-teoria-02"
+  ],
+  "sourceRefs": [
+    "mml-5.2",
+    "mml-5.3",
+    "mml-5.4"
+  ],
+  "sourceFiles": [
+    "mml/05-derivatives-gradients.md"
+  ],
+  "widget": "GradientWidget",
+  "widgetConfig": {
+    "surface": "paraboloid",
+    "showGradientArrow": true,
+    "samplePoints": [
+      -1.5,
+      -0.5,
+      0.5,
+      1.5
+    ]
+  },
+  "keyFormulas": [
+    "\\nabla_{\\boldsymbol{x}} f = \\frac{df}{d\\boldsymbol{x}} = \\left[ \\frac{\\partial f(\\boldsymbol{x})}{\\partial x_1}, \\, \\frac{\\partial f(\\boldsymbol{x})}{\\partial x_2}, \\, \\dots, \\, \\frac{\\partial f(\\boldsymbol{x})}{\\partial x_n} \\right] \\in \\mathbb{R}^{1 \\times n}",
+    "\\frac{\\partial f(\\boldsymbol{x})}{\\partial x_i} = \\lim_{\\delta x \\to 0} \\frac{f(x_1, \\dots, x_i + \\delta x, \\dots, x_n) - f(x_1, \\dots, x_n)}{\\delta x}",
+    "\\frac{\\partial \\|\\boldsymbol{y} - \\boldsymbol{\\Phi}\\boldsymbol{\\theta}\\|_2^2}{\\partial \\boldsymbol{\\theta}} = -2(\\boldsymbol{y} - \\boldsymbol{\\Phi}\\boldsymbol{\\theta})^\\top \\boldsymbol{\\Phi} \\in \\mathbb{R}^{1 \\times D}"
+  ],
+  "numericExample": {
+    "description": "Gradiente de f(x,y) = x² + y²: em (1,1) vale (2,2); em (0,3) vale (0,6)",
+    "inputs": {
+      "f": "x^2 + y^2",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          3
+        ]
+      ]
+    },
+    "expected": "∇f(1,1) = (2,2); ∇f(0,3) = (0,6)",
+    "expectedValues": [
+      2,
+      2,
+      0,
+      6
+    ],
+    "sourceRef": "mml-5.2"
+  },
+  "completionCriterion": "Na widget, o aluno prever corretamente a direção do gradiente em 3 pontos do parabolóide, confirmando visualmente que aponta para fora do mínimo.",
+  "estimatedMinutes": 14,
+  "status": "draft",
+  "knownGaps": []
+}

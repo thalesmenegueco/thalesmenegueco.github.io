@@ -19,7 +19,10 @@
       "@shared/plotting": ["./libs/shared-plotting/index.ts"],
       "@shared/katex": ["./libs/shared-katex/index.ts"],
       "@shared/progress": ["./libs/shared-progress/index.ts"],
-      "@shared/learning": ["./libs/shared-learning/index.ts"]
+      "@shared/learning": ["./libs/shared-learning/index.ts"],
+      /* Domínio, não infraestrutura: o motor de ML (`@ml/engine`) é o único lib
+         que não é `shared-*`, porque nada nele é infraestrutura genérica. */
+      "@ml/engine": ["./libs/ml-engine/index.ts"]
     }
   },
   "angularCompilerOptions": {

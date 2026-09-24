@@ -6,7 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:headless": "ng test ml-platform --watch=false --browsers=ChromeHeadless",
+    "validate:manifests": "node tools/validate-manifests.mjs",
+    "examples:build": "node tools/build-manifest-examples.mjs"
   },
   "prettier": {
     "overrides": [
