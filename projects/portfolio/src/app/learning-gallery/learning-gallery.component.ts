@@ -17,9 +17,20 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 export class LearningGalleryComponent {
 
   interests: CardItem[] = [
+  // The two cards for the projects themselves carry real screenshots instead of
+  // a borrowed icon: a print of the running product says more in a glance than a
+  // generic glyph, and these are the two worth the space. Both files live in
+  // `public/images/`, the folder `angular.json` actually ships, so they resolve
+  // relative to `<base href="/">` exactly as `icons/visualab.svg` does.
+  //
+  // A screenshot also costs a card something an icon never did: the two prints
+  // are near-square but not square, so `card.scss` puts every card's media in a
+  // square frame — otherwise a 24 px height difference between neighbouring
+  // cards would shift their titles out of line. See the `aspect-ratio` note
+  // there, which is a no-op for the square icons the other cards still use.
   { name: "Sinalize!",
     description: 'Plataforma para Aprender de Libras DE GRAÇA! 📚',
-    image: 'https://www.svgrepo.com/show/489247/global.svg',
+    image: 'images/sinalize-preview.png',
     link: 'https://www.sinalize.org'
   },
   {
@@ -38,14 +49,14 @@ export class LearningGalleryComponent {
   // footer already points back here, so these two are what tie the sites
   // together once Cálculo stops being reachable from this origin.
   //
-  // The icon is a local asset rather than another svgrepo URL: every other card
-  // borrows a remote image, and adding one more dependency for a card about
-  // *this* project seemed like the wrong trade. `public/` is what
-  // `angular.json` actually ships, so this resolves under `<base href="/">`.
+  // Like the Sinalize! card above, this one shows a real screenshot of the
+  // platform rather than the `icons/visualab.svg` glyph it used to carry. That
+  // icon is still shipped and still used as the platform's own favicon-style
+  // mark; it is simply no longer what this card leads with.
   {
     name: "VisuaLab",
     description: 'Cursos interativos de exatas: entenda explorando, aplique em problemas reais 📐',
-    image: 'icons/visualab.svg',
+    image: 'images/visualab-preview.png',
     link: PLATFORM_LINKS.hub
   }
 ];

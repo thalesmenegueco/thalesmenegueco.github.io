@@ -829,7 +829,7 @@ Gate: `ng build ml-platform` succeeds; the shell chunk contains no `katex`/`echa
    > **Both stubs and the removal itself must not precede the platform's first
    > deploy** — see Phase 3 hazard H2. That is satisfied: production has been
    > serving since before Phase 3, and it is what answers at `www.visualab.dev`.
-4. ~~Cross-link: add a card in `learning-gallery.component.ts`.~~ — **done**, a "VisuaLab" entry in `interests: CardItem[]` whose link reads from `PLATFORM_LINKS.hub`. Its icon is a **local** asset (`public/icons/visualab.svg`) rather than another svgrepo URL: every other card borrows a remote image, and adding one more external dependency for the card about this very project seemed like the wrong trade. The platform half — "Feito por Thales Menegueço" in its footer, linking back here — **landed early in Phase 3 (`1075e01`)**, because that footer was being written then and writing it twice would have been silly.
+4. ~~Cross-link: add a card in `learning-gallery.component.ts`.~~ — **done**, a "VisuaLab" entry in `interests: CardItem[]` whose link reads from `PLATFORM_LINKS.hub`. Its image was originally a **local** asset (`public/icons/visualab.svg`) rather than another svgrepo URL, on the grounds that adding one more external dependency for the card about this very project was the wrong trade. It has since been replaced by a real screenshot — see § *Card previews* below — which keeps that local-asset property while saying far more about the product than a glyph ever did. The platform half — "Feito por Thales Menegueço" in its footer, linking back here — **landed early in Phase 3 (`1075e01`)**, because that footer was being written then and writing it twice would have been silly.
 5. ~~Opportunistic cleanup while touching these files.~~ — **done** (`75aea4a`).
    - `src/app/app.module.ts` deleted, after confirming by grep that nothing referenced `AppModule`.
    - `app-routing.module.ts` → `app.routes.ts` via `git mv` (history follows the file), with the `@NgModule` wrapper and a stale commented-out header block removed, and `app.config.ts` re-pointed at `./app.routes`.
@@ -856,6 +856,56 @@ Gate: every old URL resolves to something sensible (real content or a redirect);
 > ever needs to come down again, those two are the first candidates to move behind
 > `loadComponent` — with the trade-off that a lazy stub buys a network round trip
 > before a redirect, on exactly the URLs that most want to be instant.
+
+#### Card previews — the two flagship cards show screenshots, not icons
+
+A post-migration change to the same gallery, recorded here because it edits an
+asset decision Phase 4 made deliberately (step 4 above).
+
+The projects are the most valuable thing the portfolio shows, and a screenshot of
+the running product argues for it in a way a 24 px glyph cannot. So the two cards
+about the projects themselves now lead with a print:
+
+| Card | Image | Was |
+|---|---|---|
+| Sinalize! | `public/images/sinalize-preview.png` (738×690) | a remote svgrepo `global.svg` |
+| VisuaLab | `public/images/visualab-preview.png` (407×437) | the local `icons/visualab.svg` |
+
+Both live in `projects/portfolio/public/images/`, the folder `angular.json`
+actually ships, so they resolve under `<base href="/">` — the same property the
+VisuaLab card was chosen for in Phase 4, kept. The two `Sinal Fala` and `Lab de
+Ferramentas` cards keep their borrowed icons, unchanged. (`icons/visualab.svg`
+is still shipped; it is simply no longer what that card leads with.)
+
+**The one thing a screenshot costs, and the fix.** The prints are near-square but
+not square (0.93 and 1.07), and `.flex-cards` stretches its cards to a common
+height while each card centres its own content — so a ~24 px media-height
+difference between neighbours would push their titles out of line. `.group-card
+img` therefore gets `aspect-ratio: 1 / 1; object-fit: contain`. That is a **no-op
+for every other card**: their icons are square (24×24 and 120×120 local viewBoxes,
+800×800 from svgrepo), and a 1:1 source in a 1:1 frame lays out identically.
+`contain` rather than `cover` because cropping a screenshot cuts the edges that
+make it recognisable; the letterboxing it leaves instead is under 4% of one axis
+against the card's own surface.
+
+Measured in a real browser (headless Chrome over CDP, against the production
+build) rather than assumed:
+
+| Check | Result |
+|---|---|
+| All four cards' images load | ✅ `naturalWidth > 0` for each |
+| Media boxes | ✅ every card `170×170`, `object-fit: contain`, `aspect-ratio: 1 / 1` |
+| Titles aligned in a row | ✅ at 1920 px all four cards share `titleTop = 445`; at 1440 px the three that fit share it and the fourth wraps |
+| Square icons unchanged | ✅ svgrepo icons report 800×800 and lay out exactly as before |
+
+**And a test, because a bad asset path is invisible to every other gate.**
+`learning-gallery.component.spec.ts` now loads each locally-referenced card image
+through `new Image()`. A mistyped path compiles, type-checks, builds and deploys
+cleanly, and the visitor gets a broken image on the portfolio's most valuable
+surface; Karma already serves the app's `assets`, so the check is real. Verified
+to have teeth by temporarily breaking the path — the suite fails with `card image
+did not load: images/sinalize-preview-TYPO.png`, and passes once restored.
+`portfolio` tests: **206 → 207**.
 
 ### Phase 5 — Deploy split
 

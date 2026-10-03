@@ -32,6 +32,19 @@
 
 .group-card img {
   width: 80%;
+  // Every card's media occupies a square box. For the square icons most cards
+  // still use this changes nothing — a 1:1 source in a 1:1 frame lays out
+  // identically — and for the two project screenshots it is what keeps a row of
+  // cards even: the prints are near-square but not square (0.93 and 1.07), which
+  // at this width is a ~24 px height difference, and `.flex-cards` stretches its
+  // cards to a common height, so that difference would push the neighbouring
+  // titles out of line.
+  //
+  // `contain` rather than `cover`: cropping a product screenshot cuts the edges
+  // that make it recognisable, and the letterboxing it leaves instead is under
+  // 4% of one axis, against the card's own surface.
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
   height: auto;
   margin: 20px;
 }
