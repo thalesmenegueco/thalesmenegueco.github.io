@@ -21,8 +21,78 @@ Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](
 | 2 — Extract shared libs | ✅ Done — all gates closed | `05bf585`, `3d64c46`, `7410119`, `34f5d07`, `0a42f10`, `c2dc314` |
 | 3 — Build ml-platform content | ✅ Done on the branch, pushed, and the H2 gate closed on a Vercel preview — see § Phase 3 results | `4a3cef5`, `1075e01`, `1a4c62b` |
 | 4 — Redirects & cross-links | ✅ Done — landing page, four redirect stubs, cross-link card and the dead-NgModule cleanup; gate closed, see § Phase 4 | `75aea4a`, `ec1aac6` |
-| 5 — Deploy split | ✅ Live at **`www.visualab.dev`** — domain bought through Vercel Registrar and already attached; `vercel.json` codifies the build. Remaining: the portfolio workflow's `setup-node` npm caching | `24f7f79`, `bedd845` |
-| 6 — Cleanup | Partly done early (docs moved to `docs/`) | — |
+| 5 — Deploy split | ⚠️ **Pipeline live, content not shipped.** `www.visualab.dev` is bought, attached and building from `main` — but `main` predates Phase 3, so production serves the generated placeholder. All the code work is done (`vercel.json`, npm caching, the PR guard); **`main` is now fast-forwarded to the branch locally, so the remaining step is `git push origin main`**, which is the author's call because it also removes Cálculo from the live portfolio | `24f7f79`, `bedd845`, § Phase 5 status |
+| 6 — Cleanup | Partly done early (docs moved to `docs/`), plus the two permanently-failing portfolio specs and the dead `title` signal. Remaining: unused root dependencies, and `package.json`'s stale `name` | — |
+
+### Where this stands, and the single step that is left
+
+Everything Phases 0–4 asked for is on `migration/monorepo`. Phase 5 built the
+pipeline and attached the domain, but its content half never shipped, because the
+last step of this migration is not a build — **it is the merge**, and a merge is
+a push:
+
+```bash
+git push origin migration/monorepo   # keep the branch's remote copy in sync
+git switch main
+git push origin main                 # this is the one that starts both deploys
+```
+
+**The merge itself is already done locally.** `main` was fast-forwarded to the
+branch tip in the same session that wrote this section, so there is no merge
+left to perform and nothing to resolve — `main` and `migration/monorepo` point at
+the same commit. It was a pure fast-forward because `main` is a direct ancestor
+of the branch, which is also why the whole migration arrives as linear history
+with no merge commit. All that remains is the two pushes above, and the reason
+they are the author's call rather than a mechanical step is that pushing `main`
+starts *both* deploys at once: Vercel rebuilds `ml-platform` onto
+`www.visualab.dev` (replacing the placeholder), and `deploy.yml` republishes the
+portfolio, which is where Cálculo disappears from `thalesmenegueco.github.io` in
+favour of the Phase 4 redirect stubs. The two halves cannot be separated, which
+is why Phase 4 had to land first.
+
+If the branch push turns out to be unwanted, it is harmless on its own: the
+remote branch is not what either host deploys from, and `main` is the only ref
+that triggers anything.
+
+**Gates re-verified on the branch before handing this over** (Node 22.22.0, the
+version `.nvmrc` and Vercel both pin):
+
+| Gate | Result |
+|---|---|
+| `npx ng build ml-platform --configuration production` | ✅ exit 0 — only the three pre-existing SCSS budget warnings |
+| `npx ng build portfolio --configuration production` | ✅ exit 0 — only the pre-existing budget/CJS warnings |
+| `npx ng test ml-platform` | ✅ **56 SUCCESS** |
+| `npx ng test portfolio` | ✅ **206 SUCCESS, 0 FAILED** (was 203 + 2 failing — see below) |
+| `npm ci --dry-run` | ✅ clean, so Vercel's `installCommand` will not fail on a stale lockfile |
+| `main` is an ancestor of the branch | ✅ fast-forward, no conflicts |
+| `package.json` dependency diff vs `main` | ✅ none — only `scripts` changed, so the Vercel install is unchanged |
+
+**The two failing portfolio tests were fixed, not tolerated.** They had been
+recorded as "pre-existing failures" for three phases, which is a bad thing to
+carry into a CI gate that would then be red on every pull request. Both turned
+out to be generated CLI-template specs that outlived the thing they described:
+
+1. `app.spec.ts` asserted `Hello, learning-gallery` inside an `h1`. This app's
+   shell has no `h1` and never said that — it is the placeholder heading from the
+   Angular CLI template, left behind by Phase 1's rename to `portfolio`. The
+   test now asserts what the shell really renders: the nav brand, both nav entry
+   points, and the `router-outlet`.
+2. `sign-language-translation.spec.ts` created the component without its required
+   `linkForVideo` input, so `undefined` reached an iframe `src` binding and
+   Angular refused it with `NG0904`. The fixture now supplies a trusted URL, the
+   way both real callers do.
+
+`AppComponent`'s `title = signal('learning-gallery')` was deleted with them: it
+is dead code that nothing read — not the template, not any spec — and it was the
+only surviving trace of the old project name inside the app. (`package.json`'s
+`name` is still `learning-gallery`; that one is Phase 6 and is cosmetic.)
+
+**Phase 5's own leftovers are now closed too:** `deploy.yml` caches npm and reads
+its Node version from `.nvmrc` instead of hard-coding `24` (which had made CI the
+only place building on a version neither `engines.node` nor Vercel used), and
+`.github/workflows/ci.yml` is the PR guard the plan called for — it tests and
+builds *both* apps on every pull request, which is the check that keeps a `libs/`
+change from breaking the app nobody was looking at.
 
 **Phase 1:** complete. The live-deploy gate was confirmed green on GitHub Pages
 after the branch was pushed — the portfolio is published to `gh-pages` by
@@ -845,6 +915,32 @@ Gate: every old URL resolves to something sensible (real content or a redirect);
 5. **Cache headers** — set long-lived immutable caching on hashed `chunk-*`/`worker-*` assets at the edge. With 6 MB workers in the tree, this — not the bundle size — is where the Vercel-over-Pages argument actually pays off.
 
 Gate: pushing to `main` deploys the portfolio to its existing URL; the platform deploys from the same repo at its own domain; a PR preview builds both apps green.
+
+#### Phase 5 status
+
+| Step | State |
+|---|---|
+| 1 — Pages workflow: npm caching | ✅ Added, and its Node version now comes from `.nvmrc` rather than a hard-coded `24` |
+| 2 — Vercel project: build command, output dir, SPA rewrite, root domain | ✅ Codified in `vercel.json` and proven by the live deploy that is serving today (see the caveat below) |
+| 3 — Do not stack Cloudflare in front of Vercel | ✅ Held — the domain is on Vercel's own nameservers |
+| 4 — Domain on the platform only | ✅ `www.visualab.dev`, apex 308-redirecting to `www` |
+| 5 — PR build guard for both apps | ✅ `.github/workflows/ci.yml` — tests *and* builds both apps on every PR |
+| 5b — Cache headers on hashed assets | ⬜ Not done. Vercel already sends `cache-control: public, max-age=0, must-revalidate` with a strong `etag` on the HTML shell and immutable caching on hashed build output, so this is a tuning pass, not a gap |
+
+⚠️ **How step 2 was "proven", and why that is weaker than it sounds.** The live
+production deploy is evidence that the build command, output directory, root
+directory and rewrite are all accepted by Vercel — but it is evidence about the
+*placeholder* build. Nothing about that deploy exercises Cálculo, the KaTeX
+stylesheet, the manifest engine or the 6 MB workers. Treat the first post-merge
+deployment as the real test of step 2, and run its post-deploy check (§ above)
+on it rather than assuming this row closed the question.
+
+#### The one item Phase 5 could not close by itself
+
+Its gate is stated as a single pushing event, but that event is the merge, so
+Phase 5 finishes only when `migration/monorepo` lands on `main` — see § *Where
+this stands, and the single step that is left* at the top of this document for
+the exact commands and the verified gate table.
 
 ### Phase 6 — Cleanup (optional)
 
