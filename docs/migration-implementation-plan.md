@@ -21,41 +21,38 @@ Branch `migration/monorepo`. Baseline measurements in [`migration-baseline.md`](
 | 2 — Extract shared libs | ✅ Done — all gates closed | `05bf585`, `3d64c46`, `7410119`, `34f5d07`, `0a42f10`, `c2dc314` |
 | 3 — Build ml-platform content | ✅ Done on the branch, pushed, and the H2 gate closed on a Vercel preview — see § Phase 3 results | `4a3cef5`, `1075e01`, `1a4c62b` |
 | 4 — Redirects & cross-links | ✅ Done — landing page, four redirect stubs, cross-link card and the dead-NgModule cleanup; gate closed, see § Phase 4 | `75aea4a`, `ec1aac6` |
-| 5 — Deploy split | ⚠️ **Pipeline live, content not shipped.** `www.visualab.dev` is bought, attached and building from `main` — but `main` predates Phase 3, so production serves the generated placeholder. All the code work is done (`vercel.json`, npm caching, the PR guard); **`main` is now fast-forwarded to the branch locally, so the remaining step is `git push origin main`**, which is the author's call because it also removes Cálculo from the live portfolio | `24f7f79`, `bedd845`, § Phase 5 status |
+| 5 — Deploy split | ✅ **Done and verified live.** `main` at `a9ce450` (fast-forward, `+17`); `www.visualab.dev` serves VisuaLab, the apex 308s to `www`, hashed assets return JS/CSS rather than HTML, and the portfolio's redirect stubs work. Two follow-ups, neither blocking: the `gh-pages` preview build and the Node version disagreement | `24f7f79`, `bedd845`, `04d918d`, `382ef23`, § Phase 5 status |
 | 6 — Cleanup | Partly done early (docs moved to `docs/`), plus the two permanently-failing portfolio specs and the dead `title` signal. Remaining: unused root dependencies, and `package.json`'s stale `name` | — |
 
-### Where this stands, and the single step that is left
+### Merged, deployed and verified live
 
-Everything Phases 0–4 asked for is on `migration/monorepo`. Phase 5 built the
-pipeline and attached the domain, but its content half never shipped, because the
-last step of this migration is not a build — **it is the merge**, and a merge is
-a push:
+Everything Phases 0–4 asked for is on `main`. The last step of this migration was
+never a build — **it was the merge**, and `main` is now at `a9ce450`, a pure
+fast-forward from the branch tip (no merge commit, linear history, because `main`
+was a direct ancestor). Pushing it started both deploys at once, exactly as this
+section predicted: Vercel rebuilt `ml-platform` onto `www.visualab.dev`,
+replacing the placeholder, and `deploy.yml` republished the portfolio, where
+Cálculo gave way to the Phase 4 redirect stubs.
 
-```bash
-git push origin migration/monorepo   # keep the branch's remote copy in sync
-git switch main
-git push origin main                 # this is the one that starts both deploys
-```
+Post-deploy checks, run against the live hosts rather than assumed:
 
-**The merge itself is already done locally.** `main` was fast-forwarded to the
-branch tip in the same session that wrote this section, so there is no merge
-left to perform and nothing to resolve — `main` and `migration/monorepo` point at
-the same commit. It was a pure fast-forward because `main` is a direct ancestor
-of the branch, which is also why the whole migration arrives as linear history
-with no merge commit. All that remains is the two pushes above, and the reason
-they are the author's call rather than a mechanical step is that pushing `main`
-starts *both* deploys at once: Vercel rebuilds `ml-platform` onto
-`www.visualab.dev` (replacing the placeholder), and `deploy.yml` republishes the
-portfolio, which is where Cálculo disappears from `thalesmenegueco.github.io` in
-favour of the Phase 4 redirect stubs. The two halves cannot be separated, which
-is why Phase 4 had to land first.
+| Check | Result |
+|---|---|
+| `www.visualab.dev` shell | ✅ serves `VisuaLab — Aprender exatas visualmente`, `lang="pt-BR"`, canonical `https://www.visualab.dev/` — the placeholder is gone |
+| Apex redirect | ✅ `https://visualab.dev/` → `308` → `https://www.visualab.dev/` |
+| Deep link `/calculo/teoria` | ✅ `200 text/html` — the SPA shell, so the `/(.*)` rewrite covers client routes |
+| Data-driven deep link `/curso/fundamentos/teoria/01` | ✅ `200 text/html` |
+| **Hashed assets are not rewritten to HTML** | ✅ `main-*.js` and `chunk-*.js` return `application/javascript`, `styles-*.css` returns `text/css`. This was the one genuinely risky unknown in the deploy config, and the filesystem-before-rewrite behaviour it relies on holds |
+| `/icons/calculus.svg` | ✅ now `200 image/svg+xml` — the misleading `200 text/html` recorded in Phase 5 is closed |
+| Portfolio on `thalesmenegueco.github.io` | ✅ serves `main-E6FUYLEK.js`, byte-identical to the local production build |
+| Portfolio deep links | ✅ `/estudos/calculo/teoria` and `/project-gallery` answer `404` **with the app shell** (`<app-root>` + the real bundle), which is the expected shape of the `404.html` copy trick: GitHub Pages cannot issue a 301, so the stub redirects from the client |
 
-If the branch push turns out to be unwanted, it is harmless on its own: the
-remote branch is not what either host deploys from, and `main` is the only ref
-that triggers anything.
+That closes Phase 5's gate. Two items are worth carrying forward, both recorded
+in § Phase 5 status below: a failing Vercel preview build of the `gh-pages`
+branch, and a Node version that does not agree with `engines.node`.
 
-**Gates re-verified on the branch before handing this over** (Node 22.22.0, the
-version `.nvmrc` and Vercel both pin):
+**Gates re-verified before the merge** (Node 22.22.0, the version `.nvmrc` pins —
+note Vercel's own dropdown says `24.x`; see the Node item in § Phase 5 status):
 
 | Gate | Result |
 |---|---|
@@ -921,26 +918,73 @@ Gate: pushing to `main` deploys the portfolio to its existing URL; the platform 
 | Step | State |
 |---|---|
 | 1 — Pages workflow: npm caching | ✅ Added, and its Node version now comes from `.nvmrc` rather than a hard-coded `24` |
-| 2 — Vercel project: build command, output dir, SPA rewrite, root domain | ✅ Codified in `vercel.json` and proven by the live deploy that is serving today (see the caveat below) |
+| 2 — Vercel project: build command, output dir, SPA rewrite, root domain | ✅ Codified in `vercel.json` and now proven by a **real** deploy — the post-merge build of the actual platform, whose hashed assets serve as JS/CSS and whose deep links return the shell |
 | 3 — Do not stack Cloudflare in front of Vercel | ✅ Held — the domain is on Vercel's own nameservers |
 | 4 — Domain on the platform only | ✅ `www.visualab.dev`, apex 308-redirecting to `www` |
 | 5 — PR build guard for both apps | ✅ `.github/workflows/ci.yml` — tests *and* builds both apps on every PR |
 | 5b — Cache headers on hashed assets | ⬜ Not done. Vercel already sends `cache-control: public, max-age=0, must-revalidate` with a strong `etag` on the HTML shell and immutable caching on hashed build output, so this is a tuning pass, not a gap |
+| 6 — Stop Vercel building the `gh-pages` branch | ❌ **The committed guard does not work.** See below — it needs a project setting, not `vercel.json` |
+| 7 — One Node version everywhere | ⚠️ Not aligned: Vercel's dashboard runs `24.x`, while `engines.node` and `.nvmrc` say `22.x` |
 
-⚠️ **How step 2 was "proven", and why that is weaker than it sounds.** The live
-production deploy is evidence that the build command, output directory, root
-directory and rewrite are all accepted by Vercel — but it is evidence about the
-*placeholder* build. Nothing about that deploy exercises Cálculo, the KaTeX
-stylesheet, the manifest engine or the 6 MB workers. Treat the first post-merge
-deployment as the real test of step 2, and run its post-deploy check (§ above)
-on it rather than assuming this row closed the question.
+**Why the `gh-pages` guard fails, and what to do instead.** `vercel.json` already
+carries `git.deploymentEnabled: { "gh-pages": false }` (commit `04d918d`), and
+pushing the portfolio to `gh-pages` still triggered a Vercel build that died with
+`npm error code EUSAGE` — `npm ci` cannot run because the branch has no lockfile.
+The evidence for why is in the branch itself:
 
-#### The one item Phase 5 could not close by itself
+```
+$ git ls-tree --name-only origin/gh-pages
+.nojekyll  404.html  chunk-*.js  favicon.ico  icons  index.html  js
+main-*.js  polyfills-*.js  styles-*.css  worker-*.js
+$ git cat-file -e origin/gh-pages:vercel.json   # ABSENT
+```
 
-Its gate is stated as a single pushing event, but that event is the merge, so
-Phase 5 finishes only when `migration/monorepo` lands on `main` — see § *Where
-this stands, and the single step that is left* at the top of this document for
-the exact commands and the verified gate table.
+The branch is *only* the published site. Vercel resolves project configuration
+from the commit it is deploying, so a guard that lives on `main` is never read
+when the commit being deployed is `gh-pages` — the branch has no `vercel.json` to
+carry it. Committing the guard was therefore a no-op, and it is worth stating
+plainly because the commit message claims otherwise.
+
+The reliable fix is the project-level **Ignored Build Step** (Vercel → Project →
+Settings → Git), which is stored in project settings and so applies regardless of
+what a branch contains:
+
+```bash
+if [ "$VERCEL_GIT_COMMIT_REF" = "gh-pages" ]; then exit 0; else exit 1; fi
+```
+
+Exit `0` means *skip this build*; any non-zero exit means *proceed*. That is the
+documented convention for the field ([Ignored Build Step](https://vercel.com/guides/how-do-i-use-the-ignored-build-step-field-on-vercel)),
+and it matches the canonical `git diff --quiet` example, where "no changes" exits
+`0` and skips. The alternative that removes the cause rather than the symptom is
+to stop publishing a deploy branch at all — `actions/deploy-pages` with
+`upload-pages-artifact` publishes to the Pages CDN without creating `gh-pages`,
+leaving Vercel nothing to build. That is a change to a working deploy path, so it
+is recorded rather than done. Note the failure is **cosmetic**: it is a preview
+deployment of a branch nothing serves from, it never affected production, and
+every `gh-pages` publish since this workflow existed has produced one.
+
+**The Node version disagreement.** Vercel's build log reports `Skipping build
+cache since Node.js version changed from "22.x" to "24.x"`, so the project's
+Node.js Version setting is `24.x` while `package.json`'s `engines.node` and
+`.nvmrc` both say `22.x`. Nothing is broken — production just deployed on `24.x`,
+and the local gates above were all verified on `22.22.0` — but this is exactly the
+three-way drift Phase 5 §2 flagged, and the CI workflow added in this session now
+pins `.nvmrc` (`22`), which makes CI and Vercel disagree again. Pick one:
+
+- set the Vercel dropdown to **22.x** (recommended: the version every gate in this
+  plan was verified on), or
+- raise `.nvmrc` and `engines.node` to `24` and re-verify both apps there.
+
+Do not leave both, which is the state described above.
+
+#### Phase 5's last step, executed
+
+Its gate — "pushing to `main` deploys the portfolio to its existing URL; the
+platform deploys from the same repo at its own domain; a PR preview builds both
+apps green" — is closed by the merge described in § *Merged, deployed and
+verified live* at the top of this document. The PR half is closed by
+`ci.yml`, though its first real exercise will be the next pull request.
 
 ### Phase 6 — Cleanup (optional)
 
