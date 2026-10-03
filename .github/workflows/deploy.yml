@@ -19,7 +19,14 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '24'
+        # Read from `.nvmrc` rather than repeating a version here. This workflow
+        # used to hard-code `24`, while `package.json`'s `engines.node` and
+        # `.nvmrc` both say 22 — and Vercel builds the platform on the pinned 22.
+        # That is three places to keep in sync, and the drift was already real:
+        # CI was the only place building on 24. One file now governs all of them.
+        node-version-file: '.nvmrc'
+        # `npm ci` was re-downloading every dependency on every deploy.
+        cache: 'npm'
 
     - name: Install dependencies
       run: npm ci
