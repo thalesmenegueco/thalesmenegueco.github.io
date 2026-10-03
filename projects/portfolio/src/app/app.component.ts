@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -8,6 +8,14 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  protected readonly title = signal('learning-gallery');
-}
+/**
+ * The portfolio's shell: a nav, the routed surface, and a footer.
+ *
+ * It has no `title` field. The generated component carried
+ * `title = signal('learning-gallery')`, but nothing ever read it — not this
+ * app's template, not any spec — so after Phase 1 renamed the project to
+ * `portfolio` it was only a stale string kept alive by a test asserting the
+ * placeholder `Hello, learning-gallery` heading. Both are gone now, and
+ * `app.spec.ts` asserts the shell that actually renders.
+ */
+export class AppComponent {}
