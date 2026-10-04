@@ -74,26 +74,71 @@
 
 ---
 
-## mml-6.4.6 — Geometria de Variáveis Aleatórias e Mudança de Variáveis (Seções 6.4.6 e 6.7)
+## mml-6.4.6 — Produto Interno de Variáveis Aleatórias (Inner Products of Random Variables)
 
-* **(a) Definições Formais e Notação Exata:**
-  * **Espaço Vetorial de V.A.s (Seção 6.4.6):** Para V.A.s com média zero, o **produto interno** é definido como \\(\langle X, Y \rangle := \text{Cov}[x, y]\\).
-  * **Norma Induzida:** \\(\|X\| = \sqrt{\text{Cov}[x, x]} = \sqrt{\mathbb{V}[x]} = \sigma[x]\\) (o desvio padrão é o comprimento do vetor).
-  * **Ângulo Entre V.A.s:** \\(\cos \theta = \frac{\langle X, Y \rangle}{\|X\|\|Y\|} = \frac{\text{Cov}[x, y]}{\sigma[x]\sigma[y]} = \text{corr}[x, y]\\).
-  * **Mudança de Variáveis em Densidades (Teorema 6.16):** Para uma transformação bijetiva e diferenciável \\(\boldsymbol{y} = \boldsymbol{U}(\boldsymbol{x})\\), a pdf de \\(\boldsymbol{Y}\\) é dada por:
-    \\[f_Y(\boldsymbol{y}) = f_X(\boldsymbol{U}^{-1}(\boldsymbol{y})) \cdot \left| \det \left( \frac{d\boldsymbol{U}^{-1}(\boldsymbol{y})}{d\boldsymbol{y}} \right) \right|\\]
-* **(b) Intuição Geométrica:**
-  * **Geometria de V.A.s:** Variáveis aleatórias funcionam como vetores geométricos. Duas V.A.s não correlacionadas (\\(\text{Cov}[x, y] = 0\\)) são **ortogonais** (\\(\theta = 90^\circ, \cos \theta = 0\\)). Para V.A.s ortogonais, a soma das variâncias obedece estritamente ao **Teorema de Pitágoras**: \\(\mathbb{V}[x + y] = \mathbb{V}[x] + \mathbb{V}[y]\\).
-  * **Mudança de Variáveis:** O valor absoluto do determinante da matriz Jacobiana \\(|\det(\boldsymbol{J})|\\) atua como um fator de ajuste/escala de volume local que estica ou comprime o espaço para garantir que a massa total de probabilidade continue somando \\(1\\) após a transformação não-linear.
-* **(c) Exemplo Numérico em 2D:**
-  Seja \\(\boldsymbol{X} \sim \mathcal{N}(\mathbf{0}, \boldsymbol{I}_2)\\) e uma transformação linear \\(\boldsymbol{Y} = \boldsymbol{A}\boldsymbol{X}\\) com \\(\boldsymbol{A} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}\\) (Exemplo 6.17). Como \\(\boldsymbol{X} = \boldsymbol{A}^{-1}\boldsymbol{Y}\\), o determinante da Jacobiana inversa é \\(\left|\det\left(\frac{\partial \boldsymbol{A}^{-1}\boldsymbol{y}}{\partial \boldsymbol{y}}\right)\right| = |ad - bc|^{-1}\\), resultando na densidade transformada de uma Gaussiana com covariância \\(\boldsymbol{\Sigma} = \boldsymbol{A}\boldsymbol{A}^\top\\).
-* **(d) Aplicação nos Modelos (ML):**
-  * Base teórica para transformações de distribuições em modelos gerativos profundos (*Normalizing Flows* e *Reparametrization Trick* em VAEs).
-  * A ortogonalidade entre o erro de previsão \\(\epsilon\\) e as variáveis explicativas na **Regressão Linear** reflete a falta de correlação geométrica.
-* **(e) Fórmulas Relevantes:**
-  * Produto interno probabilístico: \\(\langle X, Y \rangle = \text{Cov}[x, y]\\)
-  * Teorema de Pitágoras de Variâncias: \\(\mathbb{V}[x + y] = \mathbb{V}[x] + \mathbb{V}[y] \iff \text{Cov}[x, y] = 0\\)
-  * Fórmula de Mudança de Variáveis: \\(f_Y(\boldsymbol{y}) = f_X(\boldsymbol{A}^{-1}\boldsymbol{y}) |\det(\boldsymbol{A})|^{-1}\\)
+**(a) Definição / Conceito Central:**
+Variáveis aleatórias podem ser consideradas vetores em um espaço vetorial (*vector space*). Para variáveis aleatórias com média zero (\\( \mathbb{E}[X] = 0, \mathbb{E}[Y] = 0 \\)), pode-se definir um produto interno (*inner product*) utilizando a covariância:
+\\[ \langle X, Y \rangle := \text{Cov}[x, y] \\]
+Esta definição satisfaz as propriedades de um produto interno: é simétrica, definida positiva (para variáveis não determinísticas) e linear em relação a ambos os argumentos.
+
+**(b) Formulação Matemática:**
+- **Produto Interno (*Inner Product*):** \\( \langle X, Y \rangle = \text{Cov}[x, y] \\)
+- **Norma / Comprimento (*Length / Norm*):** O comprimento de uma variável aleatória é dado pela raiz quadrada de sua variância, isto é, o seu desvio padrão (*standard deviation*):
+\\[ \|X\| = \sqrt{\langle X, X \rangle} = \sqrt{\text{Cov}[x, x]} = \sqrt{\text{V}[x]} = \sigma[x] \\]
+Variáveis aleatórias "mais longas" possuem maior incerteza; uma variável com comprimento zero é determinística.
+- **Ângulo e Correlação (*Angle and Correlation*):** O cosseno do ângulo \\( \theta \\) entre duas variáveis aleatórias \\( X \\) e \\( Y \\) corresponde à correlação (*correlation*) entre elas:
+\\[ \cos \theta = \frac{\langle X, Y \rangle}{\|X\| \|Y\|} = \frac{\text{Cov}[x, y]}{\sqrt{\text{V}[x]\text{V}[y]}} = \text{corr}[x, y] \\]
+
+**(c) Derivação e Relação Geométrica:**
+- **Ortogonalidade e Não-Correlacionamento:** Duas variáveis aleatórias são ortogonais (\\( X \perp Y \iff \langle X, Y \rangle = 0 \\)) se e somente se sua covariância for nula (\\( \text{Cov}[x, y] = 0 \\)), ou seja, se forem não-correlacionadas.
+- **Teorema de Pitágoras para Variâncias:** Para duas variáveis não-correlacionadas, a variância da soma equivale à soma das variâncias:
+\\[ \text{V}[x + y] = \text{V}[x] + \text{V}[y] \\]
+Geometricamente, isso corresponde ao Teorema de Pitágoras (\\( c^2 = a^2 + b^2 \\)) para triângulos retângulos no espaço vetorial de variáveis aleatórias.
+
+**(d) Distâncias entre Distribuições e Geometria da Informação:**
+- **Inadequação da Distância Euclidiana:** A distância euclidiana simples não é ideal para comparar distribuições de probabilidade devido às restrições de que as densidades/massas devem ser não-negativas e somar 1.
+- **Variedade Estatística (*Statistical Manifold*):** Essas restrições fazem com que as distribuições de probabilidade habitem um espaço geométrico chamado variedade estatística (*statistical manifold*), estudado pela **geometria da informação** (*information geometry*).
+- **Divergências:** O cálculo de distâncias em variedades estatísticas é realizado por meio de divergências, notadamente a **divergência de Kullback–Leibler** (*Kullback–Leibler divergence*), que é um caso especial de divergências de Bregman (*Bregman divergences*) e \\( f \\)-divergências (*f-divergences*).
+
+**(e) Propriedades e Aplicações em Machine Learning:**
+- **Regressão e PCA:** A interpretação de variáveis aleatórias como vetores e normas como desvios fundamenta a projeção ortogonal na Regressão Linear (MML Capítulo 9) e a busca por direções de variância máxima no PCA (MML Capítulo 10).
+- **Inferência Variacional e Estimação de Densidade:** A divergência de Kullback–Leibler e a geometria da informação reaparecem diretamente ao mensurar a diferença entre distribuições reais e aproximadas em modelos probabilísticos e misturas de Gaussianas (MML Capítulo 11).
+
+---
+
+## mml-6.7 — Mudança de Variáveis / Transformada Inversa (Change of Variables/Inverse Transform)
+
+**(a) Definição / Conceito Central:**
+A técnica de mudança de variáveis (*change of variables*) e a transformada inversa (*inverse transform*) fornecem métodos formais para determinar a distribuição de probabilidade de uma nova variável aleatória \\( Y = U(X) \\) obtida a partir de uma transformação da variável \\( X \\).
+
+**(b) Formulação Matemática:**
+- **Técnica da Função de Distribuição (*Distribution Function Technique*):**
+  1. Encontra-se a função de distribuição acumulada - FDA (*cumulative distribution function* - CDF) de \\( Y \\):
+  \\[ F_Y(y) = P(Y \leqslant y) = P(U(X) \leqslant y) \\]
+  2. Diferencia-se a FDA para obter a função densidade de probabilidade - FDP (*probability density function* - PDF):
+  \\[ f(y) = \frac{\text{d}}{\text{d}y} F_Y(y) \\]
+- **Fórmula de Mudança de Variável Univariada (*Univariate Change of Variables*):** Para uma função invertível \\( U \\):
+\\[ f(y) = f_x(U^{-1}(y)) \cdot \left| \frac{\text{d}}{\text{d}y} U^{-1}(y) \right| \\]
+- **Fórmula de Mudança de Variável Multivariada (*Multivariate Change of Variables* - Teorema 6.16):** Para \\( \boldsymbol{y} = U(\boldsymbol{x}) \\) diferenciável e invertível:
+\\[ f(\boldsymbol{y}) = f_x(U^{-1}(\boldsymbol{y})) \cdot \left| \det\left( \frac{\partial}{\partial \boldsymbol{y}} U^{-1}(\boldsymbol{y}) \right) \right| \\]
+
+**(c) Derivação Matemática e Relações:**
+- **Regra de Substituição e Teorema Fundamental do Cálculo:** A derivação fundamenta-se na regra de substituição do cálculo integral \\( \int f(g(x))g'(x)\text{d}x = \int f(u)\text{d}u \\) e na diferenciação de integrais com limites variáveis.
+- **Fator de Escala Jacobiano:** O termo diferencial \\( \left| \frac{\text{d}}{\text{d}y} U^{-1}(y) \right| \\) no caso univariado ou o valor absoluto do determinante Jacobiano (*Jacobian determinant*) \\( \left| \det(J) \right| \\) no caso multivariado mede o quanto um volume ou área unitária se expande ou contrai ao aplicar a transformação \\( U \\).
+- **Transformada Integral de Probabilidade (*Probability Integral Transform* - Teorema 6.15):** Se \\( X \\) é uma variável contínua com FDA estritamente monotônica \\( F_X(x) \\), a variável \\( Y := F_X(X) \\) possui distribuição uniforme no intervalo \\( \\).
+
+**(d) Exemplo Numérico Pequeno (Exemplo 6.16 no MML):**
+Seja \\( X \\) uma variável aleatória contínua com FDP \\( f(x) = 3x^2 \\) para \\( 0 \leqslant x \leqslant 1 \\). Deseja-se encontrar a FDP de \\( Y = X^2 \\):
+1. **Cálculo da FDA de \\( Y \\):**
+\\[ F_Y(y) = P(Y \leqslant y) = P(X^2 \leqslant y) = P(X \leqslant y^{1/2}) = F_X(y^{1/2}) = \int_0^{y^{1/2}} 3t^2 \text{d}t = [t^3]_{t=0}^{t=y^{1/2}} = y^{3/2} \\]
+para \\( 0 \leqslant y \leqslant 1 \\).
+2. **Obtenção da FDP por diferenciação:**
+\\[ f(y) = \frac{\text{d}}{\text{d}y} F_Y(y) = \frac{\text{d}}{\text{d}y} \left( y^{3/2} \right) = \frac{3}{2} y^{1/2} \quad \text{para } 0 \leqslant y \leqslant 1 \\]
+
+**(e) Onde Reaparece nos Modelos e Aplicações em Machine Learning:**
+- **Geração de Amostras (*Sampling*):** O Teorema da Transformada Integral de Probabilidade é a base de algoritmos de amostragem no computador, como a transformação de Box–Muller para gerar amostras gaussianas a partir de distribuições uniformes (MML §6.5.4, §6.7.1).
+- **Transformações Afins em Modelos Gaussianos e GMM (*Clusterizador*):** Em modelos de mistura de Gaussianas (*Gaussian Mixture Models* - GMM - MML Capítulo 11), a transformação de componentes por matrizes afins \\( \boldsymbol{y} = \boldsymbol{A}\boldsymbol{x} + \boldsymbol{b} \\) resulta em novas Gaussianas cujas densidades usam o fator de escala do determinante da matriz de covariância/Jacobiana (MML §6.5.3 e Exemplo 6.17 no MML §6.7.2).
+- **Deep Learning e Normalizing Flows:** A mudança de variáveis multivariada via determinantes de matrizes Jacobianas reaparece no treinamento de redes neurais profundas por meio do truque da reparametrização (*reparametrization trick* / *infinite perturbation analysis* - MML §5.3) e no modelo de *normalizing flows* (MML §6.8).
 
 ---
 

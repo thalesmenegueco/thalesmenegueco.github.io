@@ -1,3 +1,124 @@
+## mml-5.1 — Derivadas de Funções Univariadas (Differentiation of Univariate Functions)
+
+### (a) Definições Formais e Notação Exata
+
+* **Quociente de Diferenças (Difference Quotient)** [MML §5.1]:
+  Para uma função univariada \\(y = f(x)\\), com \\(x, y \in \mathbb{R}\\), o quociente de diferenças calcula a inclinação da reta secante que passa por dois pontos no gráfico de \\(f\\):
+  \\[
+  \frac{\delta y}{\delta x} := \frac{f(x + \delta x) - f(x)}{\delta x}
+  \\]
+* **Derivada (Derivative)** [MML §5.1]:
+  Para \\(h > 0\\), a derivada de uma função univariada \\(f\\) em \\(x\\) é definida formalmente como o limite do quociente de diferenças quando \\(h \to 0\\):
+  \\[
+  \frac{\mathrm{d}f}{\mathrm{d}x} := \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}
+  \\]
+  A derivada aponta na direção de crescimento mais íngreme (steepest ascent) de \\(f\\).
+* **Polinômio de Taylor (Taylor Polynomial)** [MML §5.1.1]:
+  O polinômio de Taylor de grau \\(n\\) de uma função \\(f: \mathbb{R} \to \mathbb{R}\\) avaliado no ponto \\(x_0\\) é definido por:
+  \\[
+  T_n(x) := \sum_{k=0}^n \frac{f^{(k)}(x_0)}{k!} (x - x_0)^k
+  \\]
+  em que \\(f^{(k)}(x_0)\\) representa a \\(k\\)-ésima derivada de \\(f\\) em \\(x_0\\) e \\(\frac{f^{(k)}(x_0)}{k!}\\) são os coeficientes do polinômio (com a convenção \\(t^0 := 1\\) para todo \\(t \in \mathbb{R}\\)).
+* **Série de Taylor (Taylor Series)** [MML §5.1.1]:
+  Para uma função suave (smooth function) \\(f \in \mathcal{C}^\infty\\), \\(f: \mathbb{R} \to \mathbb{R}\\), a série de Taylor em \\(x_0\\) é dada por:
+  \\[
+  T_\infty(x) = \sum_{k=0}^\infty \frac{f^{(k)}(x_0)}{k!} (x - x_0)^k
+  \\]
+  Para o caso particular de \\(x_0 = 0\\), a série é denominada série de Maclaurin (Maclaurin series). Se \\(f(x) = T_\infty(x)\\), a função é chamada de analítica (analytic).
+* **Composição de Funções (Function Composition)** [MML §5.1.2]:
+  A notação \\(g \circ f\\) indica a composição de funções \\(x \mapsto f(x) \mapsto g(f(x))\\).
+
+---
+
+### (b) Intuição Geométrica
+
+* **Secante e Tangente** [MML §5.1]:
+  O quociente de diferenças \\(\frac{\delta y}{\delta x}\\) representa a inclinação média da função entre os pontos \\(x_0\\) e \\(x_0 + \delta x\\), correspondendo geometricamente à inclinação de uma reta secante (secant line). Ao tomar o limite \\(\delta x \to 0\\) (ou \\(h \to 0\\)), a reta secante se transforma na reta tangente (tangent) ao gráfico da função no ponto \\(x\\), cuja inclinação é exatamente a derivada \\(\frac{\mathrm{d}f}{\mathrm{d}x}\\).
+* **Aproximação Local por Polinômios de Taylor** [MML §5.1.1]:
+  Um polinômio de Taylor de grau \\(n\\) constrói uma aproximação polinomial da função \\(f\\) em uma vizinhança (neighborhood) ao redor de \\(x_0\\). Polinômios de ordem superior (como \\(T_1, T_5, T_{10}\\)) fornecem aproximações progressivamente mais precisas e de alcance mais global em relação ao ponto de expansão.
+
+---
+
+### (c) Exemplo Numérico Pequeno em 2D
+
+A Seção 5.1 apresenta dois exemplos numéricos explícitos e verificáveis à mão:
+
+1. **Aproximação por Polinômio de Taylor** [MML §5.1.1] (Exemplo 5.3):
+   Considere o polinômio \\(f(x) = x^4\\) e o ponto de expansão \\(x_0 = 1\\). Calculando as derivadas em \\(x_0 = 1\\):
+   * \\(f(1) = 1\\)
+   * \\(f'(1) = 4(1)^3 = 4\\)
+   * \\(f''(1) = 12(1)^2 = 12\\)
+   * \\(f^{(3)}(1) = 24(1) = 24\\)
+   * \\(f^{(4)}(1) = 24\\)
+   * \\(f^{(5)}(1) = 0\\) e \\(f^{(6)}(1) = 0\\)
+
+   O polinômio de Taylor \\(T_6(x)\\) é construído como:
+   \\[
+   T_6(x) = 1 + 4(x - 1) + \frac{12}{2!}(x - 1)^2 + \frac{24}{3!}(x - 1)^3 + \frac{24}{4!}(x - 1)^4 + 0
+   \\]
+   \\[
+   T_6(x) = 1 + 4(x - 1) + 6(x - 1)^2 + 4(x - 1)^3 + 1(x - 1)^4
+   \\]
+   Ao expandir e agrupar os termos, obtém-se exatamente \\(T_6(x) = x^4 = f(x)\\), mostrando que a representação é exata para polinômios de grau menor ou igual a \\(n\\).
+
+2. **Aplicação da Regra da Cadeia** [MML §5.1.2] (Exemplo 5.5):
+   Para derivar \\(h(x) = (2x + 1)^4\\), define-se a composição \\(h(x) = g(f(x))\\) com \\(f(x) = 2x + 1\\) e \\(g(f) = f^4\\).
+   * Derivadas individuais: \\(f'(x) = 2\\) e \\(g'(f) = 4f^3\\).
+   * Pela regra da cadeia: \\(h'(x) = g'(f) f'(x) = 4(2x + 1)^3 \cdot 2 = 8(2x + 1)^3\\).
+   * Avaliação numérica no ponto \\(x = 0\\): \\(f(0) = 1\\), \\(g'(1) = 4(1)^3 = 4\\), resultando em \\(h'(0) = 4 \cdot 2 = 8\\).
+
+---
+
+### (d) Como o Conceito Aparece nos Outros Modelos (Regressor Linear, Classificador, Rede Neural, Clusterizador)
+
+Não há [MML §5.1]. A Seção 5.1 (com suas subseções 5.1.1 e 5.1.2) é estritamente dedicada à revisão do cálculo escalar univariado do ensino médio e não menciona nem aplica diretamente esses modelos específicos de aprendizado de máquina nesse trecho do texto.
+
+---
+
+### (e) Fórmulas Relevantes
+
+* **Quociente de Diferenças** [MML §5.1]:
+  \\[
+  \frac{\delta y}{\delta x} := \frac{f(x + \delta x) - f(x)}{\delta x}
+  \\]
+* **Definição de Derivada** [MML §5.1]:
+  \\[
+  \frac{\mathrm{d}f}{\mathrm{d}x} := \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}
+  \\]
+* **Polinômio de Taylor de Grau \\(n\\)** [MML §5.1.1]:
+  \\[
+  T_n(x) := \sum_{k=0}^n \frac{f^{(k)}(x_0)}{k!} (x - x_0)^k
+  \\]
+* **Série de Taylor** [MML §5.1.1]:
+  \\[
+  T_\infty(x) = \sum_{k=0}^\infty \frac{f^{(k)}(x_0)}{k!} (x - x_0)^k
+  \\]
+* **Séries de Potência de \\(\cos(x)\\) e \\(\sin(x)\\)** [MML §5.1.1]:
+  \\[
+  \cos(x) = \sum_{k=0}^\infty (-1)^k \frac{1}{(2k)!} x^{2k}
+  \\]
+  \\[
+  \sin(x) = \sum_{k=0}^\infty (-1)^k \frac{1}{(2k + 1)!} x^{2k+1}
+  \\]
+* **Regra do Produto (Product Rule)** [MML §5.1.2]:
+  \\[
+  (f(x)g(x))' = f'(x)g(x) + f(x)g'(x)
+  \\]
+* **Regra do Quociente (Quotient Rule)** [MML §5.1.2]:
+  \\[
+  \left(\frac{f(x)}{g(x)}\right)' = \frac{f'(x)g(x) - f(x)g'(x)}{(g(x))^2}
+  \\]
+* **Regra da Soma (Sum Rule)** [MML §5.1.2]:
+  \\[
+  (f(x) + g(x))' = f'(x) + g'(x)
+  \\]
+* **Regra da Cadeia (Chain Rule)** [MML §5.1.2]:
+  \\[
+  (g(f(x)))' = (g \circ f)'(x) = g'(f(x))f'(x)
+  \\]
+
+---
+
 ## mml-5.2 — Derivadas Parciais e Gradiente de Funções Escalares
 
 * **(a) Definições Formais e Notação Exata:**
@@ -77,6 +198,115 @@
   * \\(\frac{\partial \boldsymbol{x}^\top \boldsymbol{B} \boldsymbol{x}}{\partial \boldsymbol{x}} = \boldsymbol{x}^\top(\boldsymbol{B} + \boldsymbol{B}^\top)\\)
   * \\(\frac{\partial}{\partial \boldsymbol{s}} (\boldsymbol{x} - \boldsymbol{A}\boldsymbol{s})^\top \boldsymbol{W} (\boldsymbol{x} - \boldsymbol{A}\boldsymbol{s}) = -2(\boldsymbol{x} - \boldsymbol{A}\boldsymbol{s})^\top \boldsymbol{W}\boldsymbol{A}\\) (para \\(\boldsymbol{W}\\) simétrica)
   * \\(\frac{\partial \text{tr}(\boldsymbol{f}(\boldsymbol{X}))}{\partial \boldsymbol{X}} = \text{tr}\left( \frac{\partial \boldsymbol{f}(\boldsymbol{X})}{\partial \boldsymbol{X}} \right)\\)
+
+---
+
+## mml-5.5 — Identidades Úteis para Cálculo de Gradientes (Useful Identities for Computing Gradients)
+
+### (a) Definições Formais e Notação Exata
+
+* **Operadores e Funções Matriciais** [MML §5.5]:
+  * \\(\mathrm{tr}(\cdot)\\): Traço de uma matriz (trace), definido como a soma dos elementos de sua diagonal principal (Definição 4.4) [MML §5.5].
+  * \\(\det(\cdot)\\): Determinante de uma matriz quadrada (determinant, Seção 4.1) [MML §5.5].
+  * \\(f(\mathbf{X})^{-1}\\): Inversa de uma função matricial \\(f(\mathbf{X})\\) (inverse), assumindo que a matriz seja invertível [MML §5.5].
+* **Convenção de Notação e Layout** [MML §5.3, §5.5]:
+  * Vetores são representados em negrito minúsculo (ex.: \\(\mathbf{x}, \mathbf{a}, \mathbf{b}, \mathbf{s} \in \mathbb{R}^D\\)) e matrizes em negrito maiúsculo (ex.: \\(\mathbf{X}, \mathbf{W}, \mathbf{B}, \mathbf{A}\\)) [MML §5.5].
+  * Utiliza-se o layout de numerador (numerator layout) para a ordenação das dimensões dos gradientes [MML §5.3].
+  * \\(\mathbf{X}^\top\\) indica a transposta da matriz \\(\mathbf{X}\\) [MML §5.5].
+* **Generalização para Tensores e Contração** [MML §5.5 (Remark)]:
+  * Quando as derivadas parciais envolvem funções multivariadas em relação a matrizes, os resultados intermediários podem ser tensores de ordem superior (multidimensional arrays) [MML §5.5].
+  * Para um tensor de dimensão \\(D \times D \times E \times F\\), o traço generaliza-se para uma matriz de dimensão \\(E \times F\\), sendo um caso especial de contração de tensores (tensor contraction) [MML §5.5].
+  * A "transposição" de um tensor refere-se à troca/permutação de suas duas primeiras dimensões (swapping the first two dimensions) [MML §5.5].
+
+---
+
+### (b) Intuição Geométrica
+
+* **Atalhos Algébricos Diretos** [MML §5.5]:
+  As identidades da Seção 5.5 funcionam como regras de derivação direta para expressões matriciais e vetoriais de uso frequente em aprendizado de máquina, evitando a necessidade de expandir e calcular derivadas parciais escalares componente a componente [MML §5.5].
+* **Ajuste Dimensional e Métrica** [MML §5.5]:
+  Em termos geométricos, identidades como \\(\frac{\partial}{\partial \mathbf{s}} (\mathbf{x} - \mathbf{A}\mathbf{s})^\top \mathbf{W} (\mathbf{x} - \mathbf{A}\mathbf{s}) = -2(\mathbf{x} - \mathbf{A}\mathbf{s})^\top \mathbf{W}\mathbf{A}\\) fornecem o vetor de taxa de variação de uma distância quadrática ponderada pela matriz de precisão/ponderação simétrica \\(\mathbf{W}\\), orientando a direção de ajuste geométrico no espaço vetorial [MML §5.5, §7.1].
+
+---
+
+### (c) Exemplo Numérico Pequeno em 2D
+
+*não encontrado no arquivo na Seção 5.5* [MML §5.5] (a Seção 5.5 é constituída estritamente por uma tabela contendo as 10 identidades algébricas e um *Remark* explicativo sobre tensores, sem apresentar exemplos numéricos calculados no texto desta seção).
+
+---
+
+### (d) Como o Conceito Aparece nos Outros Modelos (Regressor Linear, Classificador, Rede Neural, Clusterizador)
+
+* **Regressor Linear (Linear Regression — Capítulo 9)** [MML §5.3, §5.5, §9.2]:
+  A identidade (5.108) \\(\frac{\partial}{\partial \mathbf{s}} (\mathbf{x} - \mathbf{A}\mathbf{s})^\top \mathbf{W} (\mathbf{x} - \mathbf{A}\mathbf{s}) = -2(\mathbf{x} - \mathbf{A}\mathbf{s})^\top \mathbf{W}\mathbf{A}\\) (para \\(\mathbf{W}\\) simétrica) e a identidade (5.107) para formas quadráticas são diretamente aplicadas para derivar o gradiente da função de perda de mínimos quadrados (least-squares loss) \\(L(\boldsymbol{\theta}) = \frac{1}{2\sigma^2}(\mathbf{y} - \mathbf{\Phi}\boldsymbol{\theta})^\top(\mathbf{y} - \mathbf{\Phi}\boldsymbol{\theta})\\) em relação aos parâmetros \\(\boldsymbol{\theta}\\), resultando na equação normal do modelo [MML §5.3 (Exemplo 5.11), §9.2.1 (Eq. 9.11a-b)].
+* **Clusterizador / Mistura de Gaussianas (Density Estimation with GMMs — Capítulo 11)** [MML §5.5, §11.2.3]:
+  As identidades (5.101) \\(\frac{\partial}{\partial \mathbf{X}} \det(f(\mathbf{X})) = \det(f(\mathbf{X}))\mathrm{tr}\left(f(\mathbf{X})^{-1}\frac{\partial f(\mathbf{X})}{\partial \mathbf{X}}\right)\\) e (5.103) \\(\frac{\partial \mathbf{a}^\top \mathbf{X}^{-1} \mathbf{b}}{\partial \mathbf{X}} = -(\mathbf{X}^{-1})^\top \mathbf{a}\mathbf{b}^\top (\mathbf{X}^{-1})^\top\\) são **explicitamente citadas e aplicadas** nas Equações (11.33) e (11.34) para diferenciar o determinante e a forma quadrática inversa da distribuição Gaussiana ao derivar o passo M de atualização das matrizes de covariância \\(\mathbf{\Sigma}_k\\) no algoritmo EM [MML §11.2.3 (Eq. 11.33, 11.34)].
+* **Rede Neural (Deep Networks / Backpropagation — Seção 5.6)** [MML §5.5, §5.6.1]:
+  As identidades de produtos matriciais e vetoriais (como 5.104–5.106) são utilizadas nas etapas de diferenciação automática para derivar as perdas em relação aos pesos \\(\mathbf{A}_j\\) e vieses \\(\mathbf{b}_j\\) em cada camada durante o backward pass [MML §5.6.1].
+* **Classificador / Máquinas de Vetores de Suporte (SVM — Capítulo 12)** [MML §12.3] e **Redução de Dimensionalidade (PCA — Capítulo 10)** [MML §10.3.1]:
+  A identidade da forma quadrática (5.107) \\(\frac{\partial \mathbf{x}^\top \mathbf{B} \mathbf{x}}{\partial \mathbf{x}} = \mathbf{x}^\top (\mathbf{B} + \mathbf{B}^\top)\\) reaparece na otimização da variância/reconstrução do PCA \\(\text{tr}(\mathbf{b}_j^\top \mathbf{S} \mathbf{b}_j)\\) [MML §10.3.1 (Eq. 10.43b)] e na diferenciação do Lagrangiano do SVM para obter o vetor de pesos ótimo \\(\mathbf{w} = \sum_{n=1}^N \alpha_n y_n \mathbf{x}_n\\) [MML §12.3 (Eq. 12.35, 12.38)].
+
+---
+
+### (e) Fórmulas Relevantes
+
+Tabela de identidades para cálculo de gradientes [MML §5.5 (Eq. 5.99–5.108)]:
+
+* **Transposta de função matricial** [MML Eq. 5.99]:
+  \\[
+  \frac{\partial}{\partial \mathbf{X}} f(\mathbf{X})^\top = \left(\frac{\partial f(\mathbf{X})}{\partial \mathbf{X}}\right)^\top
+  \\]
+* **Traço de função matricial** [MML Eq. 5.100]:
+  \\[
+  \frac{\partial}{\partial \mathbf{X}} \mathrm{tr}(f(\mathbf{X})) = \mathrm{tr}\left(\frac{\partial f(\mathbf{X})}{\partial \mathbf{X}}\right)
+  \\]
+* **Determinante de função matricial** [MML Eq. 5.101]:
+  \\[
+  \frac{\partial}{\partial \mathbf{X}} \det(f(\mathbf{X})) = \det(f(\mathbf{X})) \mathrm{tr}\left(f(\mathbf{X})^{-1} \frac{\partial f(\mathbf{X})}{\partial \mathbf{X}}\right)
+  \\]
+* **Inversa de função matricial** [MML Eq. 5.102]:
+  \\[
+  \frac{\partial}{\partial \mathbf{X}} f(\mathbf{X})^{-1} = -f(\mathbf{X})^{-1} \frac{\partial f(\mathbf{X})}{\partial \mathbf{X}} f(\mathbf{X})^{-1}
+  \\]
+* **Forma quadrática com inversa** [MML Eq. 5.103]:
+  \\[
+  \frac{\partial \mathbf{a}^\top \mathbf{X}^{-1} \mathbf{b}}{\partial \mathbf{X}} = -(\mathbf{X}^{-1})^\top \mathbf{a} \mathbf{b}^\top (\mathbf{X}^{-1})^\top
+  \\]
+* **Produto escalar linear (vetor à direita)** [MML Eq. 5.104]:
+  \\[
+  \frac{\partial \mathbf{x}^\top \mathbf{a}}{\partial \mathbf{x}} = \mathbf{a}^\top
+  \\]
+* **Produto escalar linear (vetor à esquerda)** [MML Eq. 5.105]:
+  \\[
+  \frac{\partial \mathbf{a}^\top \mathbf{x}}{\partial \mathbf{x}} = \mathbf{a}^\top
+  \\]
+* **Forma bilinear com matriz** [MML Eq. 5.106]:
+  \\[
+  \frac{\partial \mathbf{a}^\top \mathbf{X} \mathbf{b}}{\partial \mathbf{X}} = \mathbf{a} \mathbf{b}^\top
+  \\]
+* **Forma quadrática com matriz** [MML Eq. 5.107]:
+  \\[
+  \frac{\partial \mathbf{x}^\top \mathbf{B} \mathbf{x}}{\partial \mathbf{x}} = \mathbf{x}^\top (\mathbf{B} + \mathbf{B}^\top)
+  \\]
+* **Forma quadrática de erro ponderado** [MML Eq. 5.108]:
+  \\[
+  \frac{\partial}{\partial \mathbf{s}} (\mathbf{x} - \mathbf{A}\mathbf{s})^\top \mathbf{W} (\mathbf{x} - \mathbf{A}\mathbf{s}) = -2(\mathbf{x} - \mathbf{A}\mathbf{s})^\top \mathbf{W}\mathbf{A} \quad \text{(para } \mathbf{W} \text{ simétrica)}
+  \\]
+
+---
+
+### Lista das Identidades (LaTeX Puro)
+
+\\[ \frac{\partial}{\partial \mathbf{X}} f(\mathbf{X})^\top = \left(\frac{\partial f(\mathbf{X})}{\partial \mathbf{X}}\right)^\top \\]
+\\[ \frac{\partial}{\partial \mathbf{X}} \mathrm{tr}(f(\mathbf{X})) = \mathrm{tr}\left(\frac{\partial f(\mathbf{X})}{\partial \mathbf{X}}\right) \\]
+\\[ \frac{\partial}{\partial \mathbf{X}} \det(f(\mathbf{X})) = \det(f(\mathbf{X}))\mathrm{tr}\left(f(\mathbf{X})^{-1}\frac{\partial f(\mathbf{X})}{\partial \mathbf{X}}\right) \\]
+\\[ \frac{\partial}{\partial \mathbf{X}} f(\mathbf{X})^{-1} = -f(\mathbf{X})^{-1}\frac{\partial f(\mathbf{X})}{\partial \mathbf{X}}f(\mathbf{X})^{-1} \\]
+\\[ \frac{\partial \mathbf{a}^\top \mathbf{X}^{-1}\mathbf{b}}{\partial \mathbf{X}} = -(\mathbf{X}^{-1})^\top \mathbf{a}\mathbf{b}^\top (\mathbf{X}^{-1})^\top \\]
+\\[ \frac{\partial \mathbf{x}^\top \mathbf{a}}{\partial \mathbf{x}} = \mathbf{a}^\top \\]
+\\[ \frac{\partial \mathbf{a}^\top \mathbf{x}}{\partial \mathbf{x}} = \mathbf{a}^\top \\]
+\\[ \frac{\partial \mathbf{a}^\top \mathbf{X}\mathbf{b}}{\partial \mathbf{X}} = \mathbf{a}\mathbf{b}^\top \\]
+\\[ \frac{\partial \mathbf{x}^\top \mathbf{B}\mathbf{x}}{\partial \mathbf{x}} = \mathbf{x}^\top (\mathbf{B} + \mathbf{B}^\top) \\]
+\\[ \frac{\partial}{\partial \mathbf{s}} (\mathbf{x}-\mathbf{A}\mathbf{s})^\top \mathbf{W}(\mathbf{x}-\mathbf{A}\mathbf{s}) = -2(\mathbf{x}-\mathbf{A}\mathbf{s})^\top \mathbf{W}\mathbf{A} \\]
 
 ---
 

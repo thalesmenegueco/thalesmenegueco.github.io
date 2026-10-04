@@ -19,9 +19,9 @@
     "n": 50
   },
   "keyFormulas": [
-    "y = \\boldsymbol{x}^\\top\\boldsymbol{\\theta} + \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0, \\sigma^2)",
-    "\\mathcal{L}(\\boldsymbol{\\theta}) = \\frac{1}{2\\sigma^2} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\theta}\\|^2",
-    "\\text{RMSE} = \\sqrt{\\frac{1}{N} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\theta}\\|^2}"
+    "y = \\mathbf{x}^\\top\\boldsymbol{\\theta} + \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0, \\sigma^2)",
+    "\\mathcal{L}(\\boldsymbol{\\theta}) := \\frac{1}{2\\sigma^2} \\sum_{n=1}^N (y_n - \\mathbf{x}_n^\\top\\boldsymbol{\\theta})^2",
+    "\\text{RMSE} = \\sqrt{\\frac{1}{N}\\|\\mathbf{y} - \\boldsymbol{\\Phi}\\boldsymbol{\\theta}\\|^2}"
   ],
   "numericExample": {
     "description": "3 casos com y={100,200,300}, ŷ={110,190,290}: MSE = (100+100+100)/3 ≈ 100",

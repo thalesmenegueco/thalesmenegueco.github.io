@@ -224,3 +224,166 @@ O contrato de geração **não se chama `LessonStep`** — esse nome é do app d
 gerador produz. O manifesto é a ponte: ele nomeia o widget e o critério de conclusão, e o runtime
 mapeia depois. Nota histórica: esta seção era uma dúvida em aberto até 2026-09-22; a decisão
 segue registrada em `../manifests/README.md`.
+
+---
+
+## Prompts de extração — Camada 1 (rodada complementar, 2026-10-04)
+
+Os oito prompts que produziram [`../syllabus-content/MML_cursos_1_2_4_complemento.md`](../syllabus-content/MML_cursos_1_2_4_complemento.md).
+Rodam no NotebookLM com o livro carregado (`mml-book.pdf`, Draft 2024-01-15), **um prompt por vez**.
+Respondem aos três defeitos que a primeira extração deixou: uma seção faltando, âncoras inventadas e
+uma seção sem endereço própria.
+
+Duas regras valem para todos eles, e são o que torna a saída utilizável como fonte:
+
+1. **Só o arquivo carregado** — nada de conhecimento externo; quando algo não está no livro, a
+   resposta escreve "não encontrado no arquivo" em vez de preencher.
+2. **Todo bloco começa repetindo o número e o título exatos da seção**, para a âncora poder ser
+   conferida contra o sumário em vez de presumida.
+
+O **Prompt 0 é obrigatório e vem primeiro**: ele verifica a numeração contra a cópia carregada, e é
+o que impede os outros sete de mirarem seções que não existem.
+
+### Prompt 0 — sumário do arquivo (verificação de âncora)
+
+```text
+Liste o sumário completo do livro Mathematics for Machine Learning (Deisenroth, Faisal & Ong) que está carregado neste notebook, exatamente como está no arquivo.
+
+Para cada capítulo: número e título. Para cada seção e subseção: número e título, incluindo as subseções (5.1.1, 7.3.1, 9.2.3, ...).
+
+Regras:
+- Copie número e título como aparecem; não traduza, não agrupe, não resuma.
+- Só o arquivo carregado. Se algo não estiver lá, escreva "não encontrado no arquivo".
+- Ao final: informe a edição/versão do arquivo (ex.: Draft 2024-01-15) e quantos capítulos ele tem.
+
+Formato: uma linha por item — "5.1.2 — Differentiation Rules".
+```
+
+### Prompt 1 — §5.1, a seção que faltava
+
+```text
+Extraia do MML a Seção 5.1 (Differentiation of Univariate Functions), incluindo as subseções 5.1.1 (Taylor Series) e 5.1.2 (Differentiation Rules).
+
+Use o mesmo template (a)–(e) das extrações de capítulo já feitas:
+(a) Definições Formais e Notação Exata
+(b) Intuição Geométrica
+(c) Exemplo Numérico Pequeno em 2D
+(d) Como o Conceito Aparece nos Outros Modelos (Regressor Linear, Classificador, Rede Neural, Clusterizador)
+(e) Fórmulas Relevantes
+
+Regras:
+- Fonte única: só o livro carregado. Nenhum conhecimento externo.
+- Preserve a notação do livro em LaTeX, no formato \( ... \) e \[ ... \] que já usamos.
+- Escreva em português, com o termo técnico em inglês entre parênteses na primeira aparição.
+- Exemplo numérico verificável à mão: números pequenos, no máximo 2 casas.
+- Cite a seção de origem em cada bloco, no formato [MML §5.1.2].
+- Se um item do template não existir nesta seção, escreva "não há" — não invente.
+- Comece a resposta repetindo o número e o título exatos da seção, para eu conferir a âncora.
+```
+
+### Prompt 2 — §5.5 como seção própria
+
+```text
+Extraia do MML a Seção 5.5 (Useful Identities for Computing Gradients) como uma seção própria e endereçável — não como apêndice da 5.4.
+
+Traga a tabela completa de identidades exatamente como o livro a apresenta, com a notação preservada (∇, transposta ᵀ, tr(·), ⊗), em LaTeX no formato \( ... \) e \[ ... \].
+
+Estrutura da resposta:
+1. Primeiro, número e título exatos da seção, como aparecem no livro.
+2. Depois o template (a)–(e): definições e notação; intuição; um exemplo numérico pequeno em 2D usando duas ou três das identidades; onde cada identidade reaparece nos quatro modelos do curso; e a lista de fórmulas.
+3. Ao final, uma lista só das identidades, uma por linha, em LaTeX puro, para eu conferir contra a fonte.
+
+Regras: só o livro carregado; nada de conhecimento externo; se algo não estiver no arquivo, escreva "não encontrado no arquivo".
+```
+
+### Prompt 3 — Capítulo 9 reancorado
+
+```text
+Extraia do MML o Capítulo 9 (Linear Regression) de novo, mas agora **uma seção por bloco, com o número da seção do livro no título de cada bloco** — sem agrupar tópicos e sem renumerar.
+
+Blocos pedidos, nesta ordem:
+1. §9.1 Problem Formulation
+2. §9.2 Parameter Estimation
+3. §9.2.1 Maximum Likelihood Estimation
+4. §9.2.2 Overfitting in Linear Regression
+5. §9.2.3 Maximum A Posteriori Estimation
+6. §9.2.4 MAP Estimation as Regularization
+7. §9.3 Bayesian Linear Regression
+8. §9.4 Maximum Likelihood as Orthogonal Projection
+
+Para cada bloco, use o template (a)–(e) na íntegra.
+
+Regras:
+- Só o livro carregado; nenhum conhecimento externo.
+- Não junte duas seções num bloco, mesmo que o conteúdo seja curto.
+- Preserve a notação em LaTeX no formato \( ... \) e \[ ... \]; cite a origem em cada bloco como [MML §9.2.3].
+- Português, com o termo técnico em inglês entre parênteses na primeira aparição.
+- Se um bloco pedido não existir no arquivo, escreva "não existe no arquivo" em vez de preencher com o que vier depois.
+
+Comece com o número e o título exatos de cada seção, um por linha, e só então o conteúdo.
+```
+
+### Prompt 4 — Capítulo 7 reancorado
+
+```text
+No MML, a Seção 7.3 é Convex Optimization. Extraia as três subseções dela, cada uma como bloco próprio e endereçável, com o número exato no título:
+
+1. §7.3.1 Linear Programming
+2. §7.3.2 Quadratic Programming
+3. §7.3.3 Legendre–Fenchel Transform and Convex Conjugate
+
+Para cada bloco, template (a)–(e), notação em LaTeX no formato \( ... \) e \[ ... \], português com o termo técnico em inglês entre parênteses, e a origem citada como [MML §7.3.1].
+
+Regras: só o livro carregado; não misture as três; se uma delas não existir no arquivo, diga isso em vez de preencher.
+
+Depois do conteúdo, responda separadamente, em duas linhas, só o número e o título exatos de:
+- a Seção 7.4 do livro;
+- a Seção 7.5, se ela existir;
+conforme o arquivo carregado.
+```
+
+### Prompt 5 — Capítulo 2, o endereço de imagem/núcleo
+
+```text
+No MML, a Seção 2.7 é Linear Mappings. Antes de extrair, responda com o número e o título exatos, como aparecem no arquivo carregado:
+- o que é a §2.7.1?
+- o que é a §2.7.2?
+- o que é a §2.7.3?
+
+Depois, extraia a subseção que trata de **imagem (range) e núcleo (kernel / null space)**, sob o número que você acabou de confirmar — não sob outro.
+
+Conteúdo: definição formal de imagem e de núcleo, a relação com posto e com injetividade/sobrejetividade, o teorema da nulidade e posto (rank-nullity), um exemplo numérico pequeno com matriz 2×2, e como isso reaparece no Regressor Linear (subespaço gerado pelas colunas de Φ) e no PCA. Template (a)–(e), LaTeX no formato \( ... \) e \[ ... \].
+
+Regras: só o livro carregado; nada de conhecimento externo; se a subseção não existir, escreva "não existe no arquivo".
+```
+
+### Prompt 6 — Capítulo 6, mudança de variáveis
+
+```text
+No MML, responda primeiro, com o número e o título exatos conforme o arquivo carregado:
+- qual é o título da §6.4.6?
+- qual é o título da §6.7?
+
+Depois extraia a §6.7 (Change of Variables / Inverse Transform) como bloco próprio e endereçável sob o número §6.7 — ela hoje está sem endereço. Template (a)–(e), com a fórmula da transformação de densidades em LaTeX exatamente como no livro, um exemplo numérico pequeno, e onde isso reaparece nos modelos (mudança de variáveis em distribuições no Clusterizador/GMM).
+
+Se a §6.4.6 tiver conteúdo próprio diferente desse, extraia-o também, em bloco separado, sob o número §6.4.6.
+
+Regras: só o livro carregado; nada de conhecimento externo; não junte as duas seções.
+```
+
+### Prompt 7 — Capítulo 1 (abertura do curso)
+
+```text
+Extraia do MML o Capítulo 1 (Introduction and Motivation): a motivação do livro, a ideia de dados como vetores, o par modelo/preditor e o aprendizado como otimização — incluindo a §1.1 (Finding Words for Intuitions).
+
+Use o template (a)–(e). Como o próprio livro diz que este capítulo não traz definições formais nem fórmulas deduzidas, nos itens (a) e (e) escreva exatamente o que o livro oferece e marque o resto como "não há" — não importe formalismo do Capítulo 2.
+
+Regras: só o livro carregado; nada de conhecimento externo; português com o termo técnico em inglês entre parênteses.
+```
+
+### O que os prompts 4, 5 e 6 não fixaram
+
+O template (a)–(e) foi escrito por extenso nos prompts 1, 2 e 3, e só citado nos prompts 4, 5, 6 e 7 —
+que então devolveram estruturas próprias ("Problema Primal / Derivação do Lagrangiano…"). O conteúdo
+está correto e endereçado; o rótulo dos blocos é que não é o da casa. Se a uniformidade importar para
+a geração, reextraia essas quatro seções com os itens (a)–(e) escritos por extenso, como no Prompt 1.

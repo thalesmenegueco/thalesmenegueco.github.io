@@ -88,53 +88,95 @@ Como \\(4,75 \le 5,0\\), a condição de convexidade é satisfeita. A reta tange
 
 ---
 
-## mml-7.4 — Programação Linear (LP) e Programação Quadrática (QP)
+## mml-7.3.1 — Programação Linear (Linear Programming)
 
-#### **(a) Definições Formais e Notação Exata**
-* **Programação Linear (Linear Programming - LP):** Problema onde a função objetivo e as restrições são afins/lineares:
-  \\[\min_{x \in \mathbb{R}^d} c^\top x \quad \text{sujeito a} \quad A x \le b\\]
-* **Programação Quadrática (Quadratic Programming - QP):** Problema com função objetivo quadrática e restrições afins:
-  \\[\min_{x \in \mathbb{R}^d} \frac{1}{2} x^\top Q x + c^\top x \quad \text{sujeito a} \quad A x \le b\\]
-  onde \\(Q \in \mathbb{R}^{d \times d}\\) é uma matriz simétrica definida positiva (SPD) que garante convexidade.
+**(a) Definição / Conceito Central:**
+A programação linear (*linear programming* / *linear program*) é o caso especial de otimização convexa (*convex optimization*) no qual a função objetivo (*objective function*) e todas as restrições (*constraints*) são funções lineares nos parâmetros \\( \boldsymbol{x} \in \mathbb{R}^d \\).
 
-#### **(b) Intuição Geométrica**
-* **Programação Linear:** A função objetivo forma linhas de nível retas paralelas, enquanto o conjunto de restrições forma um polígono/polítopo viável convexo no espaço. O valor ótimo é sempre atingido em um dos vértices (cantos) do polítopo.
-* **Programação Quadrática:** As curvas de nível da função objetivo são elípses concêntricas. O ótimo restrito atinge o contorno elíptico de menor valor objetivo que tangencia o polígono de restrições.
+**(b) Problema Primal / Formulação Matemática:**
+O problema primal (*primal problem*) de um programa linear com \\( d \\) variáveis e \\( m \\) restrições lineares é formulado como:
+\\[ \min_{\boldsymbol{x} \in \mathbb{R}^d} \boldsymbol{c}^\top \boldsymbol{x} \\]
+sujeito a (*subject to*)
+\\[ \boldsymbol{A}\boldsymbol{x} \leqslant \boldsymbol{b} \\]
+onde \\( \boldsymbol{A} \in \mathbb{R}^{m \times d} \\), \\( \boldsymbol{b} \in \mathbb{R}^m \\) e \\( \boldsymbol{c} \in \mathbb{R}^d \\).
 
-#### **(c) Exemplo Numérico em 2D**
-Considere o problema de Programação Quadrática em \\(\mathbb{R}^2\\):
-\\[\min_{x \in \mathbb{R}^2} \frac{1}{2} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}^\top \begin{bmatrix} 2 & 1 \\ 1 & 4 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} + \begin{bmatrix} 5 \\ 3 \end{bmatrix}^\top \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \quad \text{sujeito a} \quad \begin{bmatrix} 1 & 0 \\ -1 & 0 \\ 0 & 1 \\ 0 & -1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \le \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix}\\]
-As restrições delimitam uma caixa quadrada viável \\([-1, 1] \times [-1, 1]\\). O ponto mínimo restrito é encontrado no Ponto de Sela (*Saddle Point*) da Lagrangiana na borda da caixa.
+**(c) Derivação do Lagrangiano / Relação Dual:**
+Introduzindo o vetor de multiplicadores de Lagrange (*Lagrange multipliers*) não negativos \\( \boldsymbol{\lambda} \in \mathbb{R}^m \\) (\\( \boldsymbol{\lambda} \geqslant \mathbf{0} \\)), o Lagrangiano (*Lagrangian*) é dado por:
+\\[ L(\boldsymbol{x}, \boldsymbol{\lambda}) = \boldsymbol{c}^\top \boldsymbol{x} + \boldsymbol{\lambda}^\top (\boldsymbol{A}\boldsymbol{x} - \boldsymbol{b}) = (\boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda})^\top \boldsymbol{x} - \boldsymbol{\lambda}^\top \boldsymbol{b} \\]
+Ao calcular a derivada parcial de \\( L(\boldsymbol{x}, \boldsymbol{\lambda}) \\) em relação a \\( \boldsymbol{x} \\) e igualar a zero, obtém-se a condição de estacionariedade:
+\\[ \boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda} = \mathbf{0} \\]
+Com essa condição satisfeita, o Lagrangiano dual resulta em \\( D(\boldsymbol{\lambda}) = -\boldsymbol{\lambda}^\top \boldsymbol{b} \\).
 
-#### **(d) Aplicação nos Modelos**
-* **Support Vector Machines (SVM):** O problema de otimização de margem rígida e suave da SVM é formulado e resolvido diretamente através de um programa quadrático (QP).
+**(d) Problema Dual / Resultado Dual:**
+A maximização da função dual \\( D(\boldsymbol{\lambda}) \\) sob as restrições derivadas define o problema dual de otimização (*dual optimization problem*) com \\( m \\) variáveis duais:
+\\[ \max_{\boldsymbol{\lambda} \in \mathbb{R}^m} -\boldsymbol{b}^\top \boldsymbol{\lambda} \\]
+sujeito a
+\\[ \boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda} = \mathbf{0} \\]
+\\[ \boldsymbol{\lambda} \geqslant \mathbf{0} \\]
 
-#### **(e) Fórmulas Relevantes**
-* **Formulação Primal de QP:** \\(\min_x \frac{1}{2} x^\top Q x + c^\top x\\) s.t. \\(A x \le b\\)
-* **Lagrangiana Dual de QP:** \\(D(\lambda) = -\frac{1}{2}(c + A^\top \lambda)^\top Q^{-1}(c + A^\top \lambda) - \lambda^\top b\\)
-* **Problema Dual de QP:** \\(\max_{\lambda \ge \mathbf{0}} D(\lambda)\\)
+**(e) Propriedades, Exemplos e Aplicações em Machine Learning:**
+- **Escolha de Resolução:** Pode-se optar por resolver o problema primal (com \\( d \\) variáveis) ou o dual (com \\( m \\) variáveis), dependendo de qual dimensão for menor.
+- **Uso em Prática:** Programas lineares constituem uma das abordagens mais utilizadas na indústria.
+- **Geometria:** A função objetivo linear gera linhas de contorno lineares (*linear contour lines*), e a região viável (*feasible region*) é um poliedro delimitado pelas restrições; a solução ótima localiza-se em um dos vértices da região viável.
 
 ---
 
-## mml-7.5 — Transformada de Legendre-Fenchel e Conjugado Convexo (Convex Conjugate & Duality)
+## mml-7.3.2 — Programação Quadrática (Quadratic Programming)
 
-#### **(a) Definições Formais e Notação Exata**
-**Conjugado Convexo / Transformada de Legendre-Fenchel (Definição 7.4):** O conjugado convexo \\(f^*\\) de uma função \\(f: \mathbb{R}^D \to \mathbb{R}\\) é definido por:
-\\[f^*(s) = \sup_{x \in \mathbb{R}^D} (\langle s, x \rangle - f(x))\\]
-adotando o produto escalar habitual \\(\langle s, x \rangle = s^\top x\\).
+**(a) Definição / Conceito Central:**
+A programação quadrática (*quadratic programming* / *quadratic program*) é o problema de otimização convexa no qual a função objetivo é quadrática convexa e as restrições são afins (*affine constraints*).
 
-#### **(b) Intuição Geométrica**
-Qualquer função ou conjunto convexo pode ser descrito de forma equivalente pela coleção de seus **hiperplanos de suporte** (*supporting hyperplanes*). Para cada vetor de inclinação/gradiente \\(s\\), a transformada calcula o intercepto \\(c\\) da reta \\(y = s^\top x + c\\) ajustada de modo que ela tangencie a função \\(f(x)\\) por baixo. O conjugado \\(f^*(s)\\) representa o valor desse intercepto em função da inclinação \\(s\\).
+**(b) Problema Primal / Formulação Matemática:**
+O problema primal com \\( d \\) variáveis e \\( m \\) restrições lineares é definido como:
+\\[ \min_{\boldsymbol{x} \in \mathbb{R}^d} \frac{1}{2} \boldsymbol{x}^\top \boldsymbol{Q}\boldsymbol{x} + \boldsymbol{c}^\top \boldsymbol{x} \\]
+sujeito a
+\\[ \boldsymbol{A}\boldsymbol{x} \leqslant \boldsymbol{b} \\]
+onde \\( \boldsymbol{A} \in \mathbb{R}^{m \times d} \\), \\( \boldsymbol{b} \in \mathbb{R}^m \\), \\( \boldsymbol{c} \in \mathbb{R}^d \\), e a matriz simétrica \\( \boldsymbol{Q} \in \mathbb{R}^{d \times d} \\) é definida positiva (*positive definite*), garantindo que a função objetivo seja convexa.
 
-#### **(c) Exemplo Numérico em 2D**
-Para a função quadrática \\(f(y) = \frac{\lambda}{2} y^\top K^{-1} y\\) construída sobre uma matriz definida positiva \\(K \in \mathbb{R}^{n \times n}\\) e escalar \\(\lambda > 0\\):
-Derivando a expressão \\(s^\top y - \frac{\lambda}{2} y^\top K^{-1} y\\) em relação a \\(y\\) e igualando a zero, encontra-se o ponto ótimo \\(y = \frac{1}{\lambda} K s\\).
-Substituindo esse valor na definição de supremum, deriva-se a função conjugada:
-\\[f^*(\alpha) = \frac{1}{2\lambda} \alpha^\top K \alpha\\]
+**(c) Derivação do Lagrangiano / Relação Dual:**
+Associando os multiplicadores de Lagrange \\( \boldsymbol{\lambda} \geqslant \mathbf{0} \\), o Lagrangiano é:
+\\[ L(\boldsymbol{x}, \boldsymbol{\lambda}) = \frac{1}{2} \boldsymbol{x}^\top \boldsymbol{Q}\boldsymbol{x} + \boldsymbol{c}^\top \boldsymbol{x} + \boldsymbol{\lambda}^\top (\boldsymbol{A}\boldsymbol{x} - \boldsymbol{b}) = \frac{1}{2} \boldsymbol{x}^\top \boldsymbol{Q}\boldsymbol{x} + (\boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda})^\top \boldsymbol{x} - \boldsymbol{\lambda}^\top \boldsymbol{b} \\]
+Igualando a derivada de \\( L(\boldsymbol{x}, \boldsymbol{\lambda}) \\) em relação a \\( \boldsymbol{x} \\) a zero:
+\\[ \boldsymbol{Q}\boldsymbol{x} + (\boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda}) = \mathbf{0} \\]
+Como \\( \boldsymbol{Q} \\) é definida positiva e portanto invertível (*invertible*), obtém-se \\( \boldsymbol{x} = -\boldsymbol{Q}^{-1}(\boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda}) \\). Substituindo essa expressão no Lagrangiano primal, chega-se ao Lagrangiano dual:
+\\[ D(\boldsymbol{\lambda}) = -\frac{1}{2} (\boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda})^\top \boldsymbol{Q}^{-1}(\boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda}) - \boldsymbol{\lambda}^\top \boldsymbol{b} \\]
 
-#### **(d) Aplicação nos Modelos**
-* **Suavização da Perda em SVM:** Utilizado para derivar a formulação dual da SVM e para suavizar a função de perda não-diferenciável *Hinge Loss* \\(\max\{0, 1 - t\}\\), permitindo o uso de métodos de gradiente de segunda ordem (como L-BFGS).
+**(d) Problema Dual / Resultado Dual:**
+O problema dual de otimização consiste em maximizar \\( D(\boldsymbol{\lambda}) \\) sujeito à não-negatividade dos multiplicadores:
+\\[ \max_{\boldsymbol{\lambda} \in \mathbb{R}^m} -\frac{1}{2} (\boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda})^\top \boldsymbol{Q}^{-1}(\boldsymbol{c} + \boldsymbol{A}^\top \boldsymbol{\lambda}) - \boldsymbol{\lambda}^\top \boldsymbol{b} \\]
+sujeito a
+\\[ \boldsymbol{\lambda} \geqslant \mathbf{0} \\]
 
-#### **(e) Fórmulas Relevantes**
-* **Definição do Conjugado Convexo:** \\(f^*(s) = \sup_x (s^\top x - f(x))\\)
-* **Conjugado da Soma de Perdas:** \\(\mathcal{L}^*(z) = \sum_{i=1}^n \ell_i^*(z_i)\\) para \\(\mathcal{L}(t) = \sum_{i=1}^n \ell_i(t_i)\\)
+**(e) Propriedades, Exemplos e Aplicações em Machine Learning:**
+- **Geometria:** As linhas de contorno (*contour lines*) de uma função objetivo quadrática com matriz \\( \boldsymbol{Q} \\) definida positiva possuem formato elíptico.
+- **Aplicação em ML:** A programação quadrática tem papel fundamental no aprendizado de máquina, constituindo a base matemática para a formulação das Máquinas de Vetores de Suporte (*Support Vector Machines* - SVMs) discutidas no Capítulo 12.
+
+---
+
+## mml-7.3.3 — Transformada de Legendre–Fenchel e Conjugado Convexo (Legendre–Fenchel Transform and Convex Conjugate)
+
+**(a) Definição / Conceito Central:**
+A transformada de Legendre–Fenchel (*Legendre–Fenchel transform*), também chamada de conjugada convexa (*convex conjugate*), é uma transformação de uma função convexa e diferenciável \\( f(\boldsymbol{x}) \\) em uma função dependente de suas tangentes ou gradientes \\( \boldsymbol{s}(\boldsymbol{x}) = \nabla_{\boldsymbol{x}} f(\boldsymbol{x}) \\), baseada na propriedade de que conjuntos convexos podem ser descritos por seus hiperplanos de suporte (*supporting hyperplanes*).
+
+**(b) Problema Primal / Formulação Matemática:**
+A conjugada convexa \\( f^* \\) de uma função \\( f : \mathbb{R}^D \to \mathbb{R} \\) é formalmente definida por:
+\\[ f^*(\boldsymbol{s}) = \sup_{\boldsymbol{x} \in \mathbb{R}^D} (\langle \boldsymbol{s}, \boldsymbol{x} \rangle - f(\boldsymbol{x})) \\]
+Considerando o produto interno padrão (*standard dot product*) \\( \langle \boldsymbol{s}, \boldsymbol{x} \rangle = \boldsymbol{s}^\top \boldsymbol{x} \\), tem-se:
+\\[ f^*(\boldsymbol{s}) = \sup_{\boldsymbol{x} \in \mathbb{R}^D} (\boldsymbol{s}^\top \boldsymbol{x} - f(\boldsymbol{x})) \\]
+Esta definição não necessita formalmente que a função \\( f \\) seja convexa ou diferenciável.
+
+**(c) Derivação do Lagrangiano / Relação Dual:**
+Para funções convexas e diferenciáveis, o supremo é único e atingido quando \\( \boldsymbol{s} = \nabla_{\boldsymbol{x}} f(\boldsymbol{x}_0) \\). Nesses casos, existe uma correspondência direta sem necessidade do supremo:
+\\[ f^*(\boldsymbol{s}) = \boldsymbol{s}^\top \boldsymbol{x}_0 - f(\boldsymbol{x}_0) \\]
+Além disso, a transformada de Legendre–Fenchel permite derivar problemas de otimização dual diretamente sem restrições explícitas; para um problema da forma \\( \min_{\boldsymbol{x}} f(\boldsymbol{A}\boldsymbol{x}) + g(\boldsymbol{x}) \\), a relação dual equivale a:
+\\[ \min_{\boldsymbol{x}} (f(\boldsymbol{A}\boldsymbol{x}) + g(\boldsymbol{x})) = \max_{\boldsymbol{u}} (-f^*(\boldsymbol{u}) - g^*(-\boldsymbol{A}^\top \boldsymbol{u})) \\]
+
+**(d) Problema Dual / Resultado Dual:**
+A transformação converte o problema de minimização primal na maximização de funções conjugadas no espaço dual. Por exemplo, para a função quadrática \\( f(\boldsymbol{y}) = \frac{\lambda}{2} \boldsymbol{y}^\top \boldsymbol{K}^{-1} \boldsymbol{y} \\) (com \\( \boldsymbol{K} \\) definida positiva), a maximização em relação a \\( \boldsymbol{y} \\) fornece a conjugada dual:
+\\[ f^*(\boldsymbol{\alpha}) = \frac{1}{2\lambda} \boldsymbol{\alpha}^\top \boldsymbol{K} \boldsymbol{\alpha} \\]
+
+**(e) Propriedades, Exemplos e Aplicações em Machine Learning:**
+- **Soma de Perdas:** Para objetivos de treinamento definidos como a soma de perdas individuais \\( \mathcal{L}(\boldsymbol{t}) = \sum_{i=1}^n \ell_i(t_i) \\), a conjugada convexa decompoe-se na soma das conjugadas de cada perda individual:
+\\[ \mathcal{L}^*(\boldsymbol{z}) = \sum_{i=1}^n \ell_i^*(z_i) \\]
+- **Involutividade:** Em funções convexas, a aplicação consecutiva da transformada de Legendre duas vezes recupera a função original.
+- **Aplicações em ML:** A perda conjugada (*conjugate loss*) é extremamente conveniente para derivar a formulação dual em modelos de aprendizado de máquina com funções de perda convexas aplicadas independentemente a cada exemplo do conjunto de dados.

@@ -11,7 +11,7 @@
   ],
   "sourceRefs": [
     "mml-2.7",
-    "mml-2.7.1"
+    "mml-2.7.3"
   ],
   "sourceFiles": [
     "mml/02-linear-algebra.md"
@@ -30,7 +30,7 @@
   "keyFormulas": [
     "\\Phi(\\lambda \\boldsymbol{x} + \\psi \\boldsymbol{y}) = \\lambda \\Phi(\\boldsymbol{x}) + \\psi \\Phi(\\boldsymbol{y})",
     "\\hat{\\boldsymbol{y}} = \\boldsymbol{A}_\\Phi \\hat{\\boldsymbol{x}}",
-    "\\dim(\\text{ker}(\\Phi)) + \\dim(\\text{Im}(\\Phi)) = \\dim(V) \\quad"
+    "\\text{dim}(\\text{ker}(\\Phi)) + \\text{dim}(\\text{Im}(\\Phi)) = \\text{dim}(V)"
   ],
   "numericExample": {
     "description": "Rotação 90° de e₁=(1,0) e e₂=(0,1) pela matriz R = [[0,-1],[1,0]]",
@@ -63,7 +63,7 @@
       -1,
       0
     ],
-    "sourceRef": "mml-2.7.1"
+    "sourceRef": "mml-2.7.3"
   },
   "completionCriterion": "Na widget, o aluno vira a malha com shear/rotação e identifica as colunas da matriz como as novas posições dos e₁, e₂.",
   "estimatedMinutes": 13,
