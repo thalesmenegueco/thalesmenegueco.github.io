@@ -48,6 +48,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # The lesson-manifest gate is app-independent — it validates `ml-platform`'s
+      # contracts against `content-source/` and against the section list of the
+      # book — so it rides one matrix leg instead of running twice. It gets a step
+      # of its own rather than being folded into the test command because it fails
+      # for different reasons: a manifest citing a section the book does not have,
+      # a heading whose address was invented during extraction, or an examples
+      # fixture that fell behind the manifests it is generated from. None of those
+      # would fail `ng test`, and until this step existed the gate only ran when
+      # somebody remembered to run it by hand.
+      - name: Validate lesson manifests
+        if: matrix.app == 'ml-platform'
+        run: npm run validate:manifests
+
       # `ChromeHeadlessNoSandbox` is a launcher the `@angular/build:karma` builder
       # defines itself (base `ChromeHeadless` plus `--no-sandbox`,
       # `--disable-gpu`, `--disable-dev-shm-usage`). Using it instead of adding a
