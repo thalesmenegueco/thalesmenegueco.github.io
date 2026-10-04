@@ -15,6 +15,11 @@
   --color-text-secondary: #ec0dcf;
   --color-border: rgba(255, 255, 255, 1);
   --radius-card: 40px;
+  // Cards round at 40px because they are 300px wide; this one is for the media
+  // inside them, which is roughly half that size, so the same number would read
+  // as a much rounder corner. Kept as a token because the two are tuned
+  // together: see `.group-card img` in `shared/card/card.scss`.
+  --radius-image: 16px;
   --shadow-card-hover: 14px 14px;
 }
 

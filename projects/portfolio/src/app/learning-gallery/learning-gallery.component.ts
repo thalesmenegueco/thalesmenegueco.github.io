@@ -23,15 +23,20 @@ export class LearningGalleryComponent {
   // `public/images/`, the folder `angular.json` actually ships, so they resolve
   // relative to `<base href="/">` exactly as `icons/visualab.svg` does.
   //
-  // A screenshot also costs a card something an icon never did: the two prints
-  // are near-square but not square, so `card.scss` puts every card's media in a
-  // square frame — otherwise a 24 px height difference between neighbouring
-  // cards would shift their titles out of line. See the `aspect-ratio` note
-  // there, which is a no-op for the square icons the other cards still use.
+  // Both also set `roundedImage`, and that flag is why the card component has one
+  // at all: a screenshot is an opaque rectangle, so a radius frames it, while the
+  // SVG icons on the other two cards are transparent glyphs that the same radius
+  // would clip rather than frame. `card.scss` carries the pixel measurements.
+  //
+  // The screenshots and the icons are all sized by a shared media *height* rather
+  // than a shared square box, which is what keeps a row of cards on one baseline
+  // even though these two prints are near-square rather than square (0.93 and
+  // 1.07). That rule lives in `card.scss` too.
   { name: "Sinalize!",
     description: 'Plataforma para Aprender de Libras DE GRAÇA! 📚',
     image: 'images/sinalize-preview.png',
-    link: 'https://www.sinalize.org'
+    link: 'https://www.sinalize.org',
+    roundedImage: true
   },
   {
     name: "Sinal Fala",
@@ -57,7 +62,8 @@ export class LearningGalleryComponent {
     name: "VisuaLab",
     description: 'Cursos interativos de exatas: entenda explorando, aplique em problemas reais 📐',
     image: 'images/visualab-preview.png',
-    link: PLATFORM_LINKS.hub
+    link: PLATFORM_LINKS.hub,
+    roundedImage: true
   }
 ];
 

@@ -31,22 +31,46 @@
 }
 
 .group-card img {
-  width: 80%;
-  // Every card's media occupies a square box. For the square icons most cards
-  // still use this changes nothing — a 1:1 source in a 1:1 frame lays out
-  // identically — and for the two project screenshots it is what keeps a row of
-  // cards even: the prints are near-square but not square (0.93 and 1.07), which
-  // at this width is a ~24 px height difference, and `.flex-cards` stretches its
-  // cards to a common height, so that difference would push the neighbouring
-  // titles out of line.
+  // The media is sized by a shared *height* rather than by a shared square box.
+  // `.flex-cards` stretches cards to a common height and each card centres its
+  // own content, so media of differing heights would push neighbouring titles
+  // out of line; a common height keeps the row on one baseline whatever each
+  // image's aspect ratio is. 170px is the width these images already occupied at
+  // `width: 80%` of the card's 212px content box, so the square icons render
+  // 170×170 exactly as they did before.
   //
-  // `contain` rather than `cover`: cropping a product screenshot cuts the edges
-  // that make it recognisable, and the letterboxing it leaves instead is under
-  // 4% of one axis, against the card's own surface.
-  aspect-ratio: 1 / 1;
+  // Sizing the box to the image is also what makes the rounded corners real. In
+  // a fixed square frame the near-square project prints (0.93 and 1.07) have to
+  // be `contain`-ed, which leaves them short of the frame's corners on one axis —
+  // a `border-radius` on that frame rounds the empty space beside the picture,
+  // not the picture. Here the box *is* the picture, so the radius lands on the
+  // print's own corners.
+  //
+  // The two fallbacks only matter for an image wide enough to be clamped by
+  // `max-width` (nothing in the gallery is): they letterbox instead of
+  // stretching, which would otherwise be the alternative to distorting it.
+  height: 170px;
+  width: auto;
+  max-width: 100%;
   object-fit: contain;
-  height: auto;
   margin: 20px;
+}
+
+// Rounded corners, on the screenshot cards only.
+//
+// The radius is not a general style rule because the two kinds of media here are
+// not the same kind of thing. A screenshot is an opaque rectangle, so a radius
+// frames it — measured: with the radius on, the pixel at each print's top-left
+// corner becomes the card's surface (`#333`) instead of the picture's own corner
+// pixel, and ~290 pixels change per print, all of them at the corners. An SVG
+// icon is a transparent glyph drawn on that same surface, so the radius has no
+// rectangle to round and clips the artwork instead: the same measurement showed
+// 450 and 210 pixels of the `creativity-1` and `puzzle` glyphs being cut away.
+//
+// Hence `CardComponent.roundedImage`, set from `CardItem.roundedImage` — which is
+// why the card component's template carries the class binding at all.
+.group-card img.image--rounded {
+  border-radius: var(--radius-image);
 }
 
 .content span {

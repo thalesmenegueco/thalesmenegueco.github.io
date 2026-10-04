@@ -11,7 +11,8 @@
     <h3 class="top-projects__title">⭐ Top Projetos</h3>
     <div class="flex-cards">
       @for (item of topProjects; track $index) {
-      <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''">
+      <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''"
+        [roundedImage]="item.roundedImage ?? false">
       </app-card>
       }
     </div>
@@ -19,7 +20,8 @@
 
   <div class="flex-cards">
     @for (item of interests; track $index) {
-    <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''">
+    <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''"
+      [roundedImage]="item.roundedImage ?? false">
     </app-card>
     }
   </div>

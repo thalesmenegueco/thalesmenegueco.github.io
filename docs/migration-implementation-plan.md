@@ -877,26 +877,50 @@ VisuaLab card was chosen for in Phase 4, kept. The two `Sinal Fala` and `Lab de
 Ferramentas` cards keep their borrowed icons, unchanged. (`icons/visualab.svg`
 is still shipped; it is simply no longer what that card leads with.)
 
-**The one thing a screenshot costs, and the fix.** The prints are near-square but
-not square (0.93 and 1.07), and `.flex-cards` stretches its cards to a common
-height while each card centres its own content — so a ~24 px media-height
-difference between neighbours would push their titles out of line. `.group-card
-img` therefore gets `aspect-ratio: 1 / 1; object-fit: contain`. That is a **no-op
-for every other card**: their icons are square (24×24 and 120×120 local viewBoxes,
-800×800 from svgrepo), and a 1:1 source in a 1:1 frame lays out identically.
-`contain` rather than `cover` because cropping a screenshot cuts the edges that
-make it recognisable; the letterboxing it leaves instead is under 4% of one axis
-against the card's own surface.
+**A screenshot costs a card something an icon never did: its own aspect ratio.**
+The prints are near-square but not square (0.93 and 1.07), and `.flex-cards`
+stretches its cards to a common height while each card centres its own content —
+so a ~24 px media-height difference between neighbours would push their titles out
+of line. `.group-card img` therefore sizes the media by a shared **height**
+(`height: 170px; width: auto`) instead of by a shared square box. 170px is simply
+the width these images already occupied at `width: 80%` of the card's 212px
+content box, so the square icons render exactly as before.
 
-Measured in a real browser (headless Chrome over CDP, against the production
-build) rather than assumed:
+Sizing by height rather than by a fixed square frame is also what makes the
+rounded corners real, and that is worth recording because the first attempt got
+it wrong. Inside a square frame the prints have to be `contain`-ed, which leaves
+them short of the frame's corners on one axis — so a `border-radius` on that frame
+rounds the *empty space beside* the picture, not the picture. Sizing the box to
+the image means the box **is** the image, and the radius lands on the print.
 
-| Check | Result |
-|---|---|
-| All four cards' images load | ✅ `naturalWidth > 0` for each |
-| Media boxes | ✅ every card `170×170`, `object-fit: contain`, `aspect-ratio: 1 / 1` |
-| Titles aligned in a row | ✅ at 1920 px all four cards share `titleTop = 445`; at 1440 px the three that fit share it and the fourth wraps |
-| Square icons unchanged | ✅ svgrepo icons report 800×800 and lay out exactly as before |
+**The radius is opt-in per card, because it damages the icons.** Setting
+`border-radius` on every card image — the obvious one-line version — clips the SVG
+glyphs: they are transparent artwork drawn straight onto the card's surface, so
+there is no rectangle for the radius to round and it cuts the glyph instead. Only
+measurement showed this; the icons *look* like padded, centred glyphs in their
+source files, and the whole point is that the second derivative of a 16 px arc is
+invisible in a code review. So the rounding is opt-in through
+`CardItem.roundedImage` → `CardComponent.roundedImage` → `.image--rounded`, set on
+the two screenshot cards and nowhere else.
+
+Measured in a real browser (headless Chrome over CDP against the production
+build), each card's media captured twice — radius applied, then forced to 0 with
+an injected stylesheet — and the two images diffed pixel by pixel:
+
+| Card | Media box | `border-radius` | Pixels changed by the radius | Verdict |
+|---|---|---|---|---|
+| Sinalize! | 182×170 | `16px` | 294, corner `#333` → `#ffffff` | ✅ rounding lands on the print |
+| VisuaLab | 158×170 | `16px` | 290, corner `#333` → `#0a0f10` | ✅ rounding lands on the print |
+| Sinal Fala | 170×170 | `0px` | 0 | ✅ glyph untouched |
+| Lab de Ferramentas | 170×170 | `0px` | 0 | ✅ glyph untouched |
+
+In the first pass, with the radius applied to every card, the same comparison
+changed **450** pixels of the `creativity-1` glyph and **210** of `puzzle` — the
+radius removing artwork — which is what moved this to an opt-in flag. The corner
+column is the proof that the rounding is on the picture: with the radius on, each
+print's top-left pixel becomes the card's surface `#333` instead of the picture's
+own corner pixel. Titles still align at 1920 px (all four share `titleTop = 445`),
+and at 1440 px the three that fit share it and the fourth wraps.
 
 **And a test, because a bad asset path is invisible to every other gate.**
 `learning-gallery.component.spec.ts` now loads each locally-referenced card image
