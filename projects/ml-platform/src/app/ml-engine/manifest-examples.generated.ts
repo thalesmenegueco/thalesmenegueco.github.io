@@ -5,7 +5,7 @@
  * Cada entrada vem de um `numericExample` em `projects/ml-platform/manifests/`.
  * Depois de mexer em qualquer exemplo: `npm run examples:build`.
  *
- * manifestsHash: d051b31de734e9d0
+ * manifestsHash: a97fb57260be7d96
  */
 export interface ManifestNumericExample {
   lessonId: string;
@@ -19,7 +19,7 @@ export interface ManifestNumericExample {
 }
 
 /** Hash dos exemplos que geraram este arquivo; conferido por `validate:manifests`. */
-export const MANIFESTS_HASH = 'd051b31de734e9d0';
+export const MANIFESTS_HASH = 'a97fb57260be7d96';
 
 export const MANIFEST_EXAMPLES: ManifestNumericExample[] = [
   {

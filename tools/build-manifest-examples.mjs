@@ -53,12 +53,35 @@ export function collectExamples(dir = MANIFESTS_DIR) {
 }
 
 /**
- * Hash of the generated payload. Deliberately covers only what the test asserts
- * (inputs, expected prose and numbers) so reformatting a manifest does not
- * invalidate the fixture.
+ * Hash of the **asserted** part of the payload: the fields
+ * `manifest-examples.spec.ts` actually reads — the dispatch key, the engine inputs,
+ * the numbers it compares, and the prose it cross-checks them against.
+ *
+ * `title` and `sourceRef` ride along in the fixture but no assertion touches them:
+ * the spec reads `sourceRef` zero times, and `title` only to build the test's name.
+ * They used to be hashed anyway, so correcting a `sourceRef` — a provenance fix that
+ * moves no number the spec verifies — invalidated a fixture whose numbers were still
+ * current. That fails closed, so it was never a hole; it was noise, and noise on a
+ * gate is what teaches people to distrust it.
+ *
+ * `lessonId` stays in even though it is never compared: the spec asserts the
+ * examples are non-empty and unique by lesson, so adding or removing one must move
+ * the hash.
+ *
+ * Reformatting a manifest still does not invalidate anything — `JSON.parse`
+ * normalises whitespace before this ever sees it.
  */
 export function hashExamples(examples) {
-  return createHash('sha256').update(JSON.stringify(examples)).digest('hex').slice(0, 16);
+  const asserted = examples.map(
+    ({ lessonId, inputs, expected, expectedValues, description }) => ({
+      lessonId,
+      inputs,
+      expected,
+      expectedValues,
+      description,
+    }),
+  );
+  return createHash('sha256').update(JSON.stringify(asserted)).digest('hex').slice(0, 16);
 }
 
 function render(examples) {
