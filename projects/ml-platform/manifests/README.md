@@ -12,7 +12,34 @@ fonte.
 | :--- | :--- |
 | `manifest.schema.json` | JSON Schema (draft 2020-12) — a definição normativa dos campos |
 | `registries.json` | Vocabulário fechado: nomes de widget e IDs de dataset |
+| `book-sections.json` | Vocabulário fechado dos **endereços que o livro tem** (`mml-2.7.3` → "Image and Kernel"), fixado por edição. Não é manifesto: é a régua contra a qual o gate confere todo `sourceRef` **e** todo heading de `content-source/` |
 | `fundamentos-*.json` | Os 12 manifestos do Curso 1 (7 do módulo teoria, 5 do aplicada) |
+
+### Por que existe o `book-sections.json`
+
+Porque um `sourceRef` pode resolver e mesmo assim mentir. O gate conferia que `mml-9.5` existia
+como heading — e existia, porque a extração o tinha escrito. O que ele não tinha como saber é que
+o livro **não tem** §9.6, e que §9.5 é *Further Reading*. Oito IDs assim conviveram com o gate verde
+até 2026-10-04 (ver `content-source/README.md`, § A rodada complementar). Endereço errado é endereço
+válido, e um gate que só olha o arquivo extraído nunca vê a diferença.
+
+O que ele confere agora, e o que não confere:
+
+| Situação | Resultado |
+| :--- | :--- |
+| O endereço não existe no livro (`mml-7.5`, `mml-9.6`) | **erro**, com a lista de endereços do capítulo |
+| O endereço existe mas é bibliografia (`mml-7.4`, `mml-9.5` = *Further Reading*) | **erro** — nenhuma lição se ancora em bibliografia |
+| O número é válido, mas o título entre parênteses do heading é o de **outro** endereço | **nota**, e o gate diz qual endereço tem aquele título |
+| O número é válido e o heading não repete o título do livro em inglês | **nada** — não há como julgar sem ler. Foi o caso de dois dos oito |
+
+Ou seja: dos oito endereços errados de 2026-10-04, este gate pega seis (quatro como erro, dois como
+nota). Os outros dois — um heading com "(MAP)" de sigla e outro que só citava um intervalo de seções
+— não têm título comparável; para esses o único detector é olhar o sumário, e por isso o
+`book-sections.json` existe: conferir um endereço passa a ser uma consulta de um arquivo.
+
+Atualizar o arquivo é conferir o PDF: headings `^N.M Título` (seções — os *exercises* também são
+`N.M` e **não** entram) e `^N.M.K Título` (subseções), mais os títulos de capítulo. A receita está
+no `$comment` do próprio `book-sections.json`.
 
 ## Os três comandos do loop
 
@@ -36,7 +63,7 @@ Obrigatórios estão marcados; o resto é opcional e existe porque tem uso decla
 | `title` | ✓ | Título exibido | — |
 | `objective` | ✓ | O que o aluno entende ao fim, em termos observáveis | mínimo de 20 caracteres |
 | `prerequisites` | ✓ | lessonIds que vêm antes | cada um precisa existir como manifesto; o grafo não pode ter ciclo |
-| `sourceRefs` | ✓ | IDs de seção que sustentam a lição (`mml-5.2`) | cada ref precisa existir como heading em `content-source/` |
+| `sourceRefs` | ✓ | IDs de seção que sustentam a lição (`mml-5.2`) | cada ref precisa existir como heading em `content-source/` **e** ser um endereço que o livro tem (`book-sections.json`) |
 | `sourceFiles` | ✓ | Arquivos entregues ao prompt (contexto mínimo) | existir em disco, e cobrir todo `sourceRef` e toda fórmula |
 | `widget` | ✓ | Widget em PascalCase, ou `null` em lição conceitual | precisa estar em `registries.json` |
 | `keyFormulas` | ✓ | Fórmulas em LaTeX, **cortadas literalmente** da fonte | cada uma tem de aparecer no texto dos `sourceFiles` |

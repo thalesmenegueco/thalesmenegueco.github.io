@@ -12,6 +12,12 @@
  *     - todo `sourceRef` precisa existir como heading `## <ref> — Título` no
  *       arquivo de content-source/ que ele endereça, então um manifesto não
  *       consegue citar seção renomeada, renumerada ou nunca extraída;
+ *     - **todo `sourceRef` — e todo heading de content-source/ — precisa ser um
+ *       endereço que o livro realmente tem**, conferido contra `book-sections.json`.
+ *       Sem isso o gate tinha um ponto cego estrutural: um ID como `mml-9.5`
+ *       resolve, porque o heading existe, e cita a coisa errada, porque o número
+ *       foi inventado na extração. Endereço errado é endereço válido — foi assim
+ *       que oito deles passaram (ver content-source/README.md, § Numeração);
  *     - o capítulo de todo `sourceRef` precisa estar coberto por `sourceFiles`,
  *       senão a promessa de "contexto mínimo" da Camada 3 não se sustenta: o
  *       gerador não pode honrar um trecho que não recebeu;
@@ -42,6 +48,7 @@ const DEFAULT_DIR = join(ROOT, 'projects/ml-platform/manifests');
 const CONTENT_ROOT = join(ROOT, 'projects/ml-platform/content-source');
 const SCHEMA_FILE = 'manifest.schema.json';
 const REGISTRIES_FILE = 'registries.json';
+const BOOK_SECTIONS_FILE = 'book-sections.json';
 
 const manifestsDir = process.argv[2] ? process.argv[2] : DEFAULT_DIR;
 
@@ -68,14 +75,127 @@ const registries = JSON.parse(readFileSync(join(DEFAULT_DIR, REGISTRIES_FILE), '
 const KNOWN_WIDGETS = new Set(registries.widgets ?? []);
 const KNOWN_DATASETS = new Set(registries.datasets ?? []);
 
+// Os endereços que cada livro realmente tem (`mml-2.7.3` → "Image and Kernel"),
+// fixados por edição. É o que permite recusar um ID plausível e falso; o cabeçalho
+// do arquivo explica de onde ele sai e como atualizá-lo.
+const bookSections = JSON.parse(readFileSync(join(DEFAULT_DIR, BOOK_SECTIONS_FILE), 'utf8'));
+const BOOK_ADDRESSES = Object.fromEntries(
+  Object.entries(bookSections).filter(([key, value]) => !key.startsWith('$') && typeof value === 'object'),
+);
+
+/** `mml-2.7.3` → `mml`. */
+function bookOf(ref) {
+  return ref.slice(0, ref.indexOf('-'));
+}
+
+/** `mml-2.7.3` → `2.7.3`. */
+function addressOf(ref) {
+  return ref.slice(ref.indexOf('-') + 1);
+}
+
+/**
+ * O endereço existe no livro? Devolve `null` quando sim, e a mensagem do problema
+ * quando não — ou quando o livro não tem lista versionada (NNDL hoje), caso em que
+ * não há o que conferir e quem barra o manifesto é a checagem de heading.
+ */
+function addressProblem(ref) {
+  const known = BOOK_ADDRESSES[bookOf(ref)];
+  if (!known) return null;
+  const address = addressOf(ref);
+  if (known[address]) return null;
+
+  const chapter = address.split('.')[0];
+  const depth = address.split('.').length;
+  const siblings = Object.keys(known)
+    .filter((a) => a.split('.')[0] === chapter && a.split('.').length <= depth)
+    .join(', ');
+  return (
+    `"${ref}": o livro não tem a seção ${address}. ` +
+    `Endereços do cap. ${chapter}: ${siblings || '(nenhum)'}`
+  );
+}
+
+/** Título que o livro dá a um endereço, ou `undefined` se o endereço não existe. */
+function bookTitle(ref) {
+  return BOOK_ADDRESSES[bookOf(ref)]?.[addressOf(ref)];
+}
+
+const FURTHER_READING = 'Further Reading';
+
+/**
+ * "Further Reading" é a bibliografia do capítulo, não conteúdo: nenhuma lição se
+ * ancora nela. Citar uma é sinal quase certo de número errado — foi exatamente o
+ * que aconteceu com `mml-7.4` (que a extração usou para LP+QP) e `mml-9.5` (que
+ * ela usou para regressão Bayesiana). Os dois existem no livro; os dois estão
+ * errados.
+ */
+function furtherReadingProblem(ref) {
+  if (bookTitle(ref) !== FURTHER_READING) return null;
+  return (
+    `"${ref}" é a seção "${FURTHER_READING}" do livro — bibliografia, não conteúdo. ` +
+    'Número errado? O livro fecha cada capítulo com ela; confira o endereço no sumário.'
+  );
+}
+
+/**
+ * O título do heading combina com o do livro? Heurística — e por isso vira **nota,
+ * nunca erro**: pega o caso em que o número existe mas nomeia outro assunto (o
+ * heading `mml-2.7.1 — Imagem (Range) e Núcleo…` enquanto `2.7.1` do livro é
+ * "Matrix Representation of Linear Mappings").
+ *
+ * Só olha o que está entre parênteses, que é onde a extração repete o título
+ * original: parênteses de citação ("(Seções 6.4.1 a 6.4.3)", "(Teorema 2.24)"),
+ * siglas ("(SVD)") e texto em português ("(Gradiente de Funções Vetoriais)") são
+ * ignorados — os três aparecem em headings corretos e dariam nota à toa. Nota que
+ * aparece em conteúdo certo ensina a ignorar o canal, que é pior do que não ter.
+ */
+const CITATION_LIKE = /^\((seç|cap|definiç|teorema|exemplo|eq|fig|tabela|remark|obs)/i;
+const PT_STOPWORDS = /\b(de|da|do|das|dos|em|para|com|como|entre)\b/i;
+
+function titleMismatchNote(id, headingTitle) {
+  const book = bookTitle(id);
+  if (!book || book === FURTHER_READING) return null;
+
+  const candidates = [...headingTitle.matchAll(/\(([^)]+)\)/g)]
+    .map((m) => m[1].trim())
+    .filter((p) => !CITATION_LIKE.test(`(${p})`))
+    .filter((p) => (p.match(/[A-Za-zÀ-ÿ]{4,}/g) ?? []).length > 0)
+    .filter((p) => !PT_STOPWORDS.test(p));
+  if (candidates.length === 0) return null;
+
+  const words = (s) => new Set((s.toLowerCase().match(/[a-z]{4,}/g) ?? []));
+  const inBook = words(book);
+  if (candidates.some((p) => [...words(p)].some((w) => inBook.has(w)))) return null;
+
+  // Se o heading citar o título de outro endereço, dizer qual é o conserto.
+  let elsewhere = null;
+  for (const p of candidates) {
+    for (const [address, title] of Object.entries(BOOK_ADDRESSES[bookOf(id)] ?? {})) {
+      const titleWords = words(title);
+      if (address === addressOf(id) || titleWords.size < 2) continue;
+      if ([...titleWords].every((w) => words(p).has(w))) elsewhere = `${address} ("${title}")`;
+    }
+  }
+  return (
+    `"${id}": o heading diz (${candidates.join(') (')}) mas o livro chama ${addressOf(id)} de ` +
+    `"${book}"` +
+    (elsewhere ? ` — esse título é o de ${elsewhere}; confira o número` : ' — confira se o número é o certo')
+  );
+}
+
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 const validate = ajv.compile(schema);
 
 /** IDs de seção (`## mml-5.2 — …`, `# mml-7 — …`) presentes num arquivo. */
 function sectionIds(relPath) {
+  return sectionHeadings(relPath).map((h) => h.id);
+}
+
+/** Headings de seção de um arquivo, com o título que o heading exibe. */
+function sectionHeadings(relPath) {
   const text = readFileSync(join(CONTENT_ROOT, relPath), 'utf8');
-  const re = /^#{1,2} ([a-z]+-[0-9]+(?:\.[0-9]+)*(?:-[a-z0-9-]+)*) — /gm;
-  return [...text.matchAll(re)].map((m) => m[1]);
+  const re = /^#{1,2} ([a-z]+-[0-9]+(?:\.[0-9]+)*(?:-[a-z0-9-]+)*) — (.*)$/gm;
+  return [...text.matchAll(re)].map((m) => ({ id: m[1], title: m[2] }));
 }
 
 /** Arquivo de capítulo que um ref endereça, ex. `mml-5.2` -> `mml/05-*.md`. */
@@ -118,7 +238,13 @@ function normalizedSourceText(sourceFiles) {
 }
 
 const files = readdirSync(manifestsDir)
-  .filter((f) => f.endsWith('.json') && f !== SCHEMA_FILE && f !== REGISTRIES_FILE)
+  .filter(
+    (f) =>
+      f.endsWith('.json') &&
+      f !== SCHEMA_FILE &&
+      f !== REGISTRIES_FILE &&
+      f !== BOOK_SECTIONS_FILE,
+  )
   .sort();
 
 if (files.length === 0) {
@@ -229,6 +355,16 @@ for (const [lessonId, { file, manifest }] of loaded) {
           `sourceRef "${ref}" não existe como heading em ${owner}` +
             (available.length ? ` (disponíveis: ${available.join(', ')})` : ' (arquivo sem IDs de seção)'),
         );
+      } else {
+        // O heading existe; resta saber se ele aponta para uma seção que o livro
+        // tem, e se essa seção é conteúdo. As falhas são independentes, e por
+        // isso cada uma tem o seu `else`.
+        const badAddress = addressProblem(ref);
+        if (badAddress) problems.push(`sourceRef ${badAddress}`);
+        else {
+          const bibliography = furtherReadingProblem(ref);
+          if (bibliography) problems.push(`sourceRef ${bibliography}`);
+        }
       }
       if (Array.isArray(sourceFiles) && !sourceFiles.includes(owner)) {
         problems.push(
@@ -323,6 +459,48 @@ const cycle = findCycle();
 if (cycle) {
   console.error(`✗ ciclo em prerequisites: ${cycle.join(' → ')}`);
   errors++;
+}
+
+// Todo heading de content-source/ precisa ser um endereço que o livro tem —
+// inclusive os que manifesto nenhum cita. É a varredura que pega o ID inventado
+// na extração: `mml-7.4`, `mml-7.5`, `mml-9.5` e `mml-9.6` não apareciam em
+// manifesto algum, então a checagem por manifesto passava ao largo deles.
+for (const book of readdirSync(CONTENT_ROOT, { withFileTypes: true })
+  .filter((e) => e.isDirectory())
+  .map((e) => e.name)) {
+  const headings = readdirSync(join(CONTENT_ROOT, book))
+    .filter((f) => f.endsWith('.md'))
+    .flatMap((f) => sectionHeadings(`${book}/${f}`).map((h) => ({ ...h, file: `${book}/${f}` })));
+  if (headings.length === 0) continue; // capítulo ainda não extraído com IDs: nada a conferir
+
+  const known = BOOK_ADDRESSES[book];
+  if (!known) {
+    console.log(`! content-source/${book}: sem lista de seções versionada — headings não conferidos`);
+    warnings++;
+    continue;
+  }
+
+  let bad = 0;
+  for (const { id, title, file } of headings) {
+    const badAddress = addressProblem(id);
+    const bibliography = furtherReadingProblem(id);
+    if (badAddress || bibliography) {
+      console.error(`✗ content-source/${file}: ${badAddress ?? bibliography}`);
+      bad++;
+      continue;
+    }
+    // O número é válido; a nota só desconfia do título.
+    const mismatch = titleMismatchNote(id, title);
+    if (mismatch) {
+      console.log(`! content-source/${file}: ${mismatch}`);
+      warnings++;
+    }
+  }
+  if (bad === 0) {
+    console.log(`✓ content-source/${book}: ${headings.length} heading(s), todos endereços de conteúdo do livro`);
+  } else {
+    errors += bad;
+  }
 }
 
 // A fixture dos exemplos numéricos é gerada a partir dos manifestos; se ficou
