@@ -95,13 +95,28 @@ Por que a notação do livro, e não uma simplificada:
   espaços e exige que cada fórmula apareça no texto dos `sourceFiles`. Fórmula reescrita à mão
   não é verificável, e "plausível mas inventada" é exatamente o erro que o pipeline existe para
   impedir;
-- **exibível** — é o LaTeX que a extração já usa (`\boldsymbol`, `\mathbb`, `^\top`, `\frac`), que
-  o KaTeX renderiza sem tradução;
+- **exibível** — é o LaTeX que a extração já usa (`\boldsymbol`, `\mathbb`, `^\top`, `\frac`,
+  `\operatorname`), que o KaTeX renderiza sem tradução;
 - **tratável por IA** — LaTeX padrão, uma string por fórmula, sem macros próprias nem sintaxe
   inventada: o gerador copia, não interpreta.
 
 O custo aceito: `\boldsymbol{x}` (negrito itálico, do livro) em vez de `\mathbf{x}`. É a
 notação que o aluno vê no material de referência, então a lição e o livro não divergem.
+
+**`\operatorname{}` entrou em 2026-10-04**, na reextração da §2.7.3 (`mml-2.7.3`): ela saiu com
+`\operatorname{ker}`, `\operatorname{Im}`, `\operatorname{dim}` e `\operatorname{rk}`, e é hoje a
+única seção do corpus escrita assim — as outras usam `\dim` (`mml/02`, `mml/03`), `\text{rk}`
+(`mml/02`, `mml/04`, `mml/09`) e `\text{ker}` (`mml/04`). Por isso **a lista acima é ilustrativa,
+não normativa**: o que vale é a regra literal, cada `keyFormula` copiada do `sourceFiles` que a
+própria lição entrega.
+
+Esse macro já trocou duas vezes, sempre na mesma seção — `\dim` → `\text{dim}` no dump-03 →
+`\operatorname{dim}` nesta reextração — porque o extrator não tem uma convenção para operadores e
+escolhe uma a cada passagem. A consequência prática: **reextrair uma seção reabre o `keyFormulas`
+de toda lição que a cita.** Foi o que aconteceu aqui — o gate recusou `fundamentos-teoria-03` até a
+fórmula do teorema da nulidade e posto ser recopiada da fonte nova. Deixar `\dim`, `\text{rk}` e
+`\operatorname{rk}` convivendo é aceitável, porque o gate confere contra o arquivo e não contra
+uma convenção; uniformizá-los é decisão consciente, não algo a delegar ao próximo prompt.
 
 As fórmulas dos 12 manifestos foram extraídas mecanicamente do texto da fonte, não redigitadas.
 

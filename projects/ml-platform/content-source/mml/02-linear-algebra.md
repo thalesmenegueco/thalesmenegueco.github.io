@@ -118,50 +118,104 @@
 
 ---
 
-## mml-2.7.3 — Imagem (Range) e Núcleo (Kernel / Null Space)
+## mml-2.7.3 — Imagem (Image) e Núcleo (Kernel / Null Space)
 
-**(a) Definição / Conceito Central:**
-Para uma transformação linear \\( \Phi : V \to W \\) entre dois espaços vetoriais \\( V \\) (domínio / *domain*) e \\( W \\) (contradomínio / *codomain*):
-- O **núcleo / espaço nulo** (*kernel* / *null space*), denotado por \\( \text{ker}(\Phi) \\), é o conjunto de todos os vetores \\( \boldsymbol{v} \in V \\) que \\( \Phi \\) mapeia no elemento neutro \\( \mathbf{0}_W \in W \\):
-\\[ \text{ker}(\Phi) := \Phi^{-1}(\mathbf{0}_W) = \{ \boldsymbol{v} \in V : \Phi(\boldsymbol{v}) = \mathbf{0}_W \} \\]
-- A **imagem / alcance** (*image* / *range*), denotada por \\( \text{Im}(\Phi) \\), é o conjunto de todos os vetores \\( \boldsymbol{w} \in W \\) que podem ser alcançados por \\( \Phi \\) a partir de algum vetor em \\( V \\):
-\\[ \text{Im}(\Phi) := \Phi(V) = \{ \boldsymbol{w} \in W \mid \exists \boldsymbol{v} \in V : \Phi(\boldsymbol{v}) = \boldsymbol{w} \} \\]
-Intuitivamente, o núcleo é um subespaço vetorial de \\( V \\) (\\( \text{ker}(\Phi) \subseteq V \\)) e a imagem é um subespaço vetorial de \\( W \\) (\\( \text{Im}(\Phi) \subseteq W \\)). O vetor nulo \\( \mathbf{0}_V \\) sempre pertence ao núcleo, pois \\( \Phi(\mathbf{0}_V) = \mathbf{0}_W \\), portanto o núcleo nunca é vazio.
+* **(a) Definições Formais e Notação Exata:**
+  Para uma transformação linear \\( \Phi : V \to W \\), onde \\( V \\) é o **domínio** (*domain*) e \\( W \\) é o **contradomínio** (*codomain*), o livro define formalmente [MML §2.7.3]:
 
-**(b) Relação com Posto e com Injetividade/Sobrejetividade:**
-- **Espaço das Colunas e Posto (*Column Space and Rank*):** Para uma matriz de transformação \\( \boldsymbol{A} \in \mathbb{R}^{m \times n} \\) associada à transformação linear \\( \Phi : \mathbb{R}^n \to \mathbb{R}^m, \boldsymbol{x} \mapsto \boldsymbol{A}\boldsymbol{x} \\), a imagem \\( \text{Im}(\Phi) \\) é o subespaço gerado pelas colunas de \\( \boldsymbol{A} \\), denominado espaço das colunas (*column space*):
-\\[ \text{Im}(\Phi) = \text{span}[\boldsymbol{a}_1, \ldots, \boldsymbol{a}_n] \subseteq \mathbb{R}^m \\]
-A dimensão da imagem é igual ao posto da matriz (*rank*): \\( \text{dim}(\text{Im}(\Phi)) = \text{rk}(\boldsymbol{A}) \\). O núcleo \\( \text{ker}(\Phi) \\) representa o conjunto de soluções gerais do sistema linear homogêneo \\( \boldsymbol{A}\boldsymbol{x} = \mathbf{0} \\).
-- **Injetividade (*Injective*):** A transformação \\( \Phi \\) é injetiva (um-para-um / *one-to-one*) se e somente se o núcleo contiver apenas o vetor nulo:
-\\[ \text{ker}(\Phi) = \{ \mathbf{0}_V \} \iff \text{dim}(\text{ker}(\Phi)) = 0 \\]
-- **Sobrejetividade (*Surjective*):** \\( \Phi \\) é sobrejetiva se e somente se sua imagem for igual a todo o contradomínio \\( W \\):
-\\[ \text{Im}(\Phi) = W \iff \text{dim}(\text{Im}(\Phi)) = \text{dim}(W) \\]
-- **Bijetividade (*Bijective*):** Se \\( \text{dim}(V) = \text{dim}(W) \\), vale a equivalência: \\( \Phi \text{ é injetiva} \iff \Phi \text{ é sobrejetiva} \iff \Phi \text{ é bijetiva} \\).
+  O **núcleo / espaço nulo** (*kernel / null space*):
+  \\[ \operatorname{ker}(\Phi) := \Phi^{-1}(\boldsymbol{0}_W) = \{v \in V : \Phi(v) = \boldsymbol{0}_W\} \\]
 
-**(c) Teorema da Nulidade e Posto (*Rank-Nullity Theorem*):**
-Também chamado de Teorema Fundamental das Transformaçoes Lineares (*fundamental theorem of linear mappings*), estabelece que para espaços vetoriais \\( V, W \\) e uma transformação linear \\( \Phi : V \to W \\):
-\\[ \text{dim}(\text{ker}(\Phi)) + \text{dim}(\text{Im}(\Phi)) = \text{dim}(V) \\]
-Consequências diretas do teorema:
-- Se \\( \text{dim}(\text{Im}(\Phi)) < \text{dim}(V) \\), então o núcleo é não trivial (\\( \text{dim}(\text{ker}(\Phi)) \geqslant 1 \\)) e o sistema homogêneo \\( \boldsymbol{A}_\Phi \boldsymbol{x} = \mathbf{0} \\) possui infinitas soluções.
+  A **imagem / alcance** (*image / range*):
+  \\[ \operatorname{Im}(\Phi) := \Phi(V) = \{w \in W \mid \exists v \in V : \Phi(v) = w\} \\]
 
-**(d) Exemplo Numérico Pequeno com Matriz 2×2:**
-Considere a transformação linear \\( \Phi : \mathbb{R}^2 \to \mathbb{R}^2 \\) representada pela matriz \\( \boldsymbol{A} \in \mathbb{R}^{2 \times 2} \\):
-\\[ \boldsymbol{A} = \begin{bmatrix} 1 & 2 \\ 1 & 2 \end{bmatrix} \\]
-- **Cálculo da Imagem \\( \text{Im}(\Phi) \\):** A imagem é dada pelo subespaço gerado pelas colunas de \\( \boldsymbol{A} \\):
-\\[ \text{Im}(\Phi) = \text{span}\left[ \begin{bmatrix} 1 \\ 1 \end{bmatrix}, \begin{bmatrix} 2 \\ 2 \end{bmatrix} \right] = \text{span}\left[ \begin{bmatrix} 1 \\ 1 \end{bmatrix} \right] \\]
-Portanto, a dimensão da imagem é \\( \text{dim}(\text{Im}(\Phi)) = \text{rk}(\boldsymbol{A}) = 1 \\).
-- **Cálculo do Núcleo \\( \text{ker}(\Phi) \\):** Resolve-se o sistema homogêneo \\( \boldsymbol{A}\boldsymbol{x} = \mathbf{0} \\):
-\\[ \begin{bmatrix} 1 & 2 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \implies x_1 + 2x_2 = 0 \implies x_1 = -2x_2 \\]
-Logo, o núcleo é a reta gerada pelo vetor \\( \begin{bmatrix} -2 \\ 1 \end{bmatrix} \\):
-\\[ \text{ker}(\Phi) = \text{span}\left[ \begin{bmatrix} -2 \\ 1 \end{bmatrix} \right] \\]
-Sua dimensão é \\( \text{dim}(\text{ker}(\Phi)) = 1 \\).
-- **Verificação do Teorema da Nulidade e Posto:**
-\\[ \text{dim}(\text{ker}(\Phi)) + \text{dim}(\text{Im}(\Phi)) = 1 + 1 = 2 = \text{dim}(\mathbb{R}^2) \\]
+  **Propriedades formais dos subespaços** [MML §2.7.3]:
+  - Como \\( \Phi(\boldsymbol{0}_V) = \boldsymbol{0}_W \\), o vetor nulo sempre pertence ao núcleo (\\( \boldsymbol{0}_V \in \operatorname{ker}(\Phi) \\)), de modo que o núcleo nunca é vazio.
+  - O núcleo é um subespaço vetorial do domínio (\\( \operatorname{ker}(\Phi) \subseteq V \\)) e a imagem é um subespaço vetorial do contradomínio (\\( \operatorname{Im}(\Phi) \subseteq W \\)).
 
-**(e) Propriedades, Exemplos e Aplicações em Machine Learning:**
-- **Regressor Linear (*Linear Regression* - MML §9.4):** A solução de verossimilhança máxima (*maximum likelihood estimate*) \\( \boldsymbol{y} \approx \boldsymbol{\Phi}\boldsymbol{\theta}_{\text{ML}} \\) na regressão linear pode ser interpretada como uma projeção ortogonal (*orthogonal projection*) do vetor de alvos/observações \\( \boldsymbol{y} \in \mathbb{R}^N \\) sobre um subespaço \\( K \\)-dimensional de \\( \mathbb{R}^N \\) gerado pelas colunas da matriz de características / matriz de design (*feature matrix / design matrix*) \\( \boldsymbol{\Phi} \in \mathbb{R}^{N \times K} \\), ou seja, a imagem / espaço das colunas \\( \text{Im}(\boldsymbol{\Phi}) \\).
-- **Análise de Componentes Principais (*Principal Component Analysis* - PCA - MML §10.1–10.3 e §4.5):** No PCA, busca-se projetar dados de alta dimensão sobre um subespaço principal (*principal subspace*) de menor dimensão \\( U \subseteq \mathbb{R}^D \\), gerado pelas colunas da matriz de projeção \\( \boldsymbol{B} \in \mathbb{R}^{D \times M} \\), onde o subespaço corresponde à imagem \\( \text{Im}(\boldsymbol{B}) \\). Além disso, na Decomposição em Valores Singulares (SVD - MML §4.5) utilizada para calcular os componentes, os vetores singulares à direita correspondentes a valores singulares nulos fornecem uma base ortonormal para o núcleo (*kernel / null space*) da matriz de dados.
-- **Ressalva da Terminologia em ML (MML §12.4 Remark):** O livro destaca que a palavra *kernel* possui múltiplos significados em Machine Learning: (1) o núcleo / espaço nulo de uma transformação linear na Álgebra Linea (MML §2.7.3); (2) a função de núcleo em métodos de *kernel* (como o truque do *kernel* / *kernel trick* em SVMs - MML §12.4); e (3) o *kernel* de suavização na estimação de densidade (*kernel density estimation* - MML §11.5).
+  **Relação com o posto (*rank*) e espaço de colunas** [MML §2.7.3]:
+  Para uma matriz \\( \boldsymbol{A} \in \mathbb{R}^{m \times n} \\) representando \\( \Phi : \mathbb{R}^n \to \mathbb{R}^m, \boldsymbol{x} \mapsto \boldsymbol{A}\boldsymbol{x} \\), a imagem coincide com o espaço gerado pelas colunas de \\( \boldsymbol{A} \\) (**espaço de colunas** / *column space*):
+  \\[ \operatorname{Im}(\Phi) = \{\boldsymbol{A}\boldsymbol{x} : \boldsymbol{x} \in \mathbb{R}^n\} = \left\{ \sum_{i=1}^n x_i \boldsymbol{a}_i : x_1, \dots, x_n \in \mathbb{R} \right\} = \operatorname{span}[\boldsymbol{a}_1, \dots, \boldsymbol{a}_n] \subseteq \mathbb{R}^m \\]
+  A dimensão da imagem é exatamente igual ao posto da matriz: \\( \operatorname{rk}(\boldsymbol{A}) = \operatorname{dim}(\operatorname{Im}(\Phi)) \\). O núcleo \\( \operatorname{ker}(\Phi) \subseteq \mathbb{R}^n \\) é a solução geral do sistema linear homogêneo \\( \boldsymbol{A}\boldsymbol{x} = \boldsymbol{0} \\), focando nas relações de dependência linear entre as colunas da matriz.
+
+  **Relação com Injetividade e Sobrejetividade** [MML §2.7.3]:
+  - **Injetividade:** \\( \Phi \\) é injetiva (*one-to-one*) se e somente se seu núcleo contiver apenas o vetor nulo, ou seja, \\( \operatorname{ker}(\Phi) = \{\boldsymbol{0}_V\} \\).
+  - **Sobrejetividade:** \\( \Phi \\) é sobrejetiva se sua imagem cobrir todo o contradomínio, isto é, \\( \operatorname{Im}(\Phi) = W \\).
+
+  **Teorema da Nulidade e Posto (*Rank-Nullity Theorem* / Theorem 2.24)** [MML §2.7.3]:
+  Para espaços vetoriais \\( V, W \\) e uma transformação linear \\( \Phi : V \to W \\):
+  \\[ \operatorname{dim}(\operatorname{ker}(\Phi)) + \operatorname{dim}(\operatorname{Im}(\Phi)) = \operatorname{dim}(V) \\]
+
+  **Consequências formais do teorema** [MML §2.7.3]:
+  - Se \\( \operatorname{dim}(\operatorname{Im}(\Phi)) < \operatorname{dim}(V) \\), o núcleo é não trivial (\\( \operatorname{dim}(\operatorname{ker}(\Phi)) \ge 1 \\)) e contém mais vetores do que apenas \\( \boldsymbol{0}_V \\).
+  - Se \\( \operatorname{dim}(\operatorname{Im}(\Phi)) < \operatorname{dim}(V) \\), o sistema linear homogêneo \\( \boldsymbol{A}_\Phi \boldsymbol{x} = \boldsymbol{0} \\) possui infinitas soluções.
+  - Se \\( \operatorname{dim}(V) = \operatorname{dim}(W) \\), vale a equivalência tripla: \\( \Phi \text{ é injetiva} \iff \Phi \text{ é sobrejetiva} \iff \Phi \text{ é bijetiva} \\).
+
+* **(b) Intuição Geométrica:**
+  - **Núcleo (*kernel / null space*):** Representa o conjunto de todas as direções do espaço de origem \\( V \\) que a transformação linear colapsa ou "achata" completamente no vetor zero \\( \boldsymbol{0}_W \\) do espaço de destino \\( W \\) [MML §2.7.3].
+  - **Imagem (*image / range*):** Representa o subespaço em \\( W \\) formado por todos os vetores que podem ser efetivamente alcançados pela transformação a partir de algum vetor em \\( V \\) (o espaço gerado pela combinação linear das colunas da matriz) [MML §2.7.3].
+
+* **(c) Exemplo Numérico Pequeno em 2D:**
+  A §2.7.3 apresenta o **Exemplo 2.25** [MML §2.7.3], utilizando uma matriz de dimensão \\(2 \times 4\\). A transformação linear \\(\Phi : \mathbb{R}^4 \to \mathbb{R}^2\\) é definida por:
+  \\[
+  \Phi\left(\begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix}\right) = \begin{bmatrix} 1 & 2 & -1 & 0 \\ 1 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix} = \begin{bmatrix} x_1 + 2x_2 - x_3 \\ x_1 + x_4 \end{bmatrix} = x_1 \begin{bmatrix} 1 \\ 1 \end{bmatrix} + x_2 \begin{bmatrix} 2 \\ 0 \end{bmatrix} + x_3 \begin{bmatrix} -1 \\ 0 \end{bmatrix} + x_4 \begin{bmatrix} 0 \\ 1 \end{bmatrix}
+  \\]
+
+  **1. Imagem (\\(\operatorname{Im}(\Phi)\\)):**
+  A imagem é o subespaço em \\(\mathbb{R}^2\\) gerado pelas colunas da matriz de transformação [MML §2.7.3]:
+  \\[
+  \operatorname{Im}(\Phi) = \operatorname{span}\left[ \begin{bmatrix} 1 \\ 1 \end{bmatrix}, \begin{bmatrix} 2 \\ 0 \end{bmatrix}, \begin{bmatrix} -1 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 1 \end{bmatrix} \right]
+  \\]
+  Como as duas primeiras colunas são linearmente independentes e geram todo o contradomínio \\(W = \mathbb{R}^2\\), temos que \\(\operatorname{dim}(\operatorname{Im}(\Phi)) = 2\\).
+
+  **2. Núcleo (\\(\operatorname{ker}(\Phi)\\)):**
+  Para encontrar o núcleo, resolve-se o sistema homogêneo \\(\boldsymbol{A}\boldsymbol{x} = \boldsymbol{0}\\). Aplicando a eliminação gaussiana para obter a forma escalonada reduzida por linhas (*reduced row-echelon form*) [MML §2.7.3]:
+  \\[
+  \begin{bmatrix} 1 & 2 & -1 & 0 \\ 1 & 0 & 0 & 1 \end{bmatrix} \rightsquigarrow \dots \rightsquigarrow \begin{bmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & -\frac{1}{2} & -\frac{1}{2} \end{bmatrix}
+  \\]
+  Expressando as colunas não-pivô (colunas 3 e 4) como combinações lineares das colunas pivô (colunas 1 e 2), obtém-se a base do núcleo [MML §2.7.3]:
+  \\[
+  \operatorname{ker}(\Phi) = \operatorname{span}\left[ \begin{bmatrix} 0 \\ \frac{1}{2} \\ 1 \\ 0 \end{bmatrix}, \begin{bmatrix} -1 \\ \frac{1}{2} \\ 0 \\ 1 \end{bmatrix} \right]
+  \\]
+  Portanto, \\(\operatorname{dim}(\operatorname{ker}(\Phi)) = 2\\).
+
+  **3. Conferência do Teorema da Nulidade e Posto (*Rank-Nullity Theorem*):**
+  O domínio é \\(V = \mathbb{R}^4\\), o que implica \\(\operatorname{dim}(V) = 4\\).
+  Verificando a igualdade do Teorema 2.24 [MML §2.7.3]:
+  \\[
+  \operatorname{dim}(\operatorname{ker}(\Phi)) + \operatorname{dim}(\operatorname{Im}(\Phi)) = 2 + 2 = 4 = \operatorname{dim}(V)
+  \\]
+  A relação do teorema é confirmada exatamente com os valores numéricos do exemplo.
+
+* **(d) Como o Conceito Aparece nos Outros Modelos (Regressor Linear, Classificador, Rede Neural, Clusterizador):**
+  - **O que a §2.7.3 sustenta:** A §2.7.3 desenvolve a teoria matemática abstrata de imagem e núcleo para transformações lineares genéricas sem construir diretamente as aplicações práticas com os modelos de aprendizado de máquina [MML §2.7.3].
+  - **Pontes com os quatro modelos (observação de síntese do livro):**
+    1. **Regressor Linear:** A matriz de características \\( \boldsymbol{\Phi} \\) (ou matriz de projeto) define um espaço de colunas correspondente à sua imagem \\( \operatorname{Im}(\boldsymbol{\Phi}) \\). A solução de mínimos quadrados projeta o vetor de alvos \\( \boldsymbol{y} \\) ortogonalmente sobre esse subespaço imagem [MML §9.4, §9.5].
+    2. **PCA / Dimensionality Reduction:** A projeção dos dados em um subespaço de menor dimensão atua sobre o espaço imagem gerado pelas colunas da matriz de base principal \\( \boldsymbol{B} \\). Além disso, autovetores associados a autovalores nulos na decomposição de covariância pertencem ao núcleo da transformação [MML §4.6, §10.3, §10.5].
+    3. **Classificador (SVM):** A seção de SVM traz um alerta explícito sobre a terminologia: o termo "kernel" em SVM refere-se às funções de núcleo em um Espaço de Hilbert de Núcleo Reprodutor (*RKHS*), ao passo que na álgebra linear (§2.7.3) "kernel" designa exclusivamente o espaço nulo / núcleo [MML §12.4].
+    4. **Rede Neural e Clusterizador:** As transformações lineares em camadas de redes neurais ou em modelos de mistura (como GMMs) utilizam matrizes cujo posto e núcleo determinam se há degradação ou perda de informação ao projetar atributos [MML §2.7.3, §8.1, §11.2].
+
+* **(e) Fórmulas Relevantes:**
+  - Definição de núcleo [MML §2.7.3]:
+    \\( \operatorname{ker}(\Phi) := \Phi^{-1}(\boldsymbol{0}_W) = \{v \in V : \Phi(v) = \boldsymbol{0}_W\} \\)
+  - Definição de imagem [MML §2.7.3]:
+    \\( \operatorname{Im}(\Phi) := \Phi(V) = \{w \in W \mid \exists v \in V : \Phi(v) = w\} \\)
+  - Imagem como espaço de colunas [MML §2.7.3]:
+    \\( \operatorname{Im}(\Phi) = \{\boldsymbol{A}\boldsymbol{x} : \boldsymbol{x} \in \mathbb{R}^n\} = \left\{ \sum_{i=1}^n x_i \boldsymbol{a}_i : x_1, \dots, x_n \in \mathbb{R} \right\} = \operatorname{span}[\boldsymbol{a}_1, \dots, \boldsymbol{a}_n] \subseteq \mathbb{R}^m \\)
+  - Teorema da Nulidade e Posto (*Rank-Nullity Theorem*) [MML §2.7.3]:
+    \\( \operatorname{dim}(\operatorname{ker}(\Phi)) + \operatorname{dim}(\operatorname{Im}(\Phi)) = \operatorname{dim}(V) \\)
+
+### Fórmulas da Seção 2.7.3 (LaTeX Puro)
+
+\operatorname{ker}(\Phi) := \Phi^{-1}(\boldsymbol{0}_W) = \{v \in V : \Phi(v) = \boldsymbol{0}_W\}
+\operatorname{Im}(\Phi) := \Phi(V) = \{w \in W \mid \exists v \in V : \Phi(v) = w\}
+\operatorname{Im}(\Phi) = \{\boldsymbol{A}\boldsymbol{x} : \boldsymbol{x} \in \mathbb{R}^n\} = \left\{ \sum_{i=1}^n x_i \boldsymbol{a}_i : x_1, \dots, x_n \in \mathbb{R} \right\} = \operatorname{span}[\boldsymbol{a}_1, \dots, \boldsymbol{a}_n] \subseteq \mathbb{R}^m
+\begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix} \mapsto \begin{bmatrix} 1 & 2 & -1 & 0 \\ 1 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix} = \begin{bmatrix} x_1 + 2x_2 - x_3 \\ x_1 + x_4 \end{bmatrix}
+= x_1 \begin{bmatrix} 1 \\ 1 \end{bmatrix} + x_2 \begin{bmatrix} 2 \\ 0 \end{bmatrix} + x_3 \begin{bmatrix} -1 \\ 0 \end{bmatrix} + x_4 \begin{bmatrix} 0 \\ 1 \end{bmatrix}
+\operatorname{Im}(\Phi) = \operatorname{span}\left[ \begin{bmatrix} 1 \\ 1 \end{bmatrix}, \begin{bmatrix} 2 \\ 0 \end{bmatrix}, \begin{bmatrix} -1 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 1 \end{bmatrix} \right]
+\begin{bmatrix} 1 & 2 & -1 & 0 \\ 1 & 0 & 0 & 1 \end{bmatrix} \rightsquigarrow \dots \rightsquigarrow \begin{bmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & -\frac{1}{2} & -\frac{1}{2} \end{bmatrix}
+\operatorname{ker}(\Phi) = \operatorname{span}\left[ \begin{bmatrix} 0 \\ \frac{1}{2} \\ 1 \\ 0 \end{bmatrix}, \begin{bmatrix} -1 \\ \frac{1}{2} \\ 0 \\ 1 \end{bmatrix} \right]
+\operatorname{dim}(\operatorname{ker}(\Phi)) + \operatorname{dim}(\operatorname{Im}(\Phi)) = \operatorname{dim}(V)
 
 ---
 
