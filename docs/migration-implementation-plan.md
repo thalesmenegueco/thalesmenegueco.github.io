@@ -873,9 +873,32 @@ about the projects themselves now lead with a print:
 
 Both live in `projects/portfolio/public/images/`, the folder `angular.json`
 actually ships, so they resolve under `<base href="/">` — the same property the
-VisuaLab card was chosen for in Phase 4, kept. The two `Sinal Fala` and `Lab de
-Ferramentas` cards keep their borrowed icons, unchanged. (`icons/visualab.svg`
-is still shipped; it is simply no longer what that card leads with.)
+VisuaLab card was chosen for in Phase 4, kept. The `Lab de Ferramentas` card keeps
+its borrowed icon, unchanged. (`icons/visualab.svg` is still shipped; it is simply
+no longer what that card leads with.)
+
+**The gallery lost a card and gained a footer line.** `Sinal Fala` is a TikTok
+channel, not a project with a product behind it, so as a card it was handed the
+same weight as Sinalize! and VisuaLab *and* sat between them — the two things that
+belong together were separated by the one thing that is not a project. The
+homepage (`/` redirects to `/project-gallery`, so the gallery is the homepage) now
+reads left to right as:
+
+| Position | Card | Media |
+|---|---|---|
+| 1 | Sinalize! | screenshot |
+| 2 | VisuaLab | screenshot |
+| 3 | Lab de Ferramentas | svgrepo icon |
+
+`Sinal Fala` closes the page instead, as a muted one-liner with a hairline rule
+directly above the footer — `p.sinal-fala` in the gallery template, styled in that
+component's stylesheet (which had been empty until this). Its URL moved to
+`LearningGalleryComponent.sinalFalaLink`, alongside the component's other
+outbound links, rather than staying inline in the markup.
+
+Note the `&#64;` in that template: the handle is written as `&#64;sinal.fala`
+because a bare `@` starts an Angular control-flow block, and the rendered text was
+checked to confirm it reads `@sinal.fala` rather than escaping literally.
 
 **A screenshot costs a card something an icon never did: its own aspect ratio.**
 The prints are near-square but not square (0.93 and 1.07), and `.flex-cards`
@@ -911,16 +934,16 @@ an injected stylesheet — and the two images diffed pixel by pixel:
 |---|---|---|---|---|
 | Sinalize! | 182×170 | `16px` | 294, corner `#333` → `#ffffff` | ✅ rounding lands on the print |
 | VisuaLab | 158×170 | `16px` | 290, corner `#333` → `#0a0f10` | ✅ rounding lands on the print |
-| Sinal Fala | 170×170 | `0px` | 0 | ✅ glyph untouched |
 | Lab de Ferramentas | 170×170 | `0px` | 0 | ✅ glyph untouched |
+| ~~Sinal Fala~~ | 170×170 | `0px` | 0 | ✅ glyph untouched — measured while it was still a card; it is now the footer line described above, so this row is what keeps the opt-in flag justified rather than a claim about the current grid |
 
 In the first pass, with the radius applied to every card, the same comparison
 changed **450** pixels of the `creativity-1` glyph and **210** of `puzzle` — the
 radius removing artwork — which is what moved this to an opt-in flag. The corner
 column is the proof that the rounding is on the picture: with the radius on, each
-print's top-left pixel becomes the card's surface `#333` instead of the picture's
-own corner pixel. Titles still align at 1920 px (all four share `titleTop = 445`),
-and at 1440 px the three that fit share it and the fourth wraps.
+print's top-left corner pixel becomes the card's surface `#333` instead of the
+picture's own corner pixel. Titles align at 1920 px (the three cards share
+`titleTop = 445`); at ~900 px the third card wraps to its own row, still in order.
 
 **And a test, because a bad asset path is invisible to every other gate.**
 `learning-gallery.component.spec.ts` now loads each locally-referenced card image

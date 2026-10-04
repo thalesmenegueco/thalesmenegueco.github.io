@@ -1,0 +1,35 @@
+// "Sinal Fala" used to be one of the gallery cards. It is a TikTok channel rather
+// than a project with a product behind it, so as a card it carried the same
+// weight as Sinalize! and VisuaLab while also separating them. It now closes the
+// page as a quiet line, and everything here is deliberately subdued so it reads
+// as a footnote to the gallery rather than a fourth card: muted text instead of
+// the card surface, a hairline instead of a border, no shadow, and a smaller
+// size than the card descriptions.
+.sinal-fala {
+  max-width: 640px;
+  // A clear gap from the list above, so the rule reads as a divider rather than
+  // as this line's own underline.
+  margin: 56px auto 0;
+  padding-top: 22px;
+  border-top: 1px solid color-mix(in srgb, var(--color-border), transparent 88%);
+  color: color-mix(in srgb, var(--color-text), transparent 45%);
+  font-size: 0.86rem;
+  line-height: 1.7;
+  text-align: center;
+
+  strong {
+    color: color-mix(in srgb, var(--color-text), transparent 20%);
+    font-weight: 600;
+  }
+
+  // Muted rather than the app's full `--color-text-secondary`, which is a loud
+  // magenta and would undo the whole point of the strip. The global `a:hover`
+  // underline is left to do the rest.
+  a {
+    color: color-mix(in srgb, var(--color-text-secondary), transparent 35%);
+
+    &:hover {
+      color: var(--color-text-secondary);
+    }
+  }
+}
