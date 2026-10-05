@@ -43,7 +43,7 @@ export class LearningGalleryComponent {
    */
   interests: CardItem[] = [
   { name: "Sinalize!",
-    description: 'Plataforma para Aprender de Libras DE GRAÇA! 📚',
+    description: 'Plataforma para Aprender Libras DE GRAÇA! 📚',
     image: 'images/sinalize-preview.png',
     link: 'https://www.sinalize.org',
     roundedImage: true
@@ -58,14 +58,14 @@ export class LearningGalleryComponent {
   // mark; it is simply no longer what this card leads with.
   {
     name: "VisuaLab",
-    description: 'Cursos interativos de exatas: entenda explorando, aplique em problemas reais 📐',
+    description: 'Cursos interativos de Exatas 📐',
     image: 'images/visualab-preview.png',
     link: PLATFORM_LINKS.hub,
     roundedImage: true
   },
   {
-    name: "Lab de Ferramentas",
-    description: 'Laboratório de ferramentas (aleatórias) 🧪',
+    name: "Ferramentas",
+    description: 'Ferramentas e Experimentos 🧪',
     image: 'https://www.svgrepo.com/show/489243/creativity-1.svg',
     link: '/tools'
   }
