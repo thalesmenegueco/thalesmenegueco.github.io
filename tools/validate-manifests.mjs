@@ -50,6 +50,9 @@ const SCHEMA_FILE = 'manifest.schema.json';
 const REGISTRIES_FILE = 'registries.json';
 const BOOK_SECTIONS_FILE = 'book-sections.json';
 
+/** A chapter file inside `content-source/<book>/`: `05-derivatives-gradients.md`. */
+const CHAPTER_FILE = /^\d{2}-[a-z0-9-]+\.md$/;
+
 const manifestsDir = process.argv[2] ? process.argv[2] : DEFAULT_DIR;
 
 if (!existsSync(manifestsDir)) {
@@ -468,8 +471,12 @@ if (cycle) {
 for (const book of readdirSync(CONTENT_ROOT, { withFileTypes: true })
   .filter((e) => e.isDirectory())
   .map((e) => e.name)) {
+  // Only chapter files (`NN-name.md`) — the same convention `chapterFile()` uses to resolve
+  // a ref. A `.md` that is not a chapter is not extracted source: `prompts/` holds Camada 3
+  // prompts, and those quote section headings on purpose, to hand the generator its source.
+  // Sweeping one would check a *copy* of the source text as if it were the source.
   const headings = readdirSync(join(CONTENT_ROOT, book))
-    .filter((f) => f.endsWith('.md'))
+    .filter((f) => CHAPTER_FILE.test(f))
     .flatMap((f) => sectionHeadings(`${book}/${f}`).map((h) => ({ ...h, file: `${book}/${f}` })));
   if (headings.length === 0) continue; // capítulo ainda não extraído com IDs: nada a conferir
 
