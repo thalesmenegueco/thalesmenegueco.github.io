@@ -208,6 +208,16 @@ rodando.
 | Verificação: motor para os testes numéricos | **feito** — `libs/ml-engine` (vetores, matrizes, regressão, probabilidade, registro de funções) com specs em `src/app/ml-engine`; `npm run test:headless` roda 56 specs, incluindo os 10 exemplos numéricos verificáveis | acrescentar avaliador ao criar lição com `expectedValues` |
 | Checklist humano + commits rastreáveis | processo, não código | — |
 
+> **O que mudou desde este retrato (2026-09-20).** A tabela acima é um instantâneo datado e
+> fica como está; para o estado atual, a fonte é o resto do repositório. Os deltas: os IDs
+> ancorados passaram de **46 seções + 4 capítulos** para **52 seções + 5 capítulos** (57
+> headings, contados pelo gate) depois do dump-03; o **template da Camada 3 foi extraído**
+> para [`CAMADA3.md`](./CAMADA3.md), com o prompt do piloto em
+> [`prompts/`](./prompts/); a **primeira lição foi gerada e auditada**
+> (`fundamentos-teoria-01`, ver [`../src/app/lessons/README.md`](../src/app/lessons/README.md)),
+> então a ação pendente da Camada 2 está cumprida para ela; e `npm run test:headless` roda
+> **74 specs**, não 56.
+
 **Numeração resolvida (2026-09-20):** os IDs passaram a ser o **número da seção do livro**
 (`## mml-5.2 — Derivadas Parciais e Gradiente`), reancorando `mml/02` e `mml/05`. Antes o ID era
 ordinal do arquivo, e em 02/05 isso estava deslocado: `mml-5.2` existia e resolvia, mas apontava

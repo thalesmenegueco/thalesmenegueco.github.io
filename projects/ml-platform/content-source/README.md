@@ -36,8 +36,15 @@ que continuam vazios de propósito.
 > estão na tabela de buracos abaixo, uma a uma, com o número que o livro realmente usa.
 
 O processo de geração — camadas, prompts, auditoria e checklist — está em
-[`PIPELINE.md`](./PIPELINE.md). Os contratos das lições estão em
+[`PIPELINE.md`](./PIPELINE.md). O prompt da Camada 3 (o que transforma manifesto + fonte em
+lição) está em [`CAMADA3.md`](./CAMADA3.md), com as execuções em [`prompts/`](./prompts/). Os
+contratos das lições estão em
 [`../manifests/`](../manifests/README.md): **12 manifestos, 12 validando** (`npm run validate:manifests`).
+
+> **`prompts/` não é fonte.** Os arquivos de lá citam headings reais (`## mml-2.4 — …`) de
+> propósito, para entregar a fonte ao gerador. O gate varre só arquivos de capítulo
+> (`NN-nome.md`) por isso: conferir um prompt seria conferir uma **cópia** do texto da fonte
+> como se fosse a fonte.
 
 ---
 
