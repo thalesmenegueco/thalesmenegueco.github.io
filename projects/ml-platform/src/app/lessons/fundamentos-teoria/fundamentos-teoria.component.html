@@ -1,0 +1,40 @@
+<div class="module-shell">
+  <header class="module-head">
+    <a class="back" href="/">← VisuaLab</a>
+    <p class="eyebrow">Fundamentos Matemáticos para ML · teoria</p>
+    <h1>{{ lesson.title }}</h1>
+    <p class="objective">{{ lesson.objective }}</p>
+
+    <ul class="meta">
+      <li>≈ 12 min</li>
+      <li>Fonte: MML §2.4 e §2.5</li>
+      <li>
+        Módulo: 1 de {{ plannedLessonCount }} lições geradas
+        @if (done()) {
+          <strong class="done-badge">concluída</strong>
+        }
+      </li>
+    </ul>
+  </header>
+
+  <main class="module-body">
+    <app-lesson-player [lesson]="lesson" (finished)="onFinished($event)" />
+
+    <aside class="module-note">
+      <h2>O que ainda falta neste módulo</h2>
+      <p>
+        As outras {{ plannedLessonCount - 1 }} lições de teoria têm contrato pronto em
+        <code>manifests/fundamentos-teoria-02…07</code> e passam no gate, mas ainda não têm
+        conteúdo gerado. Esta página é o piloto: existe para dar o que avaliar — o arco
+        pergunta → exploração → fórmula sobrevive à geração, e a interação revela o insight
+        que o manifesto promete?
+      </p>
+      <p>
+        O player é provisório e consome o contrato da Camada 3 direto, sem tradução. Ele não
+        tem cenário de abertura, não confere a resposta do aluno nem oferece alternativas com
+        feedback — o que existe hoje é a pergunta e a resposta para conferência própria. O
+        registro dessa decisão está em <code>src/app/lessons/README.md</code>.
+      </p>
+    </aside>
+  </main>
+</div>

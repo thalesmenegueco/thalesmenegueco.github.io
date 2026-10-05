@@ -1,0 +1,92 @@
+// Shared chrome for the ML course surface: the widget frame, the control rows and the
+// lesson shell. Imported with `@use` into each component's SCSS so Angular's emulated
+// encapsulation scopes these classes to the component that renders them — the same
+// arrangement `calculus/_shared.scss` uses, kept separate because the ML courses are a
+// different feature and should not reach into the calculus folder for their styling.
+//
+// Colours come from `plot.color-tokens()`, which the module host includes on `:host`;
+// every component below it inherits the custom properties.
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.widget {
+  margin: 19px 0;
+  padding: 17px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: #101719;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.widget-title {
+  color: var(--color-study-sage);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.widget-note {
+  color: var(--color-text-muted);
+  font-size: 0.77rem;
+}
+
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.control-group {
+  min-width: 160px;
+  flex: 1;
+}
+
+.control-group > label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.control-group .value {
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--color-study-sage);
+}
+
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 14px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.readout strong {
+  color: var(--color-text);
+}
+
+.confirmed {
+  border-color: var(--color-study-sage);
+  box-shadow: inset 0 0 0 1px var(--color-study-sage);
+}

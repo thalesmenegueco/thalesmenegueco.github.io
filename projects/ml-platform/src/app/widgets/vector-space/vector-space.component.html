@@ -1,0 +1,158 @@
+<div class="widget" [class.confirmed]="confirmed()">
+  <div class="widget-header">
+    <div class="widget-title">VectorSpaceWidget</div>
+    <div class="widget-note">
+      ℝ² · base {{ activePreset() === 0 ? 'canônica' : 'inclinada' }} · janela ±{{
+        format(windowUnits())
+      }}
+      unidades
+    </div>
+  </div>
+
+  <svg class="plane" viewBox="0 0 360 360" role="img"
+       [attr.aria-label]="'Plano com v = ' + pair(v()) + ' e alvo em ' + pair(target())">
+    @for (g of gridLines(); track g) {
+      <line class="grid" [attr.x1]="pxX(g)" [attr.y1]="pxY(-windowUnits())"
+            [attr.x2]="pxX(g)" [attr.y2]="pxY(windowUnits())" />
+      <line class="grid" [attr.x1]="pxX(-windowUnits())" [attr.y1]="pxY(g)"
+            [attr.x2]="pxX(windowUnits())" [attr.y2]="pxY(g)" />
+    }
+
+    <line class="axis" [attr.x1]="pxX(-windowUnits())" [attr.y1]="pxY(0)"
+          [attr.x2]="pxX(windowUnits())" [attr.y2]="pxY(0)" />
+    <line class="axis" [attr.x1]="pxX(0)" [attr.y1]="pxY(-windowUnits())"
+          [attr.x2]="pxX(0)" [attr.y2]="pxY(windowUnits())" />
+
+    @for (t of ticks(); track t) {
+      <text class="tick" [attr.x]="pxX(t)" [attr.y]="pxY(0) + 13">{{ t }}</text>
+      <text class="tick tick-y" [attr.x]="pxX(0) - 7" [attr.y]="pxY(t) + 4">{{ t }}</text>
+    }
+
+    <!-- the line through the origin that λv is confined to -->
+    @if (scaleLine(); as line) {
+      <line class="scale-line"
+            [attr.x1]="pxX(line[0][0])" [attr.y1]="pxY(line[0][1])"
+            [attr.x2]="pxX(line[1][0])" [attr.y2]="pxY(line[1][1])" />
+    }
+
+    <!-- the base directions: the robot's fixed unit steps, which nothing here scales -->
+    <line class="basis b1" [attr.x1]="pxX(0)" [attr.y1]="pxY(0)" [attr.x2]="pxX(b1()[0])" [attr.y2]="pxY(b1()[1])" />
+    <polygon class="basis b1" [attr.points]="headPoints([0, 0], b1())" />
+    <line class="basis b2" [attr.x1]="pxX(0)" [attr.y1]="pxY(0)" [attr.x2]="pxX(b2()[0])" [attr.y2]="pxY(b2()[1])" />
+    <polygon class="basis b2" [attr.points]="headPoints([0, 0], b2())" />
+
+    <circle class="target" [attr.cx]="pxX(target()[0])" [attr.cy]="pxY(target()[1])" r="7" />
+    <text class="target-label" [attr.x]="pxX(target()[0]) + 11" [attr.y]="pxY(target()[1]) + 4">
+      alvo {{ pair(target()) }}
+    </text>
+
+    <line class="sum" [attr.x1]="pxX(v()[0])" [attr.y1]="pxY(v()[1])" [attr.x2]="pxX(sum()[0])" [attr.y2]="pxY(sum()[1])" />
+    <polygon class="sum" [attr.points]="headPoints(v(), sum())" />
+
+    <line class="scaled" [attr.x1]="pxX(0)" [attr.y1]="pxY(0)" [attr.x2]="pxX(scaled()[0])" [attr.y2]="pxY(scaled()[1])" />
+    <polygon class="scaled" [attr.points]="headPoints([0, 0], scaled())" />
+
+    <line class="result" [attr.x1]="pxX(0)" [attr.y1]="pxY(0)" [attr.x2]="pxX(v()[0])" [attr.y2]="pxY(v()[1])" />
+    <polygon class="result" [attr.points]="headPoints([0, 0], v())" />
+    <circle class="result-dot" [attr.cx]="pxX(v()[0])" [attr.cy]="pxY(v()[1])" r="4" />
+  </svg>
+
+  <div class="legend">
+    <span class="legend-item"><i class="swatch result"></i>v = c₁b₁ + c₂b₂</span>
+    <span class="legend-item"><i class="swatch b1"></i>b₁</span>
+    <span class="legend-item"><i class="swatch b2"></i>b₂</span>
+    <span class="legend-item"><i class="swatch sum"></i>v + w</span>
+    <span class="legend-item"><i class="swatch scaled"></i>λv</span>
+  </div>
+
+  <div class="readout">
+    <span>v = <strong>{{ pair(v()) }}</strong></span>
+    <span>λv = <strong>{{ pair(scaled()) }}</strong></span>
+    <span>v + w = <strong>{{ pair(sum()) }}</strong></span>
+    <span>distância até o alvo: <strong>{{ format(distance()) }}</strong></span>
+  </div>
+
+  <section class="group">
+    <h3 class="group-title">1 · O movimento do robô <span>v = c₁b₁ + c₂b₂</span></h3>
+    <div class="control-row">
+      <div class="control-group">
+        <label>
+          <span>c₁ — quantos passos na direção b₁</span>
+          <span class="value">{{ format(values.c1()) }}</span>
+        </label>
+        <input type="range" min="-3" max="3" step="0.5"
+               [value]="values.c1()" (input)="onSlider('c1', $event)" />
+      </div>
+      <div class="control-group">
+        <label>
+          <span>c₂ — quantos passos na direção b₂</span>
+          <span class="value">{{ format(values.c2()) }}</span>
+        </label>
+        <input type="range" min="-3" max="3" step="0.5"
+               [value]="values.c2()" (input)="onSlider('c2', $event)" />
+      </div>
+    </div>
+  </section>
+
+  <section class="group">
+    <h3 class="group-title">2 · Um segundo movimento, somado a v <span>v + w</span></h3>
+    <div class="control-row">
+      <div class="control-group">
+        <label>
+          <span>w₁ — primeiro número de w</span>
+          <span class="value">{{ format(values.w1()) }}</span>
+        </label>
+        <input type="range" min="-3" max="3" step="0.5"
+               [value]="values.w1()" (input)="onSlider('w1', $event)" />
+      </div>
+      <div class="control-group">
+        <label>
+          <span>w₂ — segundo número de w</span>
+          <span class="value">{{ format(values.w2()) }}</span>
+        </label>
+        <input type="range" min="-3" max="3" step="0.5"
+               [value]="values.w2()" (input)="onSlider('w2', $event)" />
+      </div>
+    </div>
+  </section>
+
+  <section class="group">
+    <h3 class="group-title">3 · Esticar o movimento <span>λv</span></h3>
+    <div class="control-row">
+      <div class="control-group">
+        <label>
+          <span>λ — quantas vezes o movimento v</span>
+          <span class="value">{{ format(values.lambda()) }}</span>
+        </label>
+        <input type="range" min="-3" max="3" step="0.5"
+               [value]="values.lambda()" (input)="onSlider('lambda', $event)" />
+      </div>
+      <div class="control-group">
+        <label><span>Base do plano</span></label>
+        <div class="preset-row">
+          @for (preset of presets; track preset.label; let i = $index) {
+            <button type="button" class="preset" [class.active]="activePreset() === i"
+                    (click)="setPreset(i)">{{ preset.label }}</button>
+          }
+          <button type="button" class="preset" (click)="reset()">zerar c₁, c₂</button>
+        </div>
+      </div>
+    </div>
+    <p class="group-note">
+      λ multiplica o <strong>movimento resultante v</strong> — as duas direções da base
+      (b₁, b₂) são os passos fixos do robô e ficam onde estão. Note também que todo ponto
+      desenhado continua dentro do quadro: quando algo precisa de mais espaço, é a janela
+      que se afasta, não o vetor que sai do plano. O plano não tem borda.
+    </p>
+  </section>
+
+  <p class="status" [class.ok]="confirmed()">
+    @if (confirmed()) {
+      Alvo alcançado: v = {{ format(values.c1()) }}·b₁ + {{ format(values.c2()) }}·b₂ =
+      {{ pair(v()) }}.
+    } @else {
+      Ainda não: v = {{ format(values.c1()) }}·b₁ + {{ format(values.c2()) }}·b₂ =
+      {{ pair(v()) }}, e o alvo é {{ pair(target()) }}.
+    }
+  </p>
+</div>

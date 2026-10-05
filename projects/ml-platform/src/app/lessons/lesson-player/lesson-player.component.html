@@ -1,0 +1,102 @@
+<section class="player">
+  <header class="player-head">
+    <div>
+      <p class="eyebrow">Passo {{ index() + 1 }} de {{ total() }}</p>
+      <h2>{{ step().title }}</h2>
+    </div>
+
+    <div class="head-tools">
+      <label class="review">
+        <input type="checkbox" [checked]="reviewMode()" (change)="toggleReview()" />
+        <span>modo avaliação</span>
+      </label>
+
+      <div class="dots">
+        @for (s of lesson().steps; track s.id; let i = $index) {
+          <button
+            type="button"
+            class="dot"
+            [class.active]="i === index()"
+            [class.done]="i < index()"
+            [attr.aria-label]="'Ir para o passo ' + (i + 1)"
+            (click)="go(i)"
+          ></button>
+        }
+      </div>
+    </div>
+  </header>
+
+  <div class="narrative">
+    @for (block of step().narrative; track $index) {
+      <p><app-rich-text [text]="block" /></p>
+    }
+  </div>
+
+  @if (step().katex.length > 0) {
+    <div class="formulas">
+      @for (formula of step().katex; track $index) {
+        <app-katex [latex]="formula" [displayMode]="true" />
+      }
+    </div>
+  }
+
+  <div class="widget-slot">
+    <p class="widget-prompt"><app-rich-text [text]="step().widgetInteraction.prompt" /></p>
+
+    @switch (step().widgetInteraction.widgetId) {
+      @case ('VectorSpaceWidget') {
+        <app-vector-space [target]="widgetTarget" />
+      }
+      @default {
+        <p class="widget-missing">
+          A widget <code>{{ step().widgetInteraction.widgetId }}</code> está no manifesto mas
+          ainda não tem componente no runtime.
+        </p>
+      }
+    }
+  </div>
+
+  @if (reviewMode()) {
+    <aside class="review-box">
+      <p><strong>Insight esperado neste passo</strong> (campo de projeto, não aparece ao aluno):</p>
+      <p><app-rich-text [text]="step().widgetInteraction.expectedInsight" /></p>
+      <p class="review-refs">
+        Refs do passo:
+        @for (ref of step().sourceRefs; track ref) {
+          <code>{{ ref }}</code>
+        }
+      </p>
+    </aside>
+  }
+
+  <div class="checkpoint">
+    <p class="checkpoint-question">
+      <strong>Confira você mesmo.</strong> <app-rich-text [text]="step().checkpoint.question" />
+    </p>
+    <button type="button" class="reveal" (click)="toggleAnswer()">
+      {{ revealed() ? 'esconder a resposta' : 'ver a resposta' }}
+    </button>
+    @if (revealed()) {
+      <p class="checkpoint-answer"><app-rich-text [text]="step().checkpoint.answer" /></p>
+    }
+  </div>
+
+  <p class="refs">
+    Fonte:
+    @for (ref of step().sourceRefs; track ref) {
+      <span class="ref">{{ refLabel(ref) }}</span>
+    }
+  </p>
+
+  <footer class="player-nav">
+    <button type="button" (click)="prev()" [disabled]="index() === 0">anterior</button>
+
+    @if (!isLast()) {
+      <button type="button" class="primary" (click)="next()">próximo</button>
+    } @else {
+      <button type="button" class="primary" [disabled]="markedDone()" (click)="finish()">
+        {{ markedDone() ? 'lição concluída ✓' : 'marcar lição como concluída' }}
+      </button>
+    }
+  </footer>
+</section>

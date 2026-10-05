@@ -93,13 +93,16 @@ export const STUDY_SUBJECTS: StudySubject[] = [
       {
         id: 'fundamentos-teoria',
         kind: 'teoria',
-        status: 'coming-soon',
+        // Available because the first of its seven contracted lessons has content. The
+        // `meta` line says "1 de 7" rather than "7 lições" for the same reason: the route
+        // opens on a pilot, and the catalogue should not imply the module is finished.
+        status: 'available',
         title: 'Vetores, matrizes e derivadas',
         description:
           'Um exemplo é um vetor, um dataset é uma matriz, e o erro tem uma direção. Explore as três ideias antes de encarar a notação.',
-        route: null,
+        route: '/fundamentos/teoria',
         icon: 'icons/fundamentals.svg',
-        meta: ['Em breve'],
+        meta: ['1 de 7 lições', 'Aprendizagem por descoberta'],
       },
       {
         id: 'fundamentos-aplicada',

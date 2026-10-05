@@ -64,6 +64,6 @@
   },
   "completionCriterion": "Na widget, o aluno monta um vetor alvo usando combinação linear e o sistema confirma que v = Σ cᵢ bᵢ.",
   "estimatedMinutes": 12,
-  "status": "draft",
+  "status": "audited",
   "knownGaps": []
 }

@@ -1,0 +1,234 @@
+@use '../../ml-shared' as *;
+
+:host {
+  display: block;
+}
+
+.player {
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: #101719;
+}
+
+.player-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--color-study-sage);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.18rem;
+}
+
+.head-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.review {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  cursor: pointer;
+  user-select: none;
+
+  input {
+    accent-color: var(--color-study-sage);
+  }
+}
+
+.dots {
+  display: flex;
+  gap: 7px;
+}
+
+.dot {
+  width: 11px;
+  height: 11px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: transparent;
+
+  &.done {
+    background: rgba(79, 179, 166, 0.35);
+  }
+
+  &.active {
+    background: var(--color-study-sage);
+    border-color: var(--color-study-sage);
+  }
+}
+
+.narrative {
+  margin-top: 18px;
+
+  p {
+    margin: 0 0 13px;
+    line-height: 1.62;
+  }
+}
+
+.formulas {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 20px 0;
+  padding: 18px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: #0b1113;
+  overflow-x: auto;
+}
+
+.widget-prompt {
+  margin: 0 0 4px;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+  font-style: italic;
+}
+
+.widget-missing {
+  padding: 16px;
+  border: 1px dashed var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+}
+
+.review-box {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border-left: 3px solid #b48ee0;
+  border-radius: 0 10px 10px 0;
+  background: rgba(180, 142, 224, 0.08);
+  font-size: 0.86rem;
+
+  p {
+    margin: 0 0 8px;
+    line-height: 1.55;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.review-refs code {
+  margin-right: 6px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+}
+
+.checkpoint {
+  margin-top: 22px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.checkpoint-question {
+  margin: 0 0 12px;
+  line-height: 1.55;
+}
+
+.reveal {
+  padding: 7px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+
+  &:hover {
+    color: var(--color-text);
+    border-color: var(--color-study-sage);
+  }
+}
+
+.checkpoint-answer {
+  margin: 14px 0 0;
+  padding-top: 13px;
+  border-top: 1px dashed var(--color-border);
+  color: var(--color-study-sage);
+  line-height: 1.6;
+}
+
+.refs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin: 16px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+}
+
+.ref {
+  padding: 2px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.player-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+
+  button {
+    padding: 9px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 0.84rem;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-study-sage);
+    }
+
+    &:disabled {
+      color: var(--color-text-muted);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .primary {
+    margin-left: auto;
+    border-color: var(--color-study-sage);
+    background: var(--color-study-sage);
+    color: #0b1113;
+    font-weight: 700;
+  }
+
+  .primary:disabled {
+    background: transparent;
+    color: var(--color-study-sage);
+    opacity: 0.75;
+  }
+}

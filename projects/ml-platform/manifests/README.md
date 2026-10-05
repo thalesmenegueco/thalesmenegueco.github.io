@@ -131,8 +131,11 @@ Consequência útil: **as sequências de ID pulam onde uma seção não foi extr
 Mapa completo em
 [`../content-source/README.md`](../content-source/README.md#numeração-o-id-é-a-seção-do-livro).
 
-`status` no fluxo: `draft` → `generated` → `audited` → `published`. Todas as 12 lições estão em
-`draft`: nenhuma foi gerada ainda.
+`status` no fluxo: `draft` → `generated` → `audited` → `published`. Onze das doze lições estão
+em `draft`; `fundamentos-teoria-01` está em **`audited`** — conteúdo gerado, os três níveis de
+verificação cumpridos, incluindo o checklist humano (o registro está em
+[`../src/app/lessons/README.md`](../src/app/lessons/README.md)). Ela chega a `published` quando
+o deploy que a serve for conferido no ar.
 
 ---
 
@@ -152,22 +155,25 @@ partir dele, para as duas listas não divergirem.
 
 ## Estado das 12 lições do Curso 1
 
-Todas passam o gate, e todas as fórmulas são literais na fonte.
+Todas passam o gate, e todas as fórmulas são literais na fonte. A coluna **Status** é o campo
+`status` do próprio manifesto: `draft` é contrato sem derivado, e só `fundamentos-teoria-01`
+tem conteúdo gerado — ela é o piloto da Camada 3, e o registro da verificação dela está em
+[`../src/app/lessons/README.md`](../src/app/lessons/README.md).
 
-| Lição | Fonte | Widget | Exemplo |
-| :--- | :--- | :--- | :--- |
-| `fundamentos-teoria-01` Vetores | `mml-2.4`, `mml-2.5` | VectorSpaceWidget | verificado |
-| `fundamentos-teoria-02` Produto escalar e projeções | `mml-3.2`, `mml-3.4`, `mml-3.8` | ProjectionWidget | verificado |
-| `fundamentos-teoria-03` Matrizes como transformações | `mml-2.7`, `mml-2.7.1` | MatrixTransformWidget | verificado |
-| `fundamentos-teoria-04` Autovalores e autovetores | `mml-4.2` | EigenWidget | verificado |
-| `fundamentos-teoria-05` O gradiente | `mml-5.2`–`mml-5.4` | GradientWidget | verificado |
-| `fundamentos-teoria-06` Gradiente descendente | `mml-7.1` | GradientDescentWidget | verificado |
-| `fundamentos-teoria-07` Probabilidade | `mml-6.4`–`mml-6.6` | DistributionWidget | verificado |
-| `fundamentos-aplicada-01` O problema: preço de casas | `mml-9.1`, `mml-9.2` | DatasetExplorerWidget | verificado |
-| `fundamentos-aplicada-02` Treinando com GD | `mml-9.2`, `mml-5.3` | LinearRegressionWidget | verificado |
-| `fundamentos-aplicada-03` Learning rate | `mml-7.1`, `mml-9.2` | LinearRegressionWidget | qualitativo |
-| `fundamentos-aplicada-04` Equação normal | `mml-9.2` | NormalEquationWidget | verificado |
-| `fundamentos-aplicada-05` Sandbox | — (sandbox) | LinearRegressionWidget | sem exemplo |
+| Lição | Fonte | Widget | Exemplo | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| `fundamentos-teoria-01` Vetores | `mml-2.4`, `mml-2.5` | VectorSpaceWidget | verificado | **audited** |
+| `fundamentos-teoria-02` Produto escalar e projeções | `mml-3.2`, `mml-3.4`, `mml-3.8` | ProjectionWidget | verificado | draft |
+| `fundamentos-teoria-03` Matrizes como transformações | `mml-2.7`, `mml-2.7.3` | MatrixTransformWidget | verificado | draft |
+| `fundamentos-teoria-04` Autovalores e autovetores | `mml-4.2` | EigenWidget | verificado | draft |
+| `fundamentos-teoria-05` O gradiente | `mml-5.2`–`mml-5.4` | GradientWidget | verificado | draft |
+| `fundamentos-teoria-06` Gradiente descendente | `mml-7.1` | GradientDescentWidget | verificado | draft |
+| `fundamentos-teoria-07` Probabilidade | `mml-6.4`–`mml-6.6` | DistributionWidget | verificado | draft |
+| `fundamentos-aplicada-01` O problema: preço de casas | `mml-9.1`, `mml-9.2` | DatasetExplorerWidget | verificado | draft |
+| `fundamentos-aplicada-02` Treinando com GD | `mml-9.2`, `mml-5.3` | LinearRegressionWidget | verificado | draft |
+| `fundamentos-aplicada-03` Learning rate | `mml-7.1`, `mml-9.2` | LinearRegressionWidget | qualitativo | draft |
+| `fundamentos-aplicada-04` Equação normal | `mml-9.2` | NormalEquationWidget | verificado | draft |
+| `fundamentos-aplicada-05` Sandbox | — (sandbox) | LinearRegressionWidget | sem exemplo | draft |
 
 Cadeia de dependência: 01 → 02 → {03, 05} → 06 → aplicada 02 → {03, 04} → 05, com `teoria-07` e
 `aplicada-01` como raízes independentes.
@@ -247,7 +253,7 @@ critério ou descrição foi reescrito, exceto onde indicado.
 | `fundamentos-teoria-06` | `start: [−1.5, 1.8]` → `[-1.5, 1.8]` | o sinal era U+2212: o arquivo não fazia parse |
 | `fundamentos-aplicada-02` | `"convergiu"` → `\"convergiu\"` | aspas não escapadas: o arquivo não fazia parse |
 | `fundamentos-aplicada-01` | `sourceRefs` ganhou `mml-9.2` | o `numericExample.sourceRef` já era `mml-9.2` |
-| `fundamentos-teoria-03` | `sourceRefs` perdeu `mml-2.7.2`; `numericExample.sourceRef` → `mml-2.7.1` | a extração trouxe imagem e núcleo num tópico só |
+| `fundamentos-teoria-03` | `sourceRefs` perdeu `mml-2.7.2`; `numericExample.sourceRef` → `mml-2.7.1` | a extração trouxe imagem e núcleo num tópico só. **O endereço virou `mml-2.7.3` no dump-03**, quando o livro foi conferido: §2.7.1 é *Matrix Representation of Linear Mappings* |
 | `fundamentos-teoria-05` | `sourceRefs` `mml-5.1`–`5.3` → `mml-5.2`–`5.4` | §5.1 não foi extraída |
 | `fundamentos-teoria-02` | `sourceRefs` ganhou `mml-3.4`, `mml-3.8` | as fórmulas de ângulo e projeção vivem nessas seções |
 | `fundamentos-aplicada-02` | `sourceRefs` ganhou `mml-5.3`; `sourceFiles` ganhou `mml/05` | a fórmula do gradiente da perda é de §5.3 |

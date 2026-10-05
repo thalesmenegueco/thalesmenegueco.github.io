@@ -23,6 +23,13 @@ const MODULE_COMPONENTS: Record<string, () => Promise<Type<unknown>>> = {
     import('./calculus-process-lab/calculus-process-lab.component').then(
       (m) => m.CalculusProcessLabComponent,
     ),
+  // Curso 1's theory module. The route exists only for the lesson that has content: the
+  // other six theory lessons are manifests without a derivative, and the module page says
+  // so rather than pretending the module is finished.
+  'fundamentos:teoria': () =>
+    import('./lessons/fundamentos-teoria/fundamentos-teoria.component').then(
+      (m) => m.FundamentosTeoriaComponent,
+    ),
 };
 
 function moduleKey(subjectId: string, kind: ModuleKind): string {

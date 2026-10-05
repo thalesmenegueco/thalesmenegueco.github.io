@@ -1,0 +1,124 @@
+@use 'plot-tokens' as plot;
+@use '../../ml-shared' as *;
+
+:host {
+  display: block;
+  min-height: 100vh;
+
+  /* Same dark, matte, teal-tinted palette the calculus app uses, so the ML surface
+     reads as part of the same product without sharing its feature folder. */
+  @include plot.color-tokens();
+
+  background:
+    radial-gradient(circle at 15% 0%, rgba(79, 179, 166, 0.08), transparent 35%),
+    var(--color-bg);
+  color: var(--color-text);
+}
+
+// Neutralize the site's global heading hover colors within this feature.
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.module-shell {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 34px 22px 70px;
+}
+
+.module-head {
+  margin-bottom: 26px;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-study-sage);
+  }
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--color-study-sage);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0 0 10px;
+  font-size: 1.7rem;
+  line-height: 1.24;
+}
+
+.objective {
+  max-width: 62ch;
+  margin: 0 0 16px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.done-badge {
+  margin-left: 7px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(79, 179, 166, 0.18);
+  color: var(--color-study-sage);
+}
+
+.module-body {
+  display: grid;
+  gap: 22px;
+}
+
+.module-note {
+  padding: 18px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 0.94rem;
+  }
+
+  p {
+    margin: 0 0 11px;
+    color: var(--color-text-muted);
+    font-size: 0.86rem;
+    line-height: 1.62;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.07);
+    font-size: 0.8rem;
+  }
+}

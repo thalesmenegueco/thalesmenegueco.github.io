@@ -20,6 +20,7 @@ const PROGRESS_KEY_BY_MODULE: Record<string, ProgressKey> = {
   'calculo-teoria': PROGRESS_KEYS.calculus,
   'calculo-aplicada': PROGRESS_KEYS.calculusPractice,
   'calculo-processo': PROGRESS_KEYS.calculusProcess,
+  'fundamentos-teoria': PROGRESS_KEYS.mlFundamentos,
 };
 
 @Component({
