@@ -280,6 +280,7 @@ critério ou descrição foi reescrito, exceto onde indicado.
 | `fundamentos-teoria-03` | `sourceRefs` perdeu `mml-2.7.2`; `numericExample.sourceRef` → `mml-2.7.1` | a extração trouxe imagem e núcleo num tópico só. **O endereço virou `mml-2.7.3` no dump-03**, quando o livro foi conferido: §2.7.1 é *Matrix Representation of Linear Mappings* |
 | `fundamentos-teoria-05` | `sourceRefs` `mml-5.1`–`5.3` → `mml-5.2`–`5.4` | §5.1 não foi extraída |
 | `fundamentos-teoria-02` | `sourceRefs` ganhou `mml-3.4`, `mml-3.8` | as fórmulas de ângulo e projeção vivem nessas seções |
+| `fundamentos-teoria-02` | `numericExample.sourceRef` `mml-3.2` → `mml-3.8` (2026-10-05) | o exemplo **responde** uma projeção — `λ = bᵀx/‖b‖²` e `π_U(x) = λb`, que são §3.8(a) e §3.8(e); o dot product de §3.2 é o primeiro passo do cálculo, não o que ele calcula. Não move fixture nenhuma: `hashExamples` hasheia `inputs`, `expected` e `expectedValues`, e `sourceRef` não chega a um número |
 | `fundamentos-aplicada-02` | `sourceRefs` ganhou `mml-5.3`; `sourceFiles` ganhou `mml/05` | a fórmula do gradiente da perda é de §5.3 |
 | `fundamentos-aplicada-02` | **números corrigidos**: gradientes `[-3,-2]` → `[-4,-7]`, `θ=[0.3,0.2]` → `θ=[0.4,0.7]` | o exemplo não reproduzia com a própria fórmula declarada; o teste agora prova |
 | `fundamentos-teoria-04` | `inputs` ganhou `probes: [[1,1],[1,-2]]` | os autovetores que a descrição já declarava, para o teste não hardcodar |

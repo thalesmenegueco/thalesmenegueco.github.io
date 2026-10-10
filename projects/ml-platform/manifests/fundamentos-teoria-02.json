@@ -51,7 +51,7 @@
       3.5,
       0.9899
     ],
-    "sourceRef": "mml-3.2"
+    "sourceRef": "mml-3.8"
   },
   "completionCriterion": "Ao arrastar b, o aluno vê a projeção mudar de magnitude (b→horiz = proj grande em x) e prever quando cos θ = 0 (perpendicular ⇒ projeção nula).",
   "estimatedMinutes": 14,
