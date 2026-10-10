@@ -31,6 +31,11 @@
  * pede ~15, o teto do schema é 25) e ID de dataset em `widgetConfig` que não
  * está em `registries.json`. Ambos são sinal de revisão, não de erro.
  *
+ * **Fixtures geradas** (falham o gate quando defasadas): a dos exemplos numéricos
+ * (`build-manifest-examples.mjs` → `manifest-examples.generated.ts`) e a dos bindings de
+ * widget (`build-manifest-bindings.mjs` → `lesson-bindings.generated.ts`), que é de onde o
+ * runtime lê a configuração inicial da widget de cada lição.
+ *
  * Usage:
  *   node tools/validate-manifests.mjs [manifestsDir]
  *
@@ -532,6 +537,31 @@ if (existsSync(FIXTURE)) {
   }
 } else {
   console.log('! fixture de exemplos ainda não gerada — rode npm run examples:build');
+  warnings++;
+}
+
+// A fixture dos bindings de widget (`widget` + `widgetConfig` + `numericExample.inputs`) é
+// gerada pelo mesmo motivo e com a mesma trava: o runtime inicializa a widget com ela, então
+// uma fixture velha faria a lição abrir com números que nenhum teste prova mais.
+const BINDINGS = join(
+  ROOT,
+  'projects/ml-platform/src/app/lessons/runtime/lesson-bindings.generated.ts',
+);
+if (existsSync(BINDINGS)) {
+  const { collectBindings, hashBindings } = await import('./build-manifest-bindings.mjs');
+  const current = hashBindings(collectBindings());
+  const recorded = readFileSync(BINDINGS, 'utf8').match(/BINDINGS_HASH = '([0-9a-f]+)'/)?.[1];
+  if (recorded === current) {
+    console.log(`✓ fixture de bindings em dia (bindingsHash ${current})`);
+  } else {
+    console.error(
+      `✗ fixture de bindings desatualizada (${recorded ?? 'sem hash'} ≠ ${current}) — ` +
+        'rode npm run bindings:build',
+    );
+    errors++;
+  }
+} else {
+  console.log('! fixture de bindings ainda não gerada — rode npm run bindings:build');
   warnings++;
 }
 

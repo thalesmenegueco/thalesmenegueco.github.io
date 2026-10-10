@@ -18,7 +18,7 @@
   </header>
 
   <main class="module-body">
-    <app-lesson-player [lesson]="lesson" (finished)="onFinished($event)" />
+    <app-lesson-player [lesson]="lesson" [runtime]="runtime" (finished)="onFinished($event)" />
 
     <aside class="module-note">
       <h2>O que ainda falta neste módulo</h2>
@@ -30,10 +30,13 @@
         que o manifesto promete?
       </p>
       <p>
-        O player é provisório e consome o contrato da Camada 3 direto, sem tradução. Ele não
-        tem cenário de abertura, não confere a resposta do aluno nem oferece alternativas com
-        feedback — o que existe hoje é a pergunta e a resposta para conferência própria. O
-        registro dessa decisão está em <code>src/app/lessons/README.md</code>.
+        O player consome dois artefatos separados: o conteúdo gerado
+        (<code>fundamentos-teoria-01.ts</code>) e a pedagogia escrita à mão
+        (<code>fundamentos-teoria-01.runtime.ts</code>), que decide como o aluno avança e quais
+        alternativas o passo da fórmula oferece. O avanço é conferido: cada passo tem uma
+        checagem sobre o estado da widget, e a lição só fecha quando todos os passos foram
+        cumpridos. A widget usada é a que o manifesto contrata, com os números do próprio
+        manifesto. O registro dessa decisão está em <code>src/app/lessons/README.md</code>.
       </p>
     </aside>
   </main>

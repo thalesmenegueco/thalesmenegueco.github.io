@@ -11,13 +11,15 @@
         <span>modo avaliação</span>
       </label>
 
+      <!-- A dot is `done` when the step's check was met, not when the student merely passed by:
+           that is the difference between this player and the one that advanced for free. -->
       <div class="dots">
         @for (s of lesson().steps; track s.id; let i = $index) {
           <button
             type="button"
             class="dot"
             [class.active]="i === index()"
-            [class.done]="i < index()"
+            [class.done]="satisfiedIds().includes(s.id)"
             [attr.aria-label]="'Ir para o passo ' + (i + 1)"
             (click)="go(i)"
           ></button>
@@ -43,18 +45,47 @@
   <div class="widget-slot">
     <p class="widget-prompt"><app-rich-text [text]="step().widgetInteraction.prompt" /></p>
 
-    @switch (step().widgetInteraction.widgetId) {
+    @switch (runtime().widget.widgetId) {
       @case ('VectorSpaceWidget') {
-        <app-vector-space [target]="widgetTarget" />
+        <app-vector-space
+          [target]="widgetTarget()"
+          [bases]="widgetBases()"
+          (snapshotChange)="onWidgetSnapshot($event)"
+        />
       }
       @default {
         <p class="widget-missing">
-          A widget <code>{{ step().widgetInteraction.widgetId }}</code> está no manifesto mas
+          A widget <code>{{ runtime().widget.widgetId }}</code> está no manifesto mas
           ainda não tem componente no runtime.
         </p>
       }
     }
   </div>
+
+  @if (options().length > 0) {
+    <div class="choices">
+      <p class="choices-prompt">
+        <app-rich-text
+          [text]="runtimeStep()?.optionsPrompt ?? 'Escolha a alternativa que corresponde ao que você observou.'"
+        />
+      </p>
+
+      @for (option of options(); track option.id) {
+        <button
+          type="button"
+          class="choice"
+          [class.selected]="chosenOption() === option.id"
+          (click)="chooseOption(option.id)"
+        >
+          <app-katex [latex]="option.latex" />
+        </button>
+      }
+
+      @if (optionFeedback(); as feedbackText) {
+        <p class="choice-feedback"><app-rich-text [text]="feedbackText" /></p>
+      }
+    </div>
+  }
 
   @if (reviewMode()) {
     <aside class="review-box">
@@ -64,6 +95,14 @@
         Refs do passo:
         @for (ref of step().sourceRefs; track ref) {
           <code>{{ ref }}</code>
+        }
+      </p>
+      <p class="review-refs">
+        Checagem do passo:
+        @if (runtimeStep(); as check) {
+          <code>{{ check.validation | json }}</code>
+        } @else {
+          <strong>nenhuma — o avanço deste passo é livre</strong>
         }
       </p>
     </aside>
@@ -87,6 +126,10 @@
       <span class="ref">{{ refLabel(ref) }}</span>
     }
   </p>
+
+  @if (feedback(); as message) {
+    <p class="feedback" role="status">{{ message }}</p>
+  }
 
   <footer class="player-nav">
     <button type="button" (click)="prev()" [disabled]="index() === 0">anterior</button>

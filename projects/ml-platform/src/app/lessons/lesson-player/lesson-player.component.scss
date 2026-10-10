@@ -133,6 +133,67 @@ h2 {
   }
 }
 
+/* The formula step's alternatives. Every one of them is a real formula from the cited
+   sections — the wrong ones answer a neighbouring question — so they are laid out to be
+   read and compared, not to be scanned for a keyword. */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: #0b1113;
+}
+
+.choices-prompt {
+  margin: 0 0 4px;
+  line-height: 1.55;
+}
+
+.choice {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  overflow-x: auto;
+
+  &:hover {
+    border-color: var(--color-study-sage);
+  }
+
+  &.selected {
+    border-color: var(--color-study-sage);
+    background: rgba(79, 179, 166, 0.1);
+  }
+}
+
+.choice-feedback {
+  margin: 4px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+/* Why the advance was refused. Sits directly above the navigation it is about, and is
+   cleared by the interaction it asked for. */
+.feedback {
+  margin: 16px 0 0;
+  padding: 11px 14px;
+  border-left: 3px solid #e0a95f;
+  border-radius: 0 10px 10px 0;
+  background: rgba(224, 169, 95, 0.1);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
 .review-refs code {
   margin-right: 6px;
   padding: 1px 5px;

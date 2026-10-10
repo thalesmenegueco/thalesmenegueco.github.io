@@ -1,44 +1,74 @@
-# lessons — o runtime provisório do Curso 1
+# lessons — o runtime do Curso 1
 
-Conteúdo gerado da Camada 3 e o player que o exibe. Existe para dar o que **avaliar**: a
-primeira lição do Curso 1, jogável, antes de decidir a forma definitiva do runtime de ML.
+Conteúdo gerado da Camada 3, o runtime que o acompanha, e o player que exibe os dois.
 
-## Por que isto é provisório, e o que exatamente está em aberto
+## A decisão: forma (b), em 2026-10-05
 
-`LessonPlayerComponent` consome `LessonContentStep` — o contrato de **geração** de
-`@ml/engine` — **direto, sem camada de tradução**. Isso é uma escolha, não um atalho: é o que
-permite jogar o piloto sem antes decidir qual é o modelo de runtime do ML. As três formas
-possíveis estão registradas em [`manifests/README.md`](../../manifests/README.md) e repetidas
-aqui porque é este arquivo que muda quando a decisão for tomada:
+Três formas estavam na mesa, e a escolha existia porque o piloto precisava ser jogável **antes**
+de o runtime de ML ser decidido:
 
-| | O que é | O que custa |
+| | O que é | O que custava |
 | :--- | :--- | :--- |
-| **(a)** Estender o contrato | `LessonContent` ganha `scenario`; o passo declara o tipo de validação e traz `options` com `feedback` | o arco passa a ser projetado na geração |
-| **(b)** Segunda passagem | o contrato fica só prosa; uma passagem separada vira `checkpoint` em `Validation` | a pedagogia muda de lugar, não de dono |
-| **(c)** Runtime próprio do ML | sem cenário, checkpoint textual, sem avanço conferido por máquina | mais barato, e a lição deixa de travar progresso |
+| (a) Estender o contrato | `LessonContent` ganha `scenario`, validação por passo e `options` com `feedback` | o gerador passaria a escrever os distratores — matemática plausível e errada, o erro que o pipeline existe para impedir — e a lição 01 teria de ser regerada e reauditada |
+| **(b) Segunda passagem** ← **escolhida** | o contrato de geração fica só prosa; uma passagem separada vira as checagens | um arquivo pequeno por lição, escrito à mão |
+| (c) Runtime próprio do ML | sem cenário, checkpoint textual, avanço livre | a lição deixa de travar progresso — e `completionCriterion`, campo obrigatório do manifesto, passa a não valer nada |
 
-O player atual **é a forma (c)** — é o que sai de graça quando não se traduz nada. Isso
-importa para a avaliação: o piloto mostra como é a opção mais barata antes de você escolher
-entre as três, e o que ele não tem (cenário, `formulaMatch` com alternativas, avanço
-conferido) é exatamente o que (a) e (b) acrescentariam.
+**Por que (b), e não (a) nem (c):**
 
-## Dois buracos do contrato, contornados e não escondidos
+1. **O manifesto já é o binding da widget, e nada lia.** `numericExample.inputs` é o estado
+   inicial da widget em 10 dos 11 exemplos. O player carregava `widgetTarget: Vec2 = [2, 3]` — uma
+   cópia à mão do exemplo da lição 01 — e a segunda lição exigiria uma segunda constante. O
+   runtime passou a ler o manifesto, pela fixture gerada `runtime/lesson-bindings.generated.ts`.
+2. **Distrator é matemática errada de propósito.** No Cálculo eles são escritos à mão em
+   `lesson-data.ts`; entregá-los ao gerador contradiz a regra mais dura do pipeline e quebraria a
+   auditoria de nível 1 ("toda fórmula é fatia literal da fonte"), que teria de ganhar uma exceção.
+3. **A forma (c) já não existia como descrita.** "Sem camada de tradução" não sobrevive à segunda
+   lição: outra widget, outros números, outra configuração. O que (c) economizava era só a
+   validação — o binding havia de ser construído de qualquer jeito.
 
-1. **Não há `scenario`.** O cenário de abertura da lição vive na primeira frase do primeiro
-   bloco de `narrative`, e o `objective` faz as vezes de promessa. Em
-   `fundamentos-teoria-01.ts` isso está dito no comentário do arquivo.
-2. **Não há configuração de widget por passo.** Um passo nomeia um `widgetId` mas não pode
-   configurá-lo. Em vez de adivinhar um modo pelo índice do passo, o
-   `VectorSpaceWidget` expõe as três operações de `widgetConfig.availableOps` — combinação,
-   soma e escala — **ao mesmo tempo, num painel só**, e o `prompt` de cada passo manda o
-   aluno para um grupo diferente de controles.
+## O que o player consome
 
-## Um campo de projeto que não aparece ao aluno
+`LessonPlayerComponent` recebe **dois** inputs, e a separação é a decisão:
 
-`widgetInteraction.expectedInsight` diz o que o aluno *deve* notar. Mostrar isso entregaria a
-descoberta em que o passo se apoia — então ele fica atrás do toggle **modo avaliação**, no
-cabeçalho do player, junto com os `sourceRefs` do passo. É affordance de quem audita, não de
-quem aprende.
+| Input | O que é | Quem escreve |
+| :--- | :--- | :--- |
+| `lesson` | `LessonContent` — prosa, fórmulas, checkpoint, `sourceRefs` | o gerador, a partir do manifesto e da fonte |
+| `runtime` | `LessonRuntime` — checagem por passo, alternativas da fórmula, binding da widget | o autor |
+
+O conteúdo não sabe que o runtime existe e vice-versa: os dois se encontram por `contentStepId`. A
+página do módulo (`fundamentos-teoria.component.*`) monta os dois e passa adiante — o player não
+procura nada por conta própria.
+
+## O avanço agora é conferido
+
+Até 2026-10-05 o player avançava de graça: o aluno clicava "próximo" três vezes, marcava a lição
+como concluída, e o hub contava — sem tocar na widget. Todo `completionCriterion` dos manifestos
+("o sistema confirma que v = Σ cᵢbᵢ") descrevia uma checagem que ninguém fazia.
+
+Agora:
+
+- cada passo tem uma checagem sobre um **campo nomeado do snapshot da widget** (`runtime/`);
+- a recusa traz mensagem — o `hint` do autor quando existe;
+- **os pontos do cabeçalho continuam navegação livre** (são affordance de quem audita e de quem
+  volta), mas concluir exige que **todos** os passos tenham sido cumpridos alguma vez, e o botão
+  diz quais faltam;
+- um passo já cumprido continua cumprido: voltar a ele pelos pontos não pede a prova duas vezes.
+
+O que isso **não** é: uma correção de resposta. O `checkpoint` continua sendo pergunta e resposta
+para conferência própria; a checagem é sobre o que o aluno fez no widget. E `expectedInsight`
+segue atrás do **modo avaliação**, agora junto com a checagem do passo em JSON — campos de projeto
+não aparecem para quem aprende.
+
+## Dois buracos do contrato, um resolvido e um em aberto
+
+1. **`scenario` — em aberto, de propósito.** O cenário de abertura vive na primeira frase do
+   primeiro bloco de `narrative`, e o `objective` faz as vezes de promessa. Ele é prosa sobre a
+   fonte e já é gerado; um campo só para ele seria um slot de renderização, não informação nova.
+2. **Configuração de widget por passo — em aberto, e agora explícita.** Um passo nomeia um
+   `widgetId` mas não pode configurá-lo. `VectorSpaceWidget` expõe as três operações de
+   `widgetConfig.availableOps` — combinação, soma e escala — **ao mesmo tempo, num painel só**, e o
+   `prompt` de cada passo manda o aluno para um grupo diferente de controles. O binding é **por
+   lição**, porque o manifesto declara um widget por lição.
 
 ## Onde as coisas moram
 
@@ -47,21 +77,25 @@ lessons/
   README.md                      ← este arquivo
   rich-text.component.ts         ← renderiza a ênfase da prosa (2 construtores)
   rich-text.pipe.ts              ← o parser, exportado para ser testado direto
-  lesson-player/                 ← renderiza um LessonContent, passo a passo
+  runtime/                       ← o modelo de runtime: tipos, portão puro e a fixture de bindings
+  lesson-player/                 ← renderiza um LessonContent contra um LessonRuntime
   fundamentos-teoria/
-    fundamentos-teoria-01.ts     ← o conteúdo gerado (Camada 3)
-    fundamentos-teoria-01.spec.ts ← guarda o arco, não o texto
-    fundamentos-teoria.component.* ← a página do módulo, com progresso
-../widgets/vector-space/         ← o widget contratado pelo manifesto
+    fundamentos-teoria-01.ts          ← o conteúdo gerado (Camada 3)
+    fundamentos-teoria-01.runtime.ts  ← a pedagogia escrita à mão (checagens + alternativas)
+    fundamentos-teoria-01.spec.ts     ← guarda o arco, o acordo com o manifesto e o portão
+    fundamentos-teoria.component.*    ← a página do módulo, com progresso
+../widgets/vector-space/         ← a widget contratada pelo manifesto
 ```
 
-Não há `lesson.types.ts`: o player usa o contrato de `@ml/engine` direto, e é isso que
-mantém a forma (c) sem tradução. Um modelo de runtime próprio só nasce se a decisão for (a)
-ou (b).
+Não há `lesson.types.ts` fora de `runtime/`: o player consome o contrato de geração **e** o modelo
+de runtime, e nenhum dos dois é traduzido para um terceiro. Um modelo de runtime próprio do
+Cálculo não foi reusado — `libs/shared-learning/index.ts` registra a decisão de não fundir
+engines.
 
 O mapeamento **nome → componente** de widget é feito dentro do player, num `@switch` sobre
-`widgetInteraction.widgetId`. É a ponte que o `manifests/README.md` descreve como
-"o manifesto nomeia o widget, e o runtime mapeia depois" — hoje ela existe, com um caso.
+`runtime().widget.widgetId` — o nome que o **manifesto** contrata, não o que o conteúdo escreveu
+(uma spec guarda que os dois coincidem). É a ponte que o `manifests/README.md` descreve como "o
+manifesto nomeia o widget, e o runtime mapeia depois" — hoje ela existe, com um caso.
 
 ## Ênfase no texto, e por que o player tem um renderizador
 
@@ -90,8 +124,11 @@ chaves `calculo-*` são dados de usuário congelados e não foram tocadas; esta 
 o total por módulo em `PROGRESS_KEY_BY_MODULE` (`studies.component.ts`) — um módulo sem
 entrada ali simplesmente não é rastreado, que é o caso dos outros cursos.
 
-Como o player é autoavaliado, a conclusão é um botão: "marcar lição como concluída" no último
-passo. Não há verificação — é a limitação da forma (c), visível na tela.
+A conclusão continua sendo um botão — "marcar lição como concluída" no último passo —, mas desde
+2026-10-05 ela exige que **todos** os passos tenham tido a checagem cumprida. O que o botão não
+faz é corrigir a resposta do `checkpoint`: a autoavaliação segue sendo do aluno, e a checagem é
+sobre o que ele fez no widget. É a diferença entre travar o progresso e conferir o aprendizado —
+esta forma confere o arco percorrido, não a prosa lida.
 
 ## Verificação de `fundamentos-teoria-01` — os três níveis, e o que cada um provou
 
@@ -127,3 +164,23 @@ sendo o checklist humano, e por isso este parágrafo existe.
 `katex` traz a fórmula exata (`\boldsymbol{v} = \sum_{i=1}^k \lambda_i \boldsymbol{x}_i`). É
 referência ao que está exibido logo acima, não uma segunda notação: a fórmula que o aluno lê em
 KaTeX é literal da fonte.
+
+### O que a auditoria de 2026-10-04 **não** cobriu
+
+`status: "audited"` vale para o **conteúdo** (`fundamentos-teoria-01.ts`), e é isso que o
+registro acima afirma. O runtime (`fundamentos-teoria-01.runtime.ts`) chegou depois, em
+2026-10-05, e é **pedagogia escrita à mão, não derivada do livro** — não passa pela auditoria de
+nível 1 e não deveria: um distrator é errado de propósito. O que dá para provar por máquina, o
+spec prova:
+
+| Afirmação | Quem garante |
+| :--- | :--- |
+| a alternativa correta é uma `keyFormula` do manifesto, literal | `fundamentos-teoria-01.spec.ts`, contra a lista do manifesto |
+| as duas alternativas erradas são fórmulas reais de §2.4(e) e §2.5(e), não matemática inventada | **leitura humana** — é a mesma classe de conferência da regra 5 do `CAMADA3.md` |
+| a checagem do passo 2 não pede nada que o prompt não tenha mandado o aluno fazer | `fundamentos-teoria-01.spec.ts`, comparando a validação com o `prompt` do conteúdo |
+| nenhuma checagem nomeia um campo que a widget não reporta | `fundamentos-teoria-01.spec.ts`, contra a lista de campos do `VectorSpaceWidget` |
+| a recusa de avanço explica o que fazer | `runtime/validate-step.spec.ts` (mensagem por tipo) + o `hint` de cada passo |
+
+O nível 3 — o checklist de 4 itens do `CAMADA3.md` — volta a valer para o runtime: a pergunta
+"a sequência discovery-based funciona?" agora tem uma resposta observável na tela (o aluno só
+passa quando explora), e é isso que a próxima leitura humana deve conferir.

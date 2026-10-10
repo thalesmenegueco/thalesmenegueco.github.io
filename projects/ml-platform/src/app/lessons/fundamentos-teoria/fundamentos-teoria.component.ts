@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { PROGRESS_KEYS, ProgressStore } from '@shared/progress';
 import { FUNDAMENTOS_TEORIA_01 } from './fundamentos-teoria-01';
+import { FUNDAMENTOS_TEORIA_01_RUNTIME } from './fundamentos-teoria-01.runtime';
 import { LessonPlayerComponent } from '../lesson-player/lesson-player.component';
 
 /**
@@ -10,6 +11,11 @@ import { LessonPlayerComponent } from '../lesson-player/lesson-player.component'
  * through `-07`, all passing `npm run validate:manifests`). Only the first has generated
  * content; the other six are manifests without a derivative, and the page says so rather
  * than implying the module is complete.
+ *
+ * It hands the player **two** things, and the split is the runtime decision (b) recorded in
+ * `../README.md`: the generated content (`fundamentos-teoria-01.ts`, what was audited against
+ * the book) and the authored runtime (`fundamentos-teoria-01.runtime.ts`, how the student
+ * advances). The page does not merge them — the player joins them by `contentStepId`.
  *
  * Progress is stored under its own key. The three `calculo-*` keys are byte-identical to
  * what the original per-feature services persisted, so they are frozen; this one is new and
@@ -28,6 +34,7 @@ export class FundamentosTeoriaComponent {
   private readonly progress = inject(ProgressStore);
 
   protected readonly lesson = FUNDAMENTOS_TEORIA_01;
+  protected readonly runtime = FUNDAMENTOS_TEORIA_01_RUNTIME;
   protected readonly plannedLessonCount = 7;
 
   private readonly completedIds = signal<string[]>([]);

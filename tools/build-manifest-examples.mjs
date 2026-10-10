@@ -27,7 +27,7 @@ const OUTPUT = join(
   ROOT,
   'projects/ml-platform/src/app/ml-engine/manifest-examples.generated.ts',
 );
-const NOT_MANIFESTS = new Set(['manifest.schema.json', 'registries.json']);
+const NOT_MANIFESTS = new Set(['manifest.schema.json', 'registries.json', 'book-sections.json']);
 
 /** Every `numericExample` in the manifests, ordered by lessonId. */
 export function collectExamples(dir = MANIFESTS_DIR) {
@@ -35,6 +35,10 @@ export function collectExamples(dir = MANIFESTS_DIR) {
     .filter((f) => f.endsWith('.json') && !NOT_MANIFESTS.has(f))
     .sort()
     .map((f) => JSON.parse(readFileSync(join(dir, f), 'utf8')))
+    // A manifest is identified by being a lesson contract, not by living in this directory:
+    // `book-sections.json` is a ruler, and filtering by `lessonId` keeps it out even if the
+    // filename list above falls behind the directory.
+    .filter((manifest) => typeof manifest.lessonId === 'string')
     .flatMap((manifest) => {
       const example = manifest.numericExample;
       if (!example) return [];

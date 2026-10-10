@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import type { WidgetSnapshot } from '../../lessons/runtime/lesson-runtime.types';
 
 /** A point/vector in the plane, in widget units. */
 export type Vec2 = [number, number];
@@ -53,8 +54,15 @@ export class VectorSpaceWidgetComponent {
     [0, 1],
   ]);
 
-  /** The vector the student has to reach, from the manifest's `numericExample`. */
-  readonly target = input<Vec2>([2, 3]);
+  /**
+   * The vector the student has to reach, from the manifest's `numericExample.inputs.c` —
+   * passed by the player, which reads it from the generated bindings fixture.
+   *
+   * **Required, with no default.** It used to default to `[2, 3]`, which was `teoria-01`'s own
+   * example inlined into a widget every lesson shares: the second lesson to use this widget
+   * would have inherited the first lesson's target silently.
+   */
+  readonly target = input.required<Vec2>();
 
   /** Slider positions. Public so the template can bind to them directly. */
   readonly values = {
@@ -165,21 +173,47 @@ export class VectorSpaceWidgetComponent {
 
   readonly confirmed = computed(() => this.distance() <= TOLERANCE);
 
+  /**
+   * What the player validates the step against — the widget's side of the runtime protocol.
+   *
+   * Emitted on every interaction rather than read from the outside: the runtime model says a
+   * step's check is an assertion over **named snapshot fields**, and the widget is the only
+   * thing that knows what its own state means. Scalar keys only, and only the ones a step
+   * actually asserts: `reached` answers step 1, `lambda` answers step 2, and `c1`/`c2`/`distance`
+   * ride along because they are what makes a failed check debuggable from the review box.
+   */
+  readonly snapshotChange = output<WidgetSnapshot>();
+
+  private report(): void {
+    this.snapshotChange.emit({
+      reached: this.confirmed(),
+      c1: this.values.c1(),
+      c2: this.values.c2(),
+      lambda: this.values.lambda(),
+      distance: Number(this.distance().toFixed(4)),
+    });
+  }
+
   onSlider(which: keyof VectorSpaceWidgetComponent['values'], event: Event): void {
     const value = Number((event.target as HTMLInputElement).value);
     if (Number.isFinite(value)) {
       this.values[which].set(value);
+      // Signals are synchronous, so `confirmed` is already recomputed here: the snapshot the
+      // player receives is the state *after* this interaction, not the previous one.
+      this.report();
     }
   }
 
   setPreset(index: number): void {
     this.activePreset.set(index);
     this.basisOverride.set(BASIS_PRESETS[index].bases);
+    this.report();
   }
 
   reset(): void {
     this.values.c1.set(0);
     this.values.c2.set(0);
+    this.report();
   }
 
   /** Unit-space → SVG pixels. y is flipped because SVG grows downwards. */

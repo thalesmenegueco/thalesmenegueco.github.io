@@ -33,11 +33,19 @@ import type { LessonContent } from '@ml/engine';
  *     a scalar is *one* number applied to *every* coordinate; a combination is a
  *     *different* number for *each* vector.
  *
- * Known contract limits, recorded rather than worked around: there is no `scenario` field,
- * so the opening scenario rides in the first `narrative` block; and there is no per-step
- * widget configuration, so the widget exposes all three operations of the manifest's
+ * Known contract limits, recorded rather than worked around: there is no `scenario` field, so
+ * the opening scenario rides in the first `narrative` block; and there is no per-step widget
+ * configuration, so the widget exposes all three operations of the manifest's
  * `widgetConfig.availableOps` at once and each step's `prompt` directs the student to a
  * different group. See `../README.md`.
+ *
+ * **Since 2026-10-05 this file is only half of the lesson.** How the student advances, which
+ * alternatives the formula step offers and the widget's initial state live in the sibling
+ * `fundamentos-teoria-01.runtime.ts` — the second pass of shape (b), decided in
+ * `../README.md` and documented in `../runtime/README.md`. The split is deliberate: this object
+ * is what the level-1 audit signed off against §2.4/§2.5, and **not one word of it changed**
+ * when the runtime arrived; the validation that now gates each step is authored pedagogy, and it
+ * is not derived from the book. The two are joined by `contentStepId`, never merged.
  */
 export const FUNDAMENTOS_TEORIA_01: LessonContent = {
   lessonId: 'fundamentos-teoria-01',

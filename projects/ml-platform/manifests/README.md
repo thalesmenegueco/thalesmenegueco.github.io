@@ -44,9 +44,10 @@ no `$comment` do próprio `book-sections.json`.
 ## Os três comandos do loop
 
 ```bash
-npm run validate:manifests   # contrato, endereços, notação das fórmulas, prerequisites
+npm run validate:manifests   # contrato, endereços, notação das fórmulas, prerequisites, fixtures
 npm run examples:build       # regenera a fixture de testes a partir dos manifestos
-npm run test:headless        # roda os testes (motor + exemplos numéricos)
+npm run bindings:build       # regenera a fixture que inicializa a widget das lições
+npm run test:headless        # roda os testes (motor + exemplos numéricos + runtime das lições)
 ```
 
 ---
@@ -225,6 +226,29 @@ lado: o motor de ML é desenhado do zero, sem fundir engines.
 A ponte entre os dois é o manifesto: ele nomeia o `widget`, e o runtime mapeia depois. Conteúdo
 nunca inventa widget; ele descreve o que o aluno faz com o que o manifesto escolheu. Cada passo
 carrega `sourceRefs`, para a auditoria conferir que toda afirmação é rastreável à seção citada.
+
+**Dois campos do manifesto passaram a ter consumidor em 2026-10-05.** Até então eles eram
+declarados e ignorados — nada lia `widgetConfig`, e o `numericExample.inputs` existia só para o
+teste do motor, enquanto o player carregava `widgetTarget: [2, 3]` copiado à mão do exemplo da
+lição 01. Com a decisão de runtime (forma **(b)**, registrada em
+[`../src/app/lessons/README.md`](../src/app/lessons/README.md)):
+
+- `numericExample.inputs` é o **estado inicial da widget**, assado na fixture gerada
+  `src/app/lessons/runtime/lesson-bindings.generated.ts` por `npm run bindings:build`;
+- `widgetConfig` viaja junto, no mesmo binding;
+- a fixture carrega um `bindingsHash`, e `npm run validate:manifests` **falha** se ela ficar
+  velha — pelo mesmo motivo do `manifestsHash` dos exemplos.
+
+Consequência prática para quem mexe num manifesto: mudar `widgetConfig` e `numericExample.inputs`
+de uma lição com conteúdo exige `npm run bindings:build`, e mudar o `expectedValues` exige
+`npm run examples:build`. São fixtures diferentes porque são consumidores diferentes — uma
+inicializa a widget, a outra prova o número — e as duas travas são independentes de propósito:
+uma correção de proveniência que não mexe em número de widget não deve invalidar o binding.
+
+O contraste entre os dois campos também é informação: `inputs` é o que a **widget** abre, e
+`widgetConfig` é como ela se comporta. Quando os dois declaram o mesmo número (é o caso de
+`fundamentos-teoria-02`, com `widgetConfig.vectorA` e `inputs.x`), o runtime usa `inputs` — é o
+campo que o gate prova. Se eles divergirem, a divergência é do manifesto.
 
 ---
 

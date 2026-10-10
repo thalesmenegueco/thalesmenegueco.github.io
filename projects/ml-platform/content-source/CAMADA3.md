@@ -218,21 +218,45 @@ marco 2?'
 Note o que o cenário **não** faz: não menciona limite, derivada, nem fórmula. Ele dá uma
 pergunta prática; a matemática vem depois, e é o aluno que a nomeia.
 
-### O que o contrato atual não expressa (limite conhecido)
+### O que o contrato de geração não expressa — decidido em 2026-10-05
 
 `LessonContentStep` não tem `scenario` nem `options`/`feedback`, e o `checkpoint` é
-pergunta-e-resposta em texto, não uma validação que o runtime possa conferir. Então, hoje:
+pergunta-e-resposta em texto. Isso **não** é mais um limite em aberto: a decisão foi tomada — o
+runtime das lições é uma **segunda passagem** escrita à mão (forma **(b)** das três que estavam na
+mesma mesa), registrada em
+[`../src/app/lessons/README.md`](../src/app/lessons/README.md). Na prática, para quem gera:
 
-- **O cenário de abertura vai no `narrative` do primeiro bloco**, como primeira frase, e o
-  `objective` faz as vezes de promessa. Se o Curso 1 for ficar com a forma do Cálculo, isso
-  é uma extensão do contrato — a decisão está registrada em `../src/app/lessons/README.md`.
-- **O passo da fórmula nomeia no `title` e no `checkpoint`, e o aluno se autoavalia.** O
-  equivalente do `formulaMatch` ainda não existe no contrato do ML.
+- **O cenário de abertura continua indo no `narrative` do primeiro bloco**, como primeira frase, e
+  o `objective` faz as vezes de promessa. Um campo `scenario` foi considerado e **recusado**: o
+  cenário é prosa sobre a fonte, já é gerado, e um campo só para ele seria um slot de renderização
+  — não informação nova.
+- **O passo da fórmula nomeia no `title` e no `checkpoint`, com as `katex` da fonte.** As
+  **alternativas** daquele passo (com o feedback de cada uma) são escritas pelo autor no arquivo
+  de runtime da lição (`src/app/lessons/<módulo>/<lição>.runtime.ts`), **não** por você — ver a
+  regra 6 abaixo. O equivalente do `formulaMatch` do Cálculo agora existe no ML, e ele mora fora do
+  conteúdo.
+- **O avanço de cada passo é conferido** por uma checagem sobre o estado da widget, também no
+  arquivo de runtime. Você não escreve nem a checagem nem o `hint` da recusa.
 - O `widgetId` é o **nome** do widget em `registries.json` (PascalCase), não um enum de
-  runtime: o mapeamento nome→componente é feito no player.
+  runtime: o mapeamento nome→componente é feito no player, e a widget é a do **manifesto** — se o
+  conteúdo nomear outra, o teste da lição falha.
 
-Nada disso deve ser inventado pela geração. Gere dentro do contrato e registre o que faltou
-como `gap`; a decisão de estender é do autor.
+Continua valendo: gere dentro do contrato e registre o que faltou como `gap`.
+
+### Regra 6 — você não escreve opções, nem matemática errada de propósito
+
+O passo final de uma lição oferece alternativas para o aluno **reconhecer** a fórmula que ele
+acabou de descobrir. As erradas são erradas de propósito, e é por isso que elas não saem daqui:
+
+> Não escreva `options`, nem distratores, nem "alternativas plausíveis". Todo o pipeline existe
+> para impedir que uma fórmula plausível e inventada chegue a uma lição — pedir três delas ao
+> gerador é pedir exatamente o defeito que a Camada 1, a Camada 2 e o gate foram construídos para
+> barrar. As alternativas são do autor, no arquivo de runtime, e a correta é uma `keyFormula` do
+> manifesto, literal.
+
+O que continua sendo seu: a prosa que leva o aluno até a fórmula, o `prompt` e o
+`expectedInsight` da widget, o `checkpoint` — e o passo final **nomeia a fórmula** no `title` e no
+`katex`, como sempre.
 
 ---
 
