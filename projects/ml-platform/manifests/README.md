@@ -285,6 +285,7 @@ critério ou descrição foi reescrito, exceto onde indicado.
 | `fundamentos-teoria-04` | `inputs` ganhou `probes: [[1,1],[1,-2]]` | os autovetores que a descrição já declarava, para o teste não hardcodar |
 | todos | `expectedValues` acrescentado | é o que o teste compara |
 | todos | `keyFormulas` reextraídas da fonte | decisão de notação |
+| `fundamentos-teoria-02` | `knownGaps` esvaziado (2026-10-05) | a fonte cobre a "melhor aproximação" em §3.8(b), e o gap mandava citar uma observação que a extração não tem — ver *Pendências*, item 4 |
 
 ---
 
@@ -298,9 +299,14 @@ critério ou descrição foi reescrito, exceto onde indicado.
    Para virar testável, o exemplo precisa de dados concretos em `inputs`.
 3. **Typos preservados:** `widgetConfig.gradie` (`fundamentos-teoria-03`) e `"differe"`
    (`fundamentos-teoria-06`).
-4. **`knownGaps` declarados** em `teoria-02`, `aplicada-01` e `aplicada-05` — cada um precisa da
-   decisão do autor (nota autônoma dentro da lição?) antes de gerar aquela lição. `teoria-01` não
-   tem gap nenhum.
+4. **`knownGaps` declarados** em `aplicada-01` e `aplicada-05` — cada um precisa da decisão do
+   autor (nota autônoma dentro da lição?) antes de gerar aquela lição. `teoria-01` não tem gap
+   nenhum, e o de `teoria-02` **caiu**, decidido em 2026-10-05: ele afirmava que a leitura da
+   projeção como "melhor aproximação" só existia nas notas do autor, e a fonte a enuncia em
+   §3.8(b) — "encontra o ponto π_U(x) contido no subespaço U que está mais próximo de x,
+   minimizando a distância ‖x − π_U(x)‖". Ele ainda mandava o gerador citar "a observação footer do
+   livro", que não está na extração e não é citável (regra 5). Um gap que a fonte já cobre não é
+   conservadorismo: é uma decisão pendente a mais entre o manifesto e a lição.
 
 ## O que o validador não cobre
 

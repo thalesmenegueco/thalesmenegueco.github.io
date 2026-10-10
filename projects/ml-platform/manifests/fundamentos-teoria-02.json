@@ -56,7 +56,5 @@
   "completionCriterion": "Ao arrastar b, o aluno vê a projeção mudar de magnitude (b→horiz = proj grande em x) e prever quando cos θ = 0 (perpendicular ⇒ projeção nula).",
   "estimatedMinutes": 14,
   "status": "draft",
-  "knownGaps": [
-    "mml-3.2 tem a linha de dot prodt; a interpretação de projeção como 'melhor aproximação' que minimiza erros aparecem apenas nas notas do autor — gerador deve citar mml-3.2 e a observação footer do livro."
-  ]
+  "knownGaps": []
 }
