@@ -1,0 +1,166 @@
+<div class="widget" [class.confirmed]="orthogonal()">
+  <div class="widget-header">
+    <div class="widget-title">ProjectionWidget</div>
+    <div class="widget-note">
+      ℝ² · janela ±{{ format(windowUnits()) }} unidades
+      @if (!allowDrag()) {
+        · somente leitura
+      }
+    </div>
+  </div>
+
+  <svg
+    class="plane"
+    viewBox="0 0 360 360"
+    role="img"
+    [attr.aria-label]="
+      'x em ' + pair(x()) + ', direção b em ' + pair(b()) + (orthogonal() ? ', perpendiculares' : '')
+    "
+    [class.dragging]="dragging() !== null"
+    (pointerdown)="onPointerDown($event)"
+    (pointermove)="onPointerMove($event)"
+    (pointerup)="onPointerUp()"
+    (pointerleave)="onPointerUp()"
+  >
+    @for (g of gridLines(); track g) {
+      <line
+        class="grid"
+        [attr.x1]="pxX(g)"
+        [attr.y1]="pxY(-windowUnits())"
+        [attr.x2]="pxX(g)"
+        [attr.y2]="pxY(windowUnits())"
+      />
+      <line
+        class="grid"
+        [attr.x1]="pxX(-windowUnits())"
+        [attr.y1]="pxY(g)"
+        [attr.x2]="pxX(windowUnits())"
+        [attr.y2]="pxY(g)"
+      />
+    }
+
+    <line
+      class="axis"
+      [attr.x1]="pxX(-windowUnits())"
+      [attr.y1]="pxY(0)"
+      [attr.x2]="pxX(windowUnits())"
+      [attr.y2]="pxY(0)"
+    />
+    <line
+      class="axis"
+      [attr.x1]="pxX(0)"
+      [attr.y1]="pxY(-windowUnits())"
+      [attr.x2]="pxX(0)"
+      [attr.y2]="pxY(windowUnits())"
+    />
+
+    @for (t of ticks(); track t) {
+      <text class="tick" [attr.x]="pxX(t)" [attr.y]="pxY(0) + 13">{{ t }}</text>
+      <text class="tick tick-y" [attr.x]="pxX(0) - 7" [attr.y]="pxY(t) + 4">{{ t }}</text>
+    }
+
+    <!-- the line b lies on, so the foot of the projection is visibly on it -->
+    @if (bLine(); as line) {
+      <line
+        class="direction-line"
+        [attr.x1]="pxX(line[0][0])"
+        [attr.y1]="pxY(line[0][1])"
+        [attr.x2]="pxX(line[1][0])"
+        [attr.y2]="pxY(line[1][1])"
+      />
+    }
+
+    <!-- the right angle at the foot: this is why the projection is the closest point -->
+    @if (rightAnglePoints(); as mark) {
+      <polygon class="right-angle" [attr.points]="mark" />
+    }
+
+    <!-- the error x − projection, always perpendicular to b -->
+    <line
+      class="error"
+      [attr.x1]="pxX(projection()[0])"
+      [attr.y1]="pxY(projection()[1])"
+      [attr.x2]="pxX(x()[0])"
+      [attr.y2]="pxY(x()[1])"
+    />
+
+    <!-- where x lands on the direction: dashed, and gone when the projection is null -->
+    <line
+      class="projection"
+      [attr.x1]="pxX(0)"
+      [attr.y1]="pxY(0)"
+      [attr.x2]="pxX(projection()[0])"
+      [attr.y2]="pxY(projection()[1])"
+    />
+    <circle
+      class="projection-dot"
+      [attr.cx]="pxX(projection()[0])"
+      [attr.cy]="pxY(projection()[1])"
+      r="3.5"
+    />
+
+    <line
+      class="direction"
+      [attr.x1]="pxX(0)"
+      [attr.y1]="pxY(0)"
+      [attr.x2]="pxX(b()[0])"
+      [attr.y2]="pxY(b()[1])"
+    />
+    <polygon class="direction" [attr.points]="headPoints([0, 0], b())" />
+
+    <line
+      class="vector"
+      [attr.x1]="pxX(0)"
+      [attr.y1]="pxY(0)"
+      [attr.x2]="pxX(x()[0])"
+      [attr.y2]="pxY(x()[1])"
+    />
+    <polygon class="vector" [attr.points]="headPoints([0, 0], x())" />
+
+    <text class="tip-label vector-label" [attr.x]="pxX(x()[0]) + 11" [attr.y]="pxY(x()[1]) + 4">
+      x {{ pair(x()) }}
+    </text>
+    <text
+      class="tip-label direction-label"
+      [attr.x]="pxX(b()[0]) + 11"
+      [attr.y]="pxY(b()[1]) + 4"
+    >
+      b {{ pair(b()) }}
+    </text>
+
+    <circle class="handle vector-handle" [attr.cx]="pxX(x()[0])" [attr.cy]="pxY(x()[1])" r="6" />
+    <circle
+      class="handle direction-handle"
+      [attr.cx]="pxX(b()[0])"
+      [attr.cy]="pxY(b()[1])"
+      r="6"
+    />
+  </svg>
+
+  <div class="legend">
+    <span class="legend-item"><i class="swatch vector"></i>x — o vetor que será projetado</span>
+    <span class="legend-item"><i class="swatch direction"></i>b — a direção</span>
+    <span class="legend-item"><i class="swatch projection"></i>projeção de x sobre b</span>
+    <span class="legend-item"><i class="swatch error"></i>erro (x menos a projeção)</span>
+  </div>
+
+  <div class="readout">
+    <span>produto escalar xᵀb = <strong>{{ format(dotProduct()) }}</strong></span>
+    <span>cos ω = <strong>{{ format(cos()) }}</strong></span>
+    <span>λ = <strong>{{ format(lambda()) }}</strong></span>
+    <span>‖projeção‖ = <strong>{{ format(projectionLength()) }}</strong></span>
+  </div>
+
+  @if (orthogonal()) {
+    <p class="state">
+      <strong>Ortogonal</strong> — cos ω = 0, então a projeção é nula e o erro passa a ser o
+      próprio x.
+    </p>
+  } @else {
+    <p class="state">Arraste as pontas de x e de b e acompanhe os quatro números.</p>
+  }
+
+  <div class="control-row">
+    <button type="button" (click)="reset()">voltar aos valores iniciais</button>
+  </div>
+</div>

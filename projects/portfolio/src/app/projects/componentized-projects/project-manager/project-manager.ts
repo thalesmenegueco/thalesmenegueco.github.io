@@ -74,6 +74,13 @@ export class ProjectManager implements OnInit {
   showTimeline = false;
   timelineItems: TimelineItem[] = [];
 
+  /** Id of the task currently being dragged (reorder in progress), if any. */
+  draggedTaskId: string | null = null;
+  /** Id of the task the drag is hovering over, used to render the drop marker. */
+  dropTargetId: string | null = null;
+  /** Sibling list the drag started from; drops are only allowed inside it. */
+  private draggedList: Task[] | null = null;
+
   newProjectName = '';
   newProjectDescription = '';
   newProjectTemplateId: string | null = null;
@@ -519,6 +526,117 @@ export class ProjectManager implements OnInit {
       task.done = !task.done;
       this.saveToStorage();
     }
+  }
+
+  // --- tasks: reorder ---
+
+  /**
+   * Moves a task one position up (-1) or down (+1) inside its own list.
+   * No-op when the move would leave the list bounds.
+   */
+  moveTaskBy(list: Task[], taskId: string, offset: number): void {
+    const from = list.findIndex((t) => t.id === taskId);
+    if (from === -1) return;
+
+    const to = from + offset;
+    if (to < 0 || to >= list.length) return;
+
+    const [task] = list.splice(from, 1);
+    list.splice(to, 0, task);
+    this.saveToStorage();
+  }
+
+  /**
+   * Drops `draggedId` onto `targetId` inside the same list. The dragged task
+   * follows the pointer: it lands after the target when moving down and before
+   * it when moving up.
+   */
+  moveTaskToPosition(list: Task[], draggedId: string, targetId: string): void {
+    const from = list.findIndex((t) => t.id === draggedId);
+    const to = list.findIndex((t) => t.id === targetId);
+    if (from === -1 || to === -1 || from === to) return;
+
+    const [task] = list.splice(from, 1);
+    list.splice(to, 0, task);
+    this.dropTargetId = null;
+    this.saveToStorage();
+  }
+
+  /** Where the drop marker should render for `targetId` ('above' | 'below'). */
+  dropPositionIn(list: Task[], targetId: string): 'above' | 'below' | null {
+    if (!this.draggedTaskId || this.draggedList !== list) return null;
+
+    const from = list.findIndex((t) => t.id === this.draggedTaskId);
+    const to = list.findIndex((t) => t.id === targetId);
+    if (from === -1 || to === -1 || from === to) return null;
+
+    return from < to ? 'below' : 'above';
+  }
+
+  isFirstInList(list: Task[], taskId: string): boolean {
+    return list.findIndex((t) => t.id === taskId) <= 0;
+  }
+
+  isLastInList(list: Task[], taskId: string): boolean {
+    return list.findIndex((t) => t.id === taskId) === list.length - 1;
+  }
+
+  onTaskDragStart(task: Task, list: Task[], event: DragEvent): void {
+    this.draggedTaskId = task.id;
+    this.draggedList = list;
+    this.dropTargetId = null;
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', task.id);
+      const row = (event.target as HTMLElement | null)?.closest('.pm-task-row');
+      if (row) {
+        event.dataTransfer.setDragImage(row, 20, 20);
+      }
+    }
+  }
+
+  onTaskDragOver(task: Task, list: Task[], event: DragEvent): void {
+    // Only siblings of the dragged list are valid drop targets.
+    if (!this.draggedTaskId || this.draggedList !== list || task.id === this.draggedTaskId) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    this.dropTargetId = task.id;
+  }
+
+  onTaskDragLeave(task: Task, event: DragEvent): void {
+    const next = event.relatedTarget as Node | null;
+    const current = event.currentTarget as HTMLElement | null;
+    // Ignore pointer moves between children of the same row.
+    if (next && current?.contains(next)) return;
+
+    if (this.dropTargetId === task.id) {
+      this.dropTargetId = null;
+    }
+  }
+
+  onTaskDrop(task: Task, list: Task[], event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const draggedId = this.draggedTaskId;
+    const sourceList = this.draggedList;
+    this.onTaskDragEnd();
+
+    if (!draggedId || sourceList !== list) return;
+    this.moveTaskToPosition(list, draggedId, task.id);
+  }
+
+  onTaskDragEnd(): void {
+    this.draggedTaskId = null;
+    this.dropTargetId = null;
+    this.draggedList = null;
   }
 
   // --- tasks: edit ---

@@ -159,7 +159,8 @@ Medido em **2026-10-09**, pelos comandos acima, não de memória:
   seção + 5 de capítulo). O número sai do próprio gate.
 - **1 de 12 lições** tem conteúdo: `fundamentos-teoria-01`, `status: "audited"`, jogável de ponta
   a ponta. As outras 11 são contratos sem derivado, e é por isso que o módulo anuncia "1 de 7".
-- **1 widget implementada** (`VectorSpaceWidget`); as demais são nomes registrados em
+- **2 widgets implementadas** (`VectorSpaceWidget`, da lição 01, e `ProjectionWidget`, da lição
+  02 — esta ainda sem conteúdo gerado); as outras 33 são nomes registrados em
   `manifests/registries.json`, à espera de uma lição que as contrate.
 - Só o Curso 1 (Fundamentos) tem lições contratadas. Cálculo está no ar com três módulos; as
   outras três matérias de ML estão em `coming-soon`, e os limites delas estão declarados em

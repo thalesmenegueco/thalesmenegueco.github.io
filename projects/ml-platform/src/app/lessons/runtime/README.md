@@ -25,6 +25,7 @@ sem tocar numa palavra que a auditoria assinou.
 | Arquivo | Papel |
 | :--- | :--- |
 | `lesson-runtime.types.ts` | `LessonRuntime`, `RuntimeStep`, `RuntimeValidation`, `RuntimeFormulaOption`, `WidgetSnapshot`, `RuntimeWidgetBinding` |
+| `widget-contract.ts` | `MlWidgetComponent` — o que **todo** widget recebe (`lessonId`, `binding`) e reporta (`snapshotChange`), mais os leitores `requireVector`/`readVectors`/`readFlag` |
 | `validate-step.ts` | O portão puro: `validateStep(validation, snapshot)` + `validationMessage(validation, hint)` |
 | `validate-step.spec.ts` | Os testes do portão — sem TestBed, sem widget, sem DOM |
 | `lesson-bindings.generated.ts` | **Gerado** por `npm run bindings:build` a partir dos manifestos — não edite à mão |
@@ -34,9 +35,22 @@ O runtime de cada lição fica ao lado do conteúdo dela, em
 
 ## O protocolo
 
+**A widget recebe o binding inteiro** — `lessonId` e `binding` (`widgetId` + `config` +
+`numericExample.inputs`, direto da fixture gerada), e nada mais. Ela lê os próprios inputs com
+`requireVector`, que falha alto e nomeia o manifesto quando o campo não existe. O player não
+conhece o vocabulário de nenhuma widget: essa foi a mudança que a segunda lição forçou em
+2026-10-28 — antes dele passava `[target]`/`[bases]` lidos de `inputs.c`/`.base`, o que só
+funcionava porque havia uma widget (ver [`../README.md`](../README.md)).
+
 **A widget reporta um snapshot** — um `Record<string, number | string | boolean>`, só escalares —
-a cada interação. `VectorSpaceWidget` emite `reached`, `c1`, `c2`, `lambda` e `distance`. A widget
-é a única coisa que sabe o que o estado dela significa, então é ela que nomeia os campos.
+a cada interação. `VectorSpaceWidget` emite `reached`, `c1`, `c2`, `lambda` e `distance`;
+`ProjectionWidget` emite `dot`, `cos`, `lambda`, `projectionLength` e `orthogonal`. A widget é a
+única coisa que sabe o que o estado dela significa, então é ela que nomeia os campos.
+
+**Geometria não se arredonda; leitura sim.** O readout do `ProjectionWidget` mostra quatro casas
+decimais, mas o desenho sai dos valores exatos: arredondar λ antes de calcular a projeção movia o
+pé em ~1e-4 e o erro deixava de ser *exatamente* perpendicular a **b** — a única identidade que
+aquela lição existe para mostrar. Um teste pegou isso com 1e-4 de folga.
 
 **O passo declara uma checagem sobre um campo nomeado.** Três tipos, porque um widget de ML serve
 vários passos — `VectorSpaceWidget` é explorado de três jeitos na mesma lição, diferente do

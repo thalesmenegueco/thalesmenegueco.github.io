@@ -415,7 +415,22 @@
 
 <ng-template #taskItem let-task="task" let-parentList="parentList" let-depth="depth">
   <div class="pm-task-item" [class.done]="task.done">
-    <div class="pm-task-row">
+    <div
+      class="pm-task-row"
+      [class.dragging]="draggedTaskId === task.id"
+      [class.drop-target]="dropTargetId === task.id"
+      [class.drop-above]="dropPositionIn(parentList, task.id) === 'above'"
+      [class.drop-below]="dropPositionIn(parentList, task.id) === 'below'"
+      (dragover)="onTaskDragOver(task, parentList, $event)"
+      (dragleave)="onTaskDragLeave(task, $event)"
+      (drop)="onTaskDrop(task, parentList, $event)">
+      <span
+        class="pm-drag-handle"
+        draggable="true"
+        (dragstart)="onTaskDragStart(task, parentList, $event)"
+        (dragend)="onTaskDragEnd()"
+        title="Arraste para reordenar"
+        aria-hidden="true">⠿</span>
       <input
         type="checkbox"
         class="pm-checkbox"
@@ -438,6 +453,18 @@
           title="Clique para editar">{{ task.text }}</span>
       }
       <div class="pm-task-actions">
+        <button
+          class="pm-btn pm-btn-ghost pm-btn-small"
+          (click)="moveTaskBy(parentList, task.id, -1)"
+          [disabled]="isFirstInList(parentList, task.id)"
+          title="Mover para cima"
+          aria-label="Mover para cima">↑</button>
+        <button
+          class="pm-btn pm-btn-ghost pm-btn-small"
+          (click)="moveTaskBy(parentList, task.id, 1)"
+          [disabled]="isLastInList(parentList, task.id)"
+          title="Mover para baixo"
+          aria-label="Mover para baixo">↓</button>
         @if (depth < 2) {
           <button
             class="pm-btn pm-btn-ghost pm-btn-small"

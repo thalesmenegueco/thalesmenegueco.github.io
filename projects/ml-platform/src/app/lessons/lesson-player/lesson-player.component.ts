@@ -2,13 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 import { JsonPipe } from '@angular/common';
 import type { LessonContent, LessonContentStep } from '@ml/engine';
 import { KatexComponent } from '@shared/katex';
-import {
-  VectorSpaceWidgetComponent,
-  type Vec2,
-} from '../../widgets/vector-space/vector-space.component';
+import { ProjectionWidgetComponent } from '../../widgets/projection/projection.component';
+import { VectorSpaceWidgetComponent } from '../../widgets/vector-space/vector-space.component';
 import { RichTextComponent } from '../rich-text.component';
 import type { LessonRuntime, WidgetSnapshot } from '../runtime/lesson-runtime.types';
 import { validateStep, validationMessage } from '../runtime/validate-step';
+import { hasWidgetComponent } from './widget-registry';
 
 /**
  * Renders a generated `LessonContent` against its `LessonRuntime`, one step at a time.
@@ -33,14 +32,26 @@ import { validateStep, validationMessage } from '../runtime/validate-step';
  * content be regenerated without moving a single validation, and a validation be retuned
  * without touching a word the audit signed off on.
  *
- * The widget's target is no longer a constant here. It used to be `widgetTarget: Vec2 = [2, 3]`
- * — a hand copy of `fundamentos-teoria-01`'s example, which the second lesson would have had to
- * duplicate.
+ * **The player no longer knows any widget's vocabulary.** It used to read
+ * `numericExample.inputs.c` and `.base` and pass them as `[target]`/`[bases]` — first as the
+ * constant `[2, 3]` copied out of `fundamentos-teoria-01`'s example, later from the fixture. That
+ * worked only because there was one widget: the second one initialises from `inputs.x`/`.y`, and
+ * the third will use something else. So each widget now receives the binding **whole** (plus the
+ * `lessonId`, for its error messages) and reads its own inputs — see
+ * `../runtime/widget-contract.ts`. Rendering stays a static `@switch`, because a dynamic outlet
+ * cannot bind an output; `./widget-registry.ts` records which ids have a component and why the
+ * two lists coexist.
  */
 @Component({
   selector: 'app-lesson-player',
   standalone: true,
-  imports: [KatexComponent, VectorSpaceWidgetComponent, RichTextComponent, JsonPipe],
+  imports: [
+    KatexComponent,
+    VectorSpaceWidgetComponent,
+    ProjectionWidgetComponent,
+    RichTextComponent,
+    JsonPipe,
+  ],
   templateUrl: './lesson-player.component.html',
   styleUrl: './lesson-player.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -86,40 +97,17 @@ export class LessonPlayerComponent {
   protected readonly isSatisfied = computed(() => this.satisfiedIds().includes(this.step().id));
 
   /**
-   * The widget's initial target, from the manifest's `numericExample.inputs.c`.
+   * Whether the widget named by the runtime has a component at all.
    *
-   * It throws instead of defaulting: a plausible fallback would be a second copy of the lesson's
-   * own number, and a lesson whose widget has no target is a contract bug that should name
-   * itself rather than draw the wrong picture.
+   * Two different failures look identical in the template otherwise, and they want different
+   * readers: an id that is **not** in the registry is content pointing at a widget nobody has
+   * built yet (a roadmap state, and the lesson simply is not playable), while an id that **is**
+   * in the registry but has no `@case` is a code defect in this template. The second one has no
+   * other detector — a spec cannot read the template — so it names itself here instead.
    */
-  protected readonly widgetTarget = computed<Vec2>(() => {
-    const c = this.runtime().widget.inputs?.['c'];
-    if (Array.isArray(c) && typeof c[0] === 'number' && typeof c[1] === 'number') {
-      return [c[0], c[1]];
-    }
-    throw new Error(
-      `${this.runtime().lessonId}: o manifesto não declara numericExample.inputs.c — ` +
-        'a widget não tem alvo para desenhar. Veja manifests/README.md, campo numericExample.',
-    );
-  });
-
-  /** The widget's base vectors, from the manifest's `numericExample.inputs.base`. */
-  protected readonly widgetBases = computed<Vec2[]>(() => {
-    const base = this.runtime().widget.inputs?.['base'];
-    if (Array.isArray(base)) {
-      const pairs = base.filter(
-        (row): row is Vec2 =>
-          Array.isArray(row) && typeof row[0] === 'number' && typeof row[1] === 'number',
-      );
-      if (pairs.length > 0) {
-        return pairs;
-      }
-    }
-    return [
-      [1, 0],
-      [0, 1],
-    ];
-  });
+  protected readonly widgetRegistered = computed(() =>
+    hasWidgetComponent(this.runtime().widget.widgetId),
+  );
 
   protected go(to: number): void {
     const clamped = Math.max(0, Math.min(this.total() - 1, to));
@@ -178,7 +166,32 @@ export class LessonPlayerComponent {
     this.reviewMode.update((on) => !on);
   }
 
+  /**
+   * Conclude the lesson — and **check the last step first**, exactly as `next()` checks every
+   * other one.
+   *
+   * This was missing, and it made every ML lesson unfinishable: only `next()` ever added a step to
+   * `satisfiedIds`, and `next()` is unreachable on the last step, where this button replaces it.
+   * So `everyStepSatisfied()` was always false there, `finish()` always refused with "faltam 1
+   * passo", and `finished` never fired — the hub could not count a lesson that the student had in
+   * fact completed. Found on 2026-10-28 while wiring lesson 02, by a spec that clicked the real
+   * button instead of asserting on its label.
+   *
+   * The refusal at the end is still needed, and this does not weaken it: a student who jumps to the
+   * last step through the dots gets the last step marked here and is then told which earlier steps
+   * are missing.
+   */
   protected finish(): void {
+    const runtimeStep = this.runtimeStep();
+    if (runtimeStep && !this.isSatisfied() && !validateStep(runtimeStep.validation, this.reported())) {
+      this.feedback.set(validationMessage(runtimeStep.validation, runtimeStep.hint));
+      return;
+    }
+
+    this.satisfiedIds.update((ids) =>
+      ids.includes(this.step().id) ? ids : [...ids, this.step().id],
+    );
+
     if (!this.everyStepSatisfied()) {
       const missing = this.lesson().steps.filter((s) => !this.satisfiedIds().includes(s.id));
       this.feedback.set(

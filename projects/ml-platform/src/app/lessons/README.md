@@ -52,7 +52,12 @@ Agora:
 - **os pontos do cabeçalho continuam navegação livre** (são affordance de quem audita e de quem
   volta), mas concluir exige que **todos** os passos tenham sido cumpridos alguma vez, e o botão
   diz quais faltam;
-- um passo já cumprido continua cumprido: voltar a ele pelos pontos não pede a prova duas vezes.
+- um passo já cumprido continua cumprido: voltar a ele pelos pontos não pede a prova duas vezes;
+- **o último passo é conferido ao concluir.** `next()` não existe nele — o botão de concluir toma o
+  lugar — então a checagem dele roda dentro de `finish()`, com a mesma mensagem. Até 2026-10-28
+  isso não acontecia: só `next()` marcava um passo como cumprido, o último passo nunca era marcado,
+  e **nenhuma lição de ML podia ser concluída** — `finished` não saía, o hub não contava, e o
+  sintoma era um "faltam 1 passo" impossível de atender. Ver *O que a segunda lição forçou*, abaixo.
 
 O que isso **não** é: uma correção de resposta. O `checkpoint` continua sendo pergunta e resposta
 para conferência própria; a checagem é sobre o que o aluno fez no widget. E `expectedInsight`
@@ -70,6 +75,44 @@ não aparecem para quem aprende.
    `prompt` de cada passo manda o aluno para um grupo diferente de controles. O binding é **por
    lição**, porque o manifesto declara um widget por lição.
 
+## O que a segunda lição forçou (2026-10-28)
+
+`fundamentos-teoria-02` está contratada em `ProjectionWidget`, e o prompt dela já existia em
+`content-source/prompts/fundamentos-teoria-02.md`. Preparar o runtime dela encontrou três coisas
+que o piloto não precisava e que não estavam no papel:
+
+1. **O player conhecia o vocabulário de uma widget só.** Ele lia `numericExample.inputs.c` e
+   `.base` e passava `[target]`/`[bases]` — funcionava porque havia uma widget. Agora ele passa o
+   **binding inteiro** (`runtime().widget`, direto da fixture) mais o `lessonId`, e cada widget lê
+   os seus próprios inputs por [`runtime/widget-contract.ts`](./runtime/widget-contract.ts), com
+   `requireVector` falhando alto e nomeando o manifesto. Duas widgets passaram a caber sem que o
+   player saiba o que qualquer uma delas significa.
+2. **Havia um `@switch` e nenhum registro.** `NgComponentOutlet` não liga `(output)`, então o
+   template continua estático; o que faltava era uma lista consultável de ids com componente —
+   [`widget-registry.ts`](./lesson-player/widget-registry.ts) — porque nenhum gate via a diferença entre "widget
+   implementada" e "widget só citada no manifesto". `widget-coverage.spec.ts` fecha isso, e o
+   `@default` do template distingue "ainda não existe" (roadmap) de "existe e o `@case` esqueceu"
+   (defeito do player).
+3. **Nenhuma lição podia ser concluída.** Ver o último item de *O avanço agora é conferido*: só
+   `next()` marcava passo cumprido, e no último passo não há `next()`. O teste que deveria pegar
+   isso assertava `toContain('concluída')` no rótulo do botão — e o rótulo **não marcado**
+   ("marcar lição como concluída") contém a palavra. Passava verde há 23 dias. Agora ele escuta
+   `finished` e exige a ausência de recusa; o `finish()` confere o último passo antes de concluir.
+
+A widget em si é [`../widgets/projection/`](../widgets/projection/projection.component.ts): dois vetores arrastáveis, os
+quatro números do prompt (xᵀb, cos ω, λ, ‖projeção‖), projeção tracejada, erro sempre perpendicular
+a **b** — desenhado com o ângulo reto marcado no pé, porque é isso que faz da projeção a melhor
+aproximação — e encaixe na perpendicular exata perto de 90°, que é o que torna o
+`completionCriterion` alcançável. O rótulo é **b** e o `inputs.y` do manifesto continua `y`: um
+nome por audiência, sem renomear o campo que o motor e a fixture usam.
+
+Três specs guardam o que não é derivável: [`../widgets/projection/projection.component.spec.ts`](../widgets/projection/projection.component.spec.ts)
+(aritmética conferida contra `@ml/engine`, encaixe, snapshot nomeado), [`player-widget-wiring.spec.ts`](./lesson-player/player-widget-wiring.spec.ts)
+(o player entrega o binding e obedece o snapshot, com uma lição sintética) e
+[`widget-coverage.spec.ts`](./lesson-player/widget-coverage.spec.ts) (cobertura do registro).
+
+---
+
 ## Onde as coisas moram
 
 ```
@@ -77,14 +120,23 @@ lessons/
   README.md                      ← este arquivo
   rich-text.component.ts         ← renderiza a ênfase da prosa (2 construtores)
   rich-text.pipe.ts              ← o parser, exportado para ser testado direto
-  runtime/                       ← o modelo de runtime: tipos, portão puro e a fixture de bindings
-  lesson-player/                 ← renderiza um LessonContent contra um LessonRuntime
+  runtime/
+    lesson-runtime.types.ts      ← o modelo: checagem por passo, binding, snapshot
+    widget-contract.ts           ← o que um widget recebe e reporta (`binding`, `snapshotChange`)
+    validate-step.ts             ← o portão puro, sem TestBed
+    lesson-bindings.generated.ts ← **gerado** dos manifestos — não edite à mão
+  lesson-player/
+    lesson-player.component.*    ← renderiza um LessonContent contra um LessonRuntime
+    widget-registry.ts           ← quais ids de widget têm componente (e por que há duas listas)
+    widget-coverage.spec.ts      ← falha se uma lição apontar para widget sem componente
   fundamentos-teoria/
     fundamentos-teoria-01.ts          ← o conteúdo gerado (Camada 3)
     fundamentos-teoria-01.runtime.ts  ← a pedagogia escrita à mão (checagens + alternativas)
     fundamentos-teoria-01.spec.ts     ← guarda o arco, o acordo com o manifesto e o portão
     fundamentos-teoria.component.*    ← a página do módulo, com progresso
-../widgets/vector-space/         ← a widget contratada pelo manifesto
+../widgets/                      ← as widgets que os manifestos contratam
+  vector-space/                  ← `VectorSpaceWidget` (lição 01)
+  projection/                    ← `ProjectionWidget` (lição 02) — ainda sem conteúdo gerado
 ```
 
 Não há `lesson.types.ts` fora de `runtime/`: o player consome o contrato de geração **e** o modelo
@@ -95,7 +147,9 @@ engines.
 O mapeamento **nome → componente** de widget é feito dentro do player, num `@switch` sobre
 `runtime().widget.widgetId` — o nome que o **manifesto** contrata, não o que o conteúdo escreveu
 (uma spec guarda que os dois coincidem). É a ponte que o `manifests/README.md` descreve como "o
-manifesto nomeia o widget, e o runtime mapeia depois" — hoje ela existe, com um caso.
+manifesto nomeia o widget, e o runtime mapeia depois": hoje ela existe com **dois** casos, e a
+lista de quais ids têm componente mora em [`widget-registry.ts`](./lesson-player/widget-registry.ts), com
+`widget-coverage.spec.ts` falhando quando uma lição aponta para um id ausente de lá.
 
 ## Ênfase no texto, e por que o player tem um renderizador
 

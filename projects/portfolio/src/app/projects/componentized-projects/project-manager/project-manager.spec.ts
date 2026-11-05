@@ -477,6 +477,234 @@ describe('ProjectManager', () => {
     });
   });
 
+  describe('task ordering', () => {
+    const makeTask = (id: string, subtasks: Task[] = []): Task => ({
+      id,
+      text: id.toUpperCase(),
+      done: false,
+      subtasks,
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
+    });
+
+    it('moveTaskBy should move a task up and persist', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const list = [makeTask('a'), makeTask('b'), makeTask('c')];
+
+      component.moveTaskBy(list, 'c', -1);
+
+      expect(list.map((t) => t.id)).toEqual(['a', 'c', 'b']);
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('moveTaskBy should move a task down', () => {
+      const list = [makeTask('a'), makeTask('b'), makeTask('c')];
+
+      component.moveTaskBy(list, 'a', 1);
+
+      expect(list.map((t) => t.id)).toEqual(['b', 'a', 'c']);
+    });
+
+    it('moveTaskBy should be a no-op at the list bounds', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const list = [makeTask('a'), makeTask('b')];
+
+      component.moveTaskBy(list, 'a', -1);
+      component.moveTaskBy(list, 'b', 1);
+      component.moveTaskBy(list, 'missing', 1);
+
+      expect(list.map((t) => t.id)).toEqual(['a', 'b']);
+      expect(setItem).not.toHaveBeenCalled();
+    });
+
+    it('moveTaskBy should only reorder siblings of the given list', () => {
+      const child = makeTask('a1');
+      const parent = makeTask('a', [child]);
+      const list = [parent, makeTask('b')];
+
+      component.moveTaskBy(list, 'a1', -1);
+
+      expect(list.map((t) => t.id)).toEqual(['a', 'b']);
+      expect(list[0].subtasks.map((t) => t.id)).toEqual(['a1']);
+    });
+
+    it('moveTaskToPosition should place the dragged task at the target position', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const list = [makeTask('a'), makeTask('b'), makeTask('c')];
+
+      component.moveTaskToPosition(list, 'a', 'c');
+
+      expect(list.map((t) => t.id)).toEqual(['b', 'c', 'a']);
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('moveTaskToPosition should move a task upward past its target', () => {
+      const list = [makeTask('a'), makeTask('b'), makeTask('c')];
+
+      component.moveTaskToPosition(list, 'c', 'a');
+
+      expect(list.map((t) => t.id)).toEqual(['c', 'a', 'b']);
+    });
+
+    it('moveTaskToPosition should ignore a drop on itself or on an unknown task', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const list = [makeTask('a'), makeTask('b')];
+
+      component.moveTaskToPosition(list, 'a', 'a');
+      component.moveTaskToPosition(list, 'a', 'missing');
+      component.moveTaskToPosition(list, 'missing', 'b');
+
+      expect(list.map((t) => t.id)).toEqual(['a', 'b']);
+      expect(setItem).not.toHaveBeenCalled();
+    });
+
+    it('isFirstInList / isLastInList should describe the list bounds', () => {
+      const list = [makeTask('a'), makeTask('b'), makeTask('c')];
+
+      expect(component.isFirstInList(list, 'a')).toBeTrue();
+      expect(component.isFirstInList(list, 'b')).toBeFalse();
+      expect(component.isLastInList(list, 'c')).toBeTrue();
+      expect(component.isLastInList(list, 'b')).toBeFalse();
+      expect(component.isFirstInList(list, 'missing')).toBeTrue();
+      expect(component.isLastInList(list, 'missing')).toBeFalse();
+    });
+
+    it('drag handlers should track the dragged task and clear on drop', () => {
+      const list = [makeTask('a'), makeTask('b')];
+      const dragStart = new Event('dragstart') as DragEvent;
+
+      component.onTaskDragStart(list[0], list, dragStart);
+      expect(component.draggedTaskId).toBe('a');
+
+      const dragOver = new Event('dragover', { cancelable: true }) as DragEvent;
+      component.onTaskDragOver(list[1], list, dragOver);
+      expect(component.dropTargetId).toBe('b');
+
+      const drop = new Event('drop', { cancelable: true }) as DragEvent;
+      component.onTaskDrop(list[1], list, drop);
+
+      expect(list.map((t) => t.id)).toEqual(['b', 'a']);
+      expect(component.draggedTaskId).toBeNull();
+      expect(component.dropTargetId).toBeNull();
+    });
+
+    it('should refuse drops coming from a different list', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const list = [makeTask('a'), makeTask('b')];
+      const otherList = [makeTask('x')];
+
+      component.onTaskDragStart(otherList[0], otherList, new Event('dragstart') as DragEvent);
+
+      const dragOver = new Event('dragover', { cancelable: true }) as DragEvent;
+      component.onTaskDragOver(list[0], list, dragOver);
+      expect(component.dropTargetId).toBeNull();
+
+      const drop = new Event('drop', { cancelable: true }) as DragEvent;
+      component.onTaskDrop(list[0], list, drop);
+
+      expect(list.map((t) => t.id)).toEqual(['a', 'b']);
+      expect(otherList.map((t) => t.id)).toEqual(['x']);
+      expect(setItem).not.toHaveBeenCalled();
+    });
+
+    it('dropPositionIn should mark the marker below when moving down and above when moving up', () => {
+      const list = [makeTask('a'), makeTask('b'), makeTask('c')];
+
+      component.onTaskDragStart(list[0], list, new Event('dragstart') as DragEvent);
+      expect(component.dropPositionIn(list, 'c')).toBe('below');
+      expect(component.dropPositionIn(list, 'a')).toBeNull();
+
+      component.onTaskDragStart(list[2], list, new Event('dragstart') as DragEvent);
+      expect(component.dropPositionIn(list, 'a')).toBe('above');
+      expect(component.dropPositionIn([makeTask('x')], 'a')).toBeNull();
+    });
+
+    it('should not treat top-level tasks as drop targets while dragging a subtask', () => {
+      const child = makeTask('a1');
+      const list = [makeTask('a', [child]), makeTask('b')];
+
+      component.onTaskDragStart(child, list[0].subtasks, new Event('dragstart') as DragEvent);
+      component.onTaskDragOver(
+        list[1],
+        list,
+        new Event('dragover', { cancelable: true }) as DragEvent
+      );
+
+      expect(component.dropTargetId).toBeNull();
+      expect(list.map((t) => t.id)).toEqual(['a', 'b']);
+      expect(list[0].subtasks.map((t) => t.id)).toEqual(['a1']);
+    });
+
+    it('onTaskDragEnd should reset the drag state', () => {
+      component.draggedTaskId = 'a';
+      component.dropTargetId = 'b';
+
+      component.onTaskDragEnd();
+
+      expect(component.draggedTaskId).toBeNull();
+      expect(component.dropTargetId).toBeNull();
+    });
+
+    describe('rendered list', () => {
+      const dragEvent = (type: string, dataTransfer: DataTransfer): DragEvent =>
+        new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer });
+
+      const renderTasks = (ids: string[]): HTMLElement[] => {
+        component.selectedProjectId = null;
+        component.showTemplates = false;
+        component.showTimeline = false;
+        component.standaloneTasks = ids.map((id) => makeTask(id));
+        fixture.detectChanges();
+        return Array.from(
+          fixture.nativeElement.querySelectorAll('.pm-task-list .pm-task-row')
+        ) as HTMLElement[];
+      };
+
+      it('should reorder tasks by dragging one row onto another', () => {
+        const rows = renderTasks(['a', 'b', 'c']);
+        const dataTransfer = new DataTransfer();
+
+        const handle = rows[0].querySelector('.pm-drag-handle') as HTMLElement;
+        handle.dispatchEvent(dragEvent('dragstart', dataTransfer));
+        fixture.detectChanges();
+
+        expect(rows[0].classList).toContain('dragging');
+
+        rows[2].dispatchEvent(dragEvent('dragover', dataTransfer));
+        fixture.detectChanges();
+
+        expect(rows[2].classList).toContain('drop-target');
+        expect(rows[2].classList).toContain('drop-below');
+
+        rows[2].dispatchEvent(dragEvent('drop', dataTransfer));
+        fixture.detectChanges();
+
+        expect(component.standaloneTasks.map((t) => t.id)).toEqual(['b', 'c', 'a']);
+        expect(component.draggedTaskId).toBeNull();
+        expect(component.dropTargetId).toBeNull();
+        expect(rows.length).toBe(3);
+      });
+
+      it('should reorder tasks with the arrow buttons and disable them at the bounds', () => {
+        const rows = renderTasks(['a', 'b', 'c']);
+        const up = (row: HTMLElement) =>
+          row.querySelector('[title="Mover para cima"]') as HTMLButtonElement;
+        const down = (row: HTMLElement) =>
+          row.querySelector('[title="Mover para baixo"]') as HTMLButtonElement;
+
+        expect(up(rows[0]).disabled).toBeTrue();
+        expect(down(rows[2]).disabled).toBeTrue();
+        expect(up(rows[2]).disabled).toBeFalse();
+
+        down(rows[0]).click();
+        fixture.detectChanges();
+
+        expect(component.standaloneTasks.map((t) => t.id)).toEqual(['b', 'a', 'c']);
+      });
+    });
+  });
+
   describe('task scheduling', () => {
     const makeTask = (overrides: Partial<Task> = {}): Task => ({
       id: 't1',

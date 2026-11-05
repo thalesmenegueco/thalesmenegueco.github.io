@@ -132,7 +132,10 @@ describe('VectorSpaceWidget — nada é desenhado fora do quadro', () => {
     }).compileComponents();
 
     const fixture = TestBed.createComponent(VectorSpaceWidgetComponent);
-    fixture.componentRef.setInput('target', [2, 3]);
+    // The widget now reads its own inputs out of the binding (see runtime/widget-contract.ts):
+    // the fixture is the whole truth, so the harness passes the real one, not a literal [2, 3].
+    fixture.componentRef.setInput('lessonId', 'fundamentos-teoria-01');
+    fixture.componentRef.setInput('binding', LESSON_BINDINGS['fundamentos-teoria-01']);
     fixture.detectChanges();
     setup(fixture.componentInstance);
     fixture.detectChanges();
@@ -382,9 +385,23 @@ describe('LessonPlayerComponent — o avanço é conferido', () => {
 
     choices[correctIndex].click();
     fixture.detectChanges();
-    click(fixture, '.player-nav .primary');
 
-    expect(element.querySelector('.player-nav .primary')?.textContent).toContain('concluída');
+    // O `finished` é o que o hub escuta — asserção no rótulo do botão não serve: o rótulo
+    // **não marcado** ("marcar lição como concluída") já contém a palavra "concluída", e foi
+    // assim que este teste passou por 23 dias enquanto a lição era impossível de concluir.
+    const emitted: string[] = [];
+    fixture.componentInstance.finished.subscribe((lessonId) => emitted.push(lessonId));
+
+    click(fixture, '.player-nav .primary');
+    fixture.detectChanges();
+
+    expect(emitted).withContext('concluir a lição tem de emitir finished').toEqual([
+      FUNDAMENTOS_TEORIA_01.lessonId,
+    ]);
+    expect(element.querySelector('.player-nav .primary')?.textContent).toContain(
+      'lição concluída ✓',
+    );
+    expect(element.querySelector('.feedback')).withContext('não deveria haver recusa').toBeNull();
   });
 
   it('recusa concluir a lição quando algum passo foi pulado pelos pontos', async () => {

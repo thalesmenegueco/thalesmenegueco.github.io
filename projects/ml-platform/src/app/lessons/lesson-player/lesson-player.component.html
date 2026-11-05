@@ -48,16 +48,32 @@
     @switch (runtime().widget.widgetId) {
       @case ('VectorSpaceWidget') {
         <app-vector-space
-          [target]="widgetTarget()"
-          [bases]="widgetBases()"
+          [lessonId]="runtime().lessonId"
+          [binding]="runtime().widget"
+          (snapshotChange)="onWidgetSnapshot($event)"
+        />
+      }
+      @case ('ProjectionWidget') {
+        <app-projection
+          [lessonId]="runtime().lessonId"
+          [binding]="runtime().widget"
           (snapshotChange)="onWidgetSnapshot($event)"
         />
       }
       @default {
-        <p class="widget-missing">
-          A widget <code>{{ runtime().widget.widgetId }}</code> está no manifesto mas
-          ainda não tem componente no runtime.
-        </p>
+        @if (widgetRegistered()) {
+          <p class="widget-missing">
+            A widget <code>{{ runtime().widget.widgetId }}</code> está registrada em
+            <code>lesson-player/widget-registry.ts</code>, mas este template não tem um
+            <code>&#64;case</code> para ela — é defeito do player, não do conteúdo, e a lição não
+            avança até o caso existir.
+          </p>
+        } @else {
+          <p class="widget-missing">
+            A widget <code>{{ runtime().widget.widgetId }}</code> está no manifesto mas ainda não
+            tem componente no runtime.
+          </p>
+        }
       }
     }
   </div>

@@ -334,7 +334,7 @@
   padding: 10px 12px;
   background: var(--pm-surface);
   border-radius: var(--pm-radius);
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s, opacity 0.15s;
 
   &:hover {
     background: var(--pm-surface-hover);
@@ -343,6 +343,58 @@
   &:hover .pm-task-actions {
     opacity: 1;
   }
+
+  &:hover .pm-drag-handle {
+    opacity: 1;
+  }
+
+  &.dragging {
+    opacity: 0.45;
+  }
+
+  &.drop-target {
+    background: rgba(196, 160, 122, 0.14);
+    box-shadow: inset 0 2px 0 var(--pm-accent);
+  }
+
+  &.drop-target.drop-below {
+    box-shadow: inset 0 -2px 0 var(--pm-accent);
+  }
+
+  &.drop-target.drop-above {
+    box-shadow: inset 0 2px 0 var(--pm-accent);
+  }
+}
+
+.pm-drag-handle {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0 2px;
+  color: var(--pm-text-muted);
+  opacity: 0.35;
+  cursor: grab;
+  user-select: none;
+  transition: opacity 0.15s, color 0.15s;
+
+  &:hover {
+    color: var(--pm-accent);
+    opacity: 1;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.pm-task-actions .pm-btn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.pm-task-actions .pm-btn:disabled:hover {
+  background: none;
+  color: var(--pm-text-muted);
 }
 
 .pm-task-text {
@@ -790,5 +842,17 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+
+  .pm-task-actions {
+    opacity: 1;
+  }
+}
+
+/* Touch devices cannot hover, and native drag-and-drop is unreliable there:
+   keep the action buttons (including the move arrows) always reachable. */
+@media (hover: none) {
+  .pm-task-actions {
+    opacity: 1;
   }
 }

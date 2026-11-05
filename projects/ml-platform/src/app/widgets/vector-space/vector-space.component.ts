@@ -1,8 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
-import type { WidgetSnapshot } from '../../lessons/runtime/lesson-runtime.types';
+import type { RuntimeWidgetBinding, WidgetSnapshot } from '../../lessons/runtime/lesson-runtime.types';
+import {
+  readVectors,
+  requireVector,
+  type MlWidgetComponent,
+  type Vec2,
+  type WidgetContext,
+} from '../../lessons/runtime/widget-contract';
 
-/** A point/vector in the plane, in widget units. */
-export type Vec2 = [number, number];
+/** A point/vector in the plane, in widget units. Re-exported: it is this widget's public type. */
+export type { Vec2 };
+
+/** The name this widget answers to in `registries.json` and in the player's `@switch`. */
+const WIDGET_ID = 'VectorSpaceWidget';
 
 /** The SVG is 360×360; this is its centre in pixels. */
 const CENTRE = 180;
@@ -47,22 +57,40 @@ const BASIS_PRESETS: { label: string; bases: [Vec2, Vec2] }[] = [
   styleUrl: './vector-space.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VectorSpaceWidgetComponent {
-  /** Initial base vectors, from the manifest's `widgetConfig.bases`. */
-  readonly bases = input<Vec2[]>([
-    [1, 0],
-    [0, 1],
-  ]);
+export class VectorSpaceWidgetComponent implements MlWidgetComponent {
+  /** The lesson whose manifest declared this binding. Used only to name the manifest on error. */
+  readonly lessonId = input.required<string>();
+
+  /** `widget`, `widgetConfig` and `numericExample.inputs` of that lesson's manifest. */
+  readonly binding = input.required<RuntimeWidgetBinding>();
+
+  private readonly context = computed<WidgetContext>(() => ({
+    lessonId: this.lessonId(),
+    widgetId: WIDGET_ID,
+  }));
 
   /**
-   * The vector the student has to reach, from the manifest's `numericExample.inputs.c` —
-   * passed by the player, which reads it from the generated bindings fixture.
+   * The vector the student has to reach, from the manifest's `numericExample.inputs.c`.
    *
-   * **Required, with no default.** It used to default to `[2, 3]`, which was `teoria-01`'s own
-   * example inlined into a widget every lesson shares: the second lesson to use this widget
-   * would have inherited the first lesson's target silently.
+   * **Required, with no default, and it throws.** It once defaulted to `[2, 3]` — `teoria-01`'s
+   * own example inlined into a widget every lesson shares, so the second lesson to use this
+   * widget would have inherited the first lesson's target silently. A lesson whose widget has no
+   * target is a contract bug, and it names itself the first time the widget is drawn.
    */
-  readonly target = input.required<Vec2>();
+  readonly target = computed<Vec2>(() => requireVector(this.binding(), 'c', this.context()));
+
+  /**
+   * The base directions the sliders move along, from `numericExample.inputs.base`.
+   *
+   * Canonical when the manifest does not declare them: a *direction* has a real default, while a
+   * coordinate the student must reach does not — which is the line between this and `target`.
+   */
+  readonly bases = computed<Vec2[]>(() =>
+    readVectors(this.binding(), 'base', [
+      [1, 0],
+      [0, 1],
+    ]),
+  );
 
   /** Slider positions. Public so the template can bind to them directly. */
   readonly values = {

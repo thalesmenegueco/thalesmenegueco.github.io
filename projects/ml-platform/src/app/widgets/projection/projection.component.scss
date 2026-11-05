@@ -1,0 +1,181 @@
+@use '../../ml-shared' as *;
+
+:host {
+  display: block;
+}
+
+.plane {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #0b1113;
+  cursor: grab;
+  touch-action: none;
+
+  &.dragging {
+    cursor: grabbing;
+  }
+}
+
+.grid {
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1;
+}
+
+.axis {
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1;
+}
+
+.tick {
+  fill: var(--color-text-muted);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.tick-y {
+  text-anchor: end;
+}
+
+// The line the direction lies on — a guide, not a quantity.
+.direction-line {
+  stroke: rgba(122, 162, 247, 0.25);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+// b: the direction the projection is measured along.
+.direction {
+  stroke: #7aa2f7;
+  fill: #7aa2f7;
+  stroke-width: 2;
+}
+
+// x: the vector being projected.
+.vector {
+  stroke: var(--color-study-sage);
+  fill: var(--color-study-sage);
+  stroke-width: 2.5;
+}
+
+// The projection itself: dashed, because it is a length read off x along b.
+.projection {
+  stroke: #b48ee0;
+  fill: #b48ee0;
+  stroke-width: 2.5;
+  stroke-dasharray: 6 4;
+}
+
+.projection-dot {
+  fill: #b48ee0;
+}
+
+// The error x − π: the segment whose perpendicularity *is* the "best approximation".
+.error {
+  stroke: #f2a65a;
+  fill: #f2a65a;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
+// The right angle at the foot — the drawing's proof, not decoration.
+.right-angle {
+  fill: none;
+  stroke: rgba(242, 166, 90, 0.85);
+  stroke-width: 1.5;
+}
+
+.tip-label {
+  font-size: 10px;
+  font-weight: 700;
+
+  &.vector-label {
+    fill: var(--color-study-sage);
+  }
+
+  &.direction-label {
+    fill: #7aa2f7;
+  }
+}
+
+// The grab handles: the affordance that says "these two tips move".
+.handle {
+  stroke: #0b1113;
+  stroke-width: 2;
+
+  &.vector-handle {
+    fill: var(--color-study-sage);
+  }
+
+  &.direction-handle {
+    fill: #7aa2f7;
+  }
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 12px;
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 14px;
+  height: 0;
+  border-top-width: 2px;
+  border-top-style: solid;
+
+  &.vector {
+    border-top-color: var(--color-study-sage);
+  }
+
+  &.direction {
+    border-top-color: #7aa2f7;
+  }
+
+  &.projection {
+    border-top-color: #b48ee0;
+    border-top-style: dashed;
+  }
+
+  &.error {
+    border-top-color: #f2a65a;
+    border-top-style: dashed;
+  }
+}
+
+.state {
+  margin-top: 12px;
+  color: var(--color-text-muted);
+  font-size: 0.79rem;
+
+  strong {
+    color: var(--color-study-sage);
+  }
+}
+
+button {
+  padding: 7px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+
+  &:hover {
+    border-color: var(--color-study-sage);
+    color: var(--color-study-sage);
+  }
+}
