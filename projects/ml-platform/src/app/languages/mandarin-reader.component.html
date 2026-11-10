@@ -140,6 +140,13 @@
         As {{ text.glossary.length }} palavras deste texto, na ordem em que
         aparecem.
       </p>
+      <!--
+        Chave por `zh`, e não por identidade do `MandarinWord`: hoje funciona porque
+        nenhuma entrada do dicionário repete o `zh`. Um homógrafo (dois significados
+        para os mesmos caracteres, separados por `id` em `mandarin-words.ts`) põe duas
+        palavras iguais nesta lista, e o `@for` lança NG0955. Antes de criar um,
+        trocar por `track $index` — ver a seção de homógrafos em `./README.md`.
+      -->
       <ul class="glossary-grid">
         @for (word of text.glossary; track word.zh) {
           <li class="glossary-item">

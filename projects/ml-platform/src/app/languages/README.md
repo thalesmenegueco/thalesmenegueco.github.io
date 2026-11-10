@@ -69,6 +69,29 @@ Limitações conhecidas do modelo, de propósito:
   falado mudam).
 - **Sem áudio.** O escopo pedido era ler e descobrir palavras.
 
+### Homógrafos: um `id` novo no dicionário abre um buraco no glossário (2026-11-10)
+
+O dicionário prevê dois significados para os mesmos caracteres via `id` — a válvula de escape para
+casos como `点` (hora, em 七点) ou `点` (pedir, no restaurante). **Antes do primeiro homógrafo de
+verdade, o glossário precisa ser corrigido.** `mandarin-reader.component.html` lista as palavras com
+`@for (word of text.glossary; track word.zh)`, e as duas entradas do homógrafo têm o mesmo `zh` (e o
+mesmo pinyin, que é o ponto do homógrafo): o Angular chaveia a coleção com chave duplicada, lança
+`NG0955` e derruba a página de leitura. O texto em si não sofre — ele renderiza tokens, que são
+identidades distintas, e só o glossário usa `zh`.
+
+Hoje não há `zh` repetido no dicionário, e não foi sorte: as sete leituras de 2026-11-10 tiveram de
+contornar `点`, `把` e `家` por isso mesmo — daí `一把`, `一家` e `要不要` entrarem como palavras
+inteiras. O conserto, quando o primeiro homógrafo for necessário, é uma linha (chavear pelo índice,
+não pelo caractere):
+
+```html
+@for (word of text.glossary; track $index) {
+```
+
+`track word.zh + word.pinyin` **não** resolve: um homógrafo tem som idêntico por definição. O gate
+não pega esse buraco — `mandarin-content.spec.ts` não testa `zh` duplicado, porque a chave do
+dicionário (`id ?? zh`) é única por construção. Quem adicionar um `id` novo abre este arquivo antes.
+
 ## A experiência de leitura
 
 Os quatro controles são estado local da página, não da rota — todos descrevem **como** o texto é
@@ -138,16 +161,18 @@ lista oficial. Os textos cobrem os cinco níveis e os três focos, e é isso que
 - nenhum parágrafo tem mais de `MAX_WORDS_PER_PARAGRAPH` palavras nem mais de três frases;
 - `wordCount`, `glossary` e `minutes` são derivados de fato, não digitados.
 
-O que ele **não** cobre: revisão por falante nativo, avaliação didática da progressão, áudio e
-sandhi. Se um pinyin está errado, o spec não sabe — o dicionário é o único lugar onde essa
-correção entra.
+O que ele **não** cobre: revisão por falante nativo, avaliação didática da progressão, áudio,
+sandhi e a unicidade de `zh` entre entradas (o caso dos homógrafos, na seção acima). Se um pinyin
+está errado, o spec não sabe — o dicionário é o único lugar onde essa correção entra.
 
 ## Como adicionar um texto
 
 1. Escreva o parágrafo em `mandarin-texts.ts`, com uma chave por palavra e a pontuação como token.
    Tradução com **um parágrafo por parágrafo** da leitura.
 2. Toda chave nova entra em `mandarin-words.ts`, com `traditional` explícito (mesmo quando igual),
-   pinyin com acentos e glosa curta em pt-BR.
+   pinyin com acentos e glosa curta em pt-BR. Se a leitura precisar de dois significados para os
+   mesmos caracteres, leia antes a seção de homógrafos: o `id` só funciona depois que o glossário
+   deixar de chavear por `zh`.
 3. Rode da **raiz do monorepo**:
 
    ```bash
