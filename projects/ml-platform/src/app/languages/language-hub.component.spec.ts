@@ -114,12 +114,19 @@ describe('LanguageHubComponent', () => {
   it('combines the two filters and says so when nothing matches', () => {
     const { fixture, element } = render();
 
-    chip(element, '[data-level="3"]').click();
+    // The empty state is pinned on a (level, focus) pair the collection does not
+    // have — HSK 1 has no cultura reading today. When a text fills that gap this
+    // guard goes red, so the pair is re-chosen instead of the assertion dropped.
+    // (The previous pin was HSK 3 · cultura, filled by "A dança da praça".)
+    const emptyPair = MANDARIN_TEXTS.filter(
+      (text) => text.level === 1 && text.focus === 'cultura',
+    );
+    expect(emptyPair.length).withContext('HSK 1 · Cultura must be empty').toBe(0);
+
+    chip(element, '[data-level="1"]').click();
     chip(element, '[data-focus="cultura"]').click();
     fixture.detectChanges();
 
-    // No HSK 3 reading is a cultura text today — the empty state is the honest
-    // answer, and this spec pins it so an added reading makes this test speak up.
     expect(cards(element).length).toBe(0);
     expect(element.querySelector('.empty')).toBeTruthy();
   });

@@ -20,7 +20,8 @@ type FocusFilter = MandarinFocus | 'todos';
  * filters the collection is organised by (HSK level and editorial focus).
  *
  * The filters are local display state over a static collection. Nothing here
- * fetches, pages or scores: there are ten readings, and the honest UI for ten
+ * fetches, pages or scores: there are seventeen readings, and the honest UI for
+ * seventeen
  * readings is a filter bar plus a grid, not a search engine.
  *
  * Today the grid is the Mandarin collection. A second language needs its own
