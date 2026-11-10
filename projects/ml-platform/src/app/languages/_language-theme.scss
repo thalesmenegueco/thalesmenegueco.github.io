@@ -1,0 +1,64 @@
+////
+/// Theme for the languages section.
+///
+/// Two palettes and one set of semantic variables, so the hub and the reader
+/// switch theme by changing custom properties — not by duplicating rules. The
+/// tokens are declared **once, at document level** (`src/styles.scss`): `:root`
+/// carries the platform's dark `--color-*` plus the section's `--lang-*` roles,
+/// and `html.lang-theme-light` carries the light palette. The page components
+/// then read them the way they read any custom property, which keeps each
+/// component stylesheet small and keeps body, nav and footer in agreement.
+///
+/// `--lang-*` names describe roles (`card`, `panel`, `passage`, `tip`, tints),
+/// not colours, which is what lets a single document class repaint both screens.
+////
+
+/// The section's role variables for the dark theme. The base `--color-*`
+/// palette comes from the platform's `:root`; only the roles are new here.
+@mixin dark-roles() {
+  --lang-glow-warm: rgba(255, 163, 0, 0.07);
+  --lang-glow-soft: rgba(176, 106, 163, 0.09);
+  --lang-card-bg: rgba(24, 32, 35, 0.75);
+  --lang-panel-bg: rgba(24, 32, 35, 0.72);
+  --lang-passage-bg: rgba(24, 32, 35, 0.55);
+  --lang-tip-bg: #0d1416;
+  --lang-tip-text: #e7ece9;
+  --lang-tip-teal: #6cc4b8;
+  --lang-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+  --lang-border-teal: rgba(79, 179, 166, 0.55);
+  --lang-border-warm: rgba(255, 163, 0, 0.5);
+  --lang-border-warm-soft: rgba(255, 163, 0, 0.35);
+  --lang-teal-tint: rgba(79, 179, 166, 0.1);
+  --lang-warm-tint: rgba(255, 163, 0, 0.08);
+}
+
+/// Light theme: warm paper, high-contrast ink, the same teal/sage accents.
+@mixin light() {
+  --color-bg: #f6f2e9;
+  --color-surface: #ffffff;
+  --color-surface-hover: #efe9dc;
+  --color-text: #1c2321;
+  --color-text-muted: #58625e;
+  --color-border: #d9d0bf;
+  --color-accent-warm: #a85f00;
+  --color-accent-warm-soft: #8c4f1c;
+  --color-study-sage: #4c6f5d;
+  --color-study-teal: #12766a;
+  --color-study-sky: #2d6b95;
+  --color-danger: #ab3f3f;
+
+  --lang-glow-warm: rgba(168, 95, 0, 0.08);
+  --lang-glow-soft: rgba(154, 79, 128, 0.1);
+  --lang-card-bg: #ffffff;
+  --lang-panel-bg: #fbf7f0;
+  --lang-passage-bg: #fffdf8;
+  --lang-tip-bg: #1c2321;
+  --lang-tip-text: #f6f2e9;
+  --lang-tip-teal: #6cc4b8;
+  --lang-shadow: 0 18px 45px rgba(60, 45, 25, 0.12);
+  --lang-border-teal: rgba(18, 118, 106, 0.45);
+  --lang-border-warm: rgba(168, 95, 0, 0.4);
+  --lang-border-warm-soft: rgba(168, 95, 0, 0.3);
+  --lang-teal-tint: rgba(18, 118, 106, 0.1);
+  --lang-warm-tint: rgba(168, 95, 0, 0.08);
+}

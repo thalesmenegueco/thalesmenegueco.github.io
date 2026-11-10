@@ -1,0 +1,260 @@
+// The languages hub. Same shell, palette and card language as
+// `studies.component.scss` — same platform, different content — plus the
+// section's own light theme, toggled from the top of the page. The palette
+// itself lives in `_language-theme.scss` and is declared at document level.
+:host {
+  display: block;
+  min-height: 100vh;
+
+  --hub-radius: 16px;
+
+  background:
+    radial-gradient(circle at 15% 0%, var(--lang-glow-warm), transparent 35%),
+    radial-gradient(circle at 90% 10%, var(--lang-glow-soft), transparent 40%),
+    var(--color-bg);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.language-hub {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 42px clamp(20px, 5vw, 68px) 80px;
+}
+
+
+.back {
+  color: var(--color-study-teal);
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// The accent SVG is tuned for the dark surface; on paper it needs more ink to
+// stay legible. A real use for the host's state class, beyond the test hook.
+:host(.theme-light) .track-icon {
+  filter: brightness(0.82) saturate(1.35);
+}
+
+// ---------- Header ----------
+
+.hub-head {
+  margin-bottom: 36px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--color-accent-warm);
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hub-head h1 {
+  margin: 0 0 14px;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 1.1;
+}
+
+.lead {
+  max-width: 720px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.98rem, 2vw, 1.1rem);
+  line-height: 1.65;
+}
+
+// ---------- Track ----------
+
+.track-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.track-icon {
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+}
+
+.track-name {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+
+.track-name-zh {
+  margin-left: 6px;
+  color: var(--color-accent-warm-soft);
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', 'Source Han Serif SC', serif;
+  font-weight: 400;
+}
+
+.track-tagline {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+// ---------- Filters ----------
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  min-width: 42px;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.chip {
+  padding: 7px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  color: var(--color-text-muted);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.chip:hover {
+  border-color: var(--lang-border-teal);
+  color: var(--color-text);
+}
+
+.chip.on {
+  border-color: var(--lang-border-teal);
+  color: var(--color-study-teal);
+  background: var(--lang-teal-tint);
+}
+
+.result-count {
+  margin: 0 0 18px;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+// ---------- Text cards ----------
+
+.text-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+  gap: 18px;
+}
+
+.text-card {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--hub-radius);
+  color: inherit;
+  background: var(--lang-card-bg);
+  box-shadow: var(--lang-shadow);
+  text-decoration: none;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.text-card:hover {
+  border-color: var(--lang-border-teal);
+  transform: translateY(-3px);
+}
+
+.text-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.badge {
+  padding: 5px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.badge--level {
+  border-color: var(--lang-border-warm);
+  color: var(--color-accent-warm);
+  background: var(--lang-warm-tint);
+  font-weight: 800;
+}
+
+.text-card__title {
+  margin: 0 0 2px;
+  font-size: 1.12rem;
+  line-height: 1.3;
+}
+
+.text-card__title-zh {
+  margin: 0 0 10px;
+  color: var(--color-accent-warm-soft);
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', 'Source Han Serif SC', serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.text-card__teaser {
+  flex: 1;
+  margin: 0 0 16px;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.text-card__meta {
+  color: var(--color-study-sage);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 26px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--hub-radius);
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  text-align: center;
+}

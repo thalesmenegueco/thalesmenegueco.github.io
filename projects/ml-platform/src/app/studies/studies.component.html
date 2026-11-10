@@ -88,4 +88,37 @@
       </section>
     }
   </main>
+
+  <section class="languages" aria-label="Línguas">
+    <header class="subject-header">
+      <h2>Línguas</h2>
+      <p>
+        A mesma ideia de aprender explorando, aplicada à leitura: textos curtos
+        em mandarim, com o significado de cada palavra ao alcance do mouse.
+      </p>
+    </header>
+
+    <div class="module-grid">
+      @for (track of languageTracks; track track.id) {
+        <article class="module-card language-card">
+          <div class="module-card__top">
+            <span class="module-kind module-kind--language">Leitura guiada</span>
+          </div>
+
+          <img class="module-icon" [src]="track.icon" alt="" />
+
+          <h3 class="module-title">{{ track.name }} · {{ track.nameZh }}</h3>
+          <p class="module-desc">{{ track.description }}</p>
+
+          <ul class="module-meta">
+            <li>Textos curtos</li>
+            <li>HSK 1–5</li>
+            <li>3 focos</li>
+          </ul>
+
+          <a class="module-cta" [routerLink]="track.route">Ler textos →</a>
+        </article>
+      }
+    </div>
+  </section>
 </div>

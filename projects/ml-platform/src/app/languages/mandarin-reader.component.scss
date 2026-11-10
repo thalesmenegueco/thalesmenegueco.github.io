@@ -1,0 +1,420 @@
+// The reading surface. The palette comes from `_language-theme.scss` at document
+// level: dark by default (the platform's), light when `<html>` carries
+// `lang-theme-light`, which the top-of-page toggle sets. The rest of the site
+// stays dark: this is a reading preference for the section, not a platform theme.
+:host {
+  display: block;
+  min-height: 100vh;
+
+  --reader-radius: 14px;
+
+  background:
+    radial-gradient(circle at 85% 0%, var(--lang-glow-soft), transparent 40%),
+    radial-gradient(circle at 10% 5%, var(--lang-glow-warm), transparent 35%),
+    var(--color-bg);
+  color: var(--color-text);
+}
+
+// The global stylesheet colours links on hover; the reading surface inherits its
+// own states from the tokens above, like `studies.component.scss` does.
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.reader {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 42px clamp(18px, 4vw, 48px) 88px;
+}
+
+
+.back {
+  color: var(--color-study-teal);
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ---------- Header ----------
+
+.reader-head {
+  margin-bottom: 26px;
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.title-zh {
+  margin: 0 0 14px;
+  color: var(--color-accent-warm-soft);
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', 'Source Han Serif SC', serif;
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  letter-spacing: 0.06em;
+}
+
+.teaser {
+  max-width: 680px;
+  margin: 0 0 16px;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge {
+  padding: 5px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.badge--level {
+  border-color: var(--lang-border-warm);
+  color: var(--color-accent-warm);
+  background: var(--lang-warm-tint);
+  font-weight: 800;
+}
+
+// ---------- Toolbar ----------
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 26px 0 10px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--reader-radius);
+  background: var(--lang-panel-bg);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.toggle,
+.script-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-muted);
+  background: transparent;
+  font-size: 0.85rem;
+}
+
+.toggle.on,
+.script-switch button.on {
+  border-color: var(--lang-border-teal);
+  color: var(--color-study-teal);
+  background: var(--lang-teal-tint);
+}
+
+.toggle-state {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.toggle.on .toggle-state {
+  color: var(--color-study-teal);
+}
+
+.script-switch {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.script-switch button {
+  border: none;
+  border-radius: 0;
+}
+
+.script-switch button + button {
+  border-left: 1px solid var(--color-border);
+}
+
+.script-switch button.on {
+  color: var(--color-accent-warm);
+  background: var(--lang-warm-tint);
+}
+
+.script-note {
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.hint {
+  margin: 0 0 14px;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+// ---------- The passage ----------
+
+.passage {
+  padding: 22px clamp(14px, 3vw, 34px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--reader-radius);
+  background: var(--lang-passage-bg);
+}
+
+.para {
+  margin: 0 0 1.1rem;
+  overflow: visible;
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', 'Source Han Serif SC', serif;
+  font-size: clamp(1.3rem, 2.6vw, 1.6rem);
+  letter-spacing: 0.01em;
+  line-height: 2.9;
+}
+
+.para:last-child {
+  margin-bottom: 0;
+}
+
+.word {
+  position: relative;
+  display: inline-block;
+  vertical-align: baseline;
+  cursor: help;
+  outline: none;
+}
+
+.word:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--color-study-teal);
+  outline-offset: 2px;
+}
+
+ruby {
+  ruby-position: over;
+}
+
+rt {
+  color: var(--color-study-sage);
+  font-family: 'Roboto', Helvetica, sans-serif;
+  font-size: 0.5em;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.punct {
+  color: var(--color-text-muted);
+}
+
+// The pinyin toggle only hides the annotation; the word keeps its place, so the
+// line does not reflow vertically when a learner switches it off.
+.hide-pinyin rt {
+  display: none;
+}
+
+// Spacing applies *between words only*: punctuation sits between two `.word`
+// siblings, so `.word + .word` never matches across a comma or a full stop.
+.show-spaces .word + .word {
+  margin-left: 0.22em;
+}
+
+// ---------- Word tooltip ----------
+
+.tip {
+  position: absolute;
+  bottom: calc(100% + 0.9em);
+  left: 50%;
+  z-index: 20;
+  display: grid;
+  gap: 2px;
+  min-width: 118px;
+  max-width: 240px;
+  padding: 8px 11px;
+  border: 1px solid var(--lang-border-teal);
+  border-radius: 10px;
+  background: var(--lang-tip-bg);
+  box-shadow: var(--lang-shadow);
+  font-family: 'Roboto', Helvetica, sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 120ms ease;
+}
+
+.word:hover .tip,
+.word:focus-visible .tip,
+.word.is-active .tip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.word.is-active ruby {
+  color: var(--color-accent-warm);
+}
+
+.tip-pinyin {
+  color: var(--lang-tip-teal);
+  font-weight: 700;
+}
+
+.tip-meaning {
+  color: var(--lang-tip-text);
+}
+
+// ---------- Translation ----------
+
+.translation {
+  margin: -0.35rem 0 1.25rem;
+  padding-left: 12px;
+  border-left: 2px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-family: 'Roboto', Helvetica, sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+// ---------- Note and glossary ----------
+
+.note {
+  margin-top: 26px;
+  padding: 18px 20px;
+  border: 1px solid var(--lang-border-warm-soft);
+  border-radius: var(--reader-radius);
+  background: var(--lang-warm-tint);
+}
+
+.note h2 {
+  margin: 0 0 8px;
+  color: var(--color-accent-warm);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.note p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.glossary {
+  margin-top: 34px;
+}
+
+.glossary h2 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+}
+
+.glossary-lead {
+  margin: 0 0 16px;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.glossary-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'zh pinyin'
+    'zh meaning';
+  align-items: baseline;
+  column-gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--lang-passage-bg);
+}
+
+.glossary-zh {
+  grid-area: zh;
+  color: var(--color-text);
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', 'Source Han Serif SC', serif;
+  font-size: 1.3rem;
+}
+
+.glossary-pinyin {
+  grid-area: pinyin;
+  color: var(--color-study-teal);
+  font-size: 0.78rem;
+}
+
+.glossary-meaning {
+  grid-area: meaning;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+// ---------- Missing text ----------
+
+.reader-missing {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.reader-missing h1 {
+  margin: 0 0 10px;
+}
+
+.reader-missing p {
+  margin: 0 0 20px;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    gap: 8px;
+  }
+
+  .toggle,
+  .script-switch button {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+  }
+
+  .passage {
+    padding: 18px 12px;
+  }
+}

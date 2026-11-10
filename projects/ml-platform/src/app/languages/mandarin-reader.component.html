@@ -1,0 +1,160 @@
+<section class="reader">
+  <div class="page-top">
+    <nav class="breadcrumb" aria-label="Navegação">
+      <a class="back" routerLink="/linguas">← Todos os textos</a>
+    </nav>
+
+  <button
+    type="button"
+    class="theme-toggle"
+    [attr.aria-pressed]="theme.light()"
+    title="Alterna entre tema escuro e claro"
+    (click)="theme.toggle()"
+  >
+    <span class="theme-toggle__icon" aria-hidden="true">{{
+      theme.light() ? '☀' : '☾'
+    }}</span>
+    Tema claro
+  </button>
+  </div>
+
+  @if (text(); as text) {
+    <header class="reader-head">
+      <h1 class="title">{{ text.title }}</h1>
+      <p class="title-zh" lang="zh-Hans">{{ text.titleZh }}</p>
+      <p class="teaser">{{ text.teaser }}</p>
+      <ul class="badges">
+        <li class="badge badge--level">HSK {{ text.level }}</li>
+        <li class="badge">{{ focusName(text.focus) }}</li>
+        <li class="badge">{{ text.wordCount }} palavras</li>
+        <li class="badge">≈ {{ text.minutes }} min</li>
+      </ul>
+    </header>
+
+    <div class="toolbar" role="toolbar" aria-label="Opções de leitura">
+      <button
+        type="button"
+        class="toggle toggle-pinyin"
+        [class.on]="showPinyin()"
+        [attr.aria-pressed]="showPinyin()"
+        (click)="togglePinyin()"
+      >
+        Pinyin
+        <span class="toggle-state">{{ showPinyin() ? 'visível' : 'oculto' }}</span>
+      </button>
+
+      <div class="script-switch" role="group" aria-label="Forma dos caracteres">
+        <button
+          type="button"
+          class="script-simplified"
+          [class.on]="!traditional()"
+          [attr.aria-pressed]="!traditional()"
+          (click)="useSimplified()"
+        >
+          简体 <span class="script-note">simplificado</span>
+        </button>
+        <button
+          type="button"
+          class="script-traditional"
+          [class.on]="traditional()"
+          [attr.aria-pressed]="traditional()"
+          (click)="useTraditional()"
+        >
+          繁體 <span class="script-note">tradicional</span>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="toggle toggle-spaces"
+        [class.on]="showSpaces()"
+        [attr.aria-pressed]="showSpaces()"
+        (click)="toggleSpaces()"
+      >
+        Espaço entre palavras
+        <span class="toggle-state">{{ showSpaces() ? 'ligado' : 'desligado' }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="toggle toggle-translation"
+        [class.on]="showTranslation()"
+        [attr.aria-pressed]="showTranslation()"
+        (click)="toggleTranslation()"
+      >
+        Tradução
+        <span class="toggle-state">{{ showTranslation() ? 'ligada' : 'desligada' }}</span>
+      </button>
+    </div>
+
+    <p class="hint">
+      Toque em uma palavra para fixar pinyin e significado — no computador, passar o
+      mouse já mostra.
+    </p>
+
+    <article
+      class="passage"
+      [class.hide-pinyin]="!showPinyin()"
+      [class.show-spaces]="showSpaces()"
+    >
+      @for (paragraph of text.tokens; track $index; let p = $index) {
+        <p class="para">
+          @for (token of paragraph; track $index) {
+            @if (token.word; as word) {
+              <span
+                class="word"
+                tabindex="0"
+                [attr.lang]="traditional() ? 'zh-Hant' : 'zh-Hans'"
+                [class.is-active]="isActive(token)"
+                (click)="togglePin(token)"
+                (keydown)="onWordKey($event, token)"
+              >
+                <ruby>{{ scriptWord(word) }}<rt>{{ word.pinyin }}</rt></ruby>
+                <span class="tip" aria-hidden="true">
+                  <span class="tip-pinyin">{{ word.pinyin }}</span>
+                  <span class="tip-meaning">{{ word.meaning }}</span>
+                </span>
+              </span>
+            } @else {
+              <span class="punct">{{ token.literal }}</span>
+            }
+          }
+        </p>
+
+        @if (showTranslation()) {
+          <p class="translation">{{ text.translation[p] }}</p>
+        }
+      }
+    </article>
+
+    @if (text.note) {
+      <aside class="note">
+        <h2>Nota de contexto</h2>
+        <p>{{ text.note }}</p>
+      </aside>
+    }
+
+    <section class="glossary" aria-label="Glossário do texto">
+      <h2>Glossário</h2>
+      <p class="glossary-lead">
+        As {{ text.glossary.length }} palavras deste texto, na ordem em que
+        aparecem.
+      </p>
+      <ul class="glossary-grid">
+        @for (word of text.glossary; track word.zh) {
+          <li class="glossary-item">
+            <span class="glossary-zh" [attr.lang]="traditional() ? 'zh-Hant' : 'zh-Hans'">{{ scriptWord(word) }}</span>
+            <span class="glossary-pinyin">{{ word.pinyin }}</span>
+            <span class="glossary-meaning">{{ word.meaning }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  } @else {
+    <div class="reader-missing">
+      <h1>Texto não encontrado</h1>
+      <p>Este endereço não corresponde a nenhum texto da coleção.</p>
+      <a class="back" routerLink="/linguas">Ver todos os textos</a>
+    </div>
+  }
+</section>

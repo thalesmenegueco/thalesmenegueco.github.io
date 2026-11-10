@@ -68,6 +68,19 @@ describe('StudiesComponent (hub)', () => {
     expect(element.querySelectorAll('.module-meta__done').length).toBe(0);
   });
 
+  it('links the languages section to its reading hub', () => {
+    const element = render().nativeElement as HTMLElement;
+    const languageSection = element.querySelector('.languages');
+    const cta = languageSection?.querySelector('a.module-cta');
+
+    // Languages are a second kind of learning on the same front door: a section
+    // after the exatas catalogue, never one of its `.subject`s.
+    expect(languageSection).toBeTruthy();
+    expect(element.querySelectorAll('.languages .subject').length).toBe(0);
+    expect(cta?.getAttribute('href')).toBe('/linguas');
+    expect(languageSection?.textContent).toContain('Mandarim');
+  });
+
   it('aggregates saved progress across the tracked modules', () => {
     localStorage.setItem(
       PROGRESS_KEYS.calculus,

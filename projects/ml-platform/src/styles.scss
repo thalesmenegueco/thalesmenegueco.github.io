@@ -1,4 +1,5 @@
 @use 'plot-tokens' as plot;
+@use 'app/languages/language-theme' as lang;
 
 // VisuaLab's global stylesheet.
 //
@@ -27,6 +28,63 @@
 // distinct from the study surface, this is the line to change.
 :root {
   @include plot.color-tokens();
+  @include lang.dark-roles();
+
+  color-scheme: dark;
+}
+
+// ---- Languages section: light reading theme ----
+//
+// The languages pages (`/linguas` and `/linguas/mandarim/:textId`) put this class
+// on <html> while they are mounted, so the **whole frame** follows the light
+// palette: body, site nav, footer and the gutters the body padding leaves, none
+// of which a component stylesheet can reach. The tokens are declared here and
+// nowhere else — the pages only toggle the class — so the class being absent
+// from the platform's other surfaces is what keeps them dark.
+html.lang-theme-light {
+  @include lang.light();
+
+  color-scheme: light;
+}
+
+// The top row both languages pages render: back link on the left, theme toggle on
+// the right. Global rather than duplicated in each component stylesheet — it is
+// the same markup in both, and the two pages must not drift apart.
+.page-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.page-top .breadcrumb {
+  margin: 0;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  color: var(--color-text-muted);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--lang-border-teal);
+  color: var(--color-text);
+}
+
+.theme-toggle__icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 * {

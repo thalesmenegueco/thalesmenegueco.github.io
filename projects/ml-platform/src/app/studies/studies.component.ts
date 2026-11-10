@@ -5,6 +5,7 @@ import {
   moduleKindLabel as labelForModuleKind,
 } from '@shared/learning';
 import { PROGRESS_KEYS, ProgressStore, type ProgressKey } from '@shared/progress';
+import { LANGUAGE_TRACKS } from '../languages/language-catalog';
 import { HeroMotionComponent } from './hero-motion.component';
 import { STUDY_SUBJECTS } from './study-catalog';
 
@@ -32,6 +33,18 @@ const PROGRESS_KEY_BY_MODULE: Record<string, ProgressKey> = {
 })
 export class StudiesComponent {
   readonly subjects = STUDY_SUBJECTS;
+
+  /**
+   * The languages section, rendered after the exatas catalogue.
+   *
+   * It is a second **kind** of learning on the same hub, so it is not a
+   * `StudySubject` — different module vocabulary, different content model, and
+   * no shared progress key (see `languages/README.md`). The hub still owns the
+   * front door, so it links there with a card of its own — and it imports only
+   * the track metadata, never the readings: the collection stays in the lazily
+   * loaded `/linguas` chunk, exactly like a course's widgets do.
+   */
+  readonly languageTracks = LANGUAGE_TRACKS;
 
   private readonly progress = inject(ProgressStore);
 

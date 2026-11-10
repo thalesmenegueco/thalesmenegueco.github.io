@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Lanterna chinesa">
+  <!-- Section icon: a paper lantern, the least ambiguous reading-and-Chinese glyph
+       in the palette the other subject icons already use (amber on transparent). -->
+  <g fill="none" stroke="#ffa300" stroke-width="3" stroke-linejoin="round">
+    <path d="M36 14h24" stroke-linecap="round" />
+    <rect x="30" y="18" width="36" height="6" rx="2" fill="#ffa300" opacity=".85" />
+    <rect x="22" y="26" width="52" height="46" rx="16" fill="rgba(255,163,0,.14)" />
+    <path d="M40 26c4 10 4 36 0 46M56 26c-4 10-4 36 0 46" opacity=".55" />
+    <rect x="30" y="74" width="36" height="6" rx="2" fill="#ffa300" opacity=".85" />
+    <path d="M48 80v6M42 86v6M54 86v6" stroke-linecap="round" opacity=".8" />
+  </g>
+</svg>

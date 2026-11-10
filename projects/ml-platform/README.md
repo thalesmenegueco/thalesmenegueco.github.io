@@ -14,7 +14,8 @@ lá — se este arquivo divergir de um deles, o outro está certo.
 ## TL;DR
 
 - VisuaLab é um hub de cursos interativos de exatas; **este app é o do Machine Learning**, e o
-  Cálculo é a matéria irmã que já está no ar.
+  Cálculo é a matéria irmã que já está no ar. Além das exatas, há uma **seção de Línguas**
+  (`/linguas`): leitura em mandarim com pinyin, simplificado/tradicional e glosas por palavra.
 - A parte difícil não é a UI: é o **pipeline de conteúdo gerado** — fonte imutável → contrato →
   geração → auditoria. Três camadas, descritas abaixo em cinco linhas.
 - **Nenhum comando roda desta pasta.** `package.json` e `angular.json` estão na **raiz do
@@ -33,6 +34,15 @@ Fundamentos Matemáticos para ML, Aprendizado Supervisionado, Redes Neurais do Z
 Não-Supervisionado. Só o primeiro deles tem lições contratadas; os outros três são `coming-soon`
 na tela, e a fonte deles (NNDL) ainda está vazia de propósito. Ver
 [`content-source/README.md`](content-source/README.md).
+
+**A seção de Línguas é a segunda forma de aprender da plataforma** — mesma ideia ("explore antes de
+nomear"), outro material. Em `/linguas` ficam textos curtos em mandarim organizados por nível HSK
+(1–5) e por foco (histórias, cultura, humor), com quatro controles de leitura: pinyin que liga e
+desliga, caracteres simplificados ou tradicionais, espaço entre as palavras e tradução; ao passar o
+mouse (ou tocar) numa palavra aparece o pinyin e o significado. A seção tem tema claro/escuro
+próprio (o resto da plataforma continua escuro) e a escolha fica salva neste navegador. O conteúdo é **original e autorado**,
+não gerado — e por isso o gate dele são os specs de conteúdo, não o pipeline de lições. Ver
+[`src/app/languages/README.md`](src/app/languages/README.md).
 
 Duas coisas definem a arquitetura:
 
@@ -71,6 +81,11 @@ A frase que explica quase todas as decisões deste repositório: **endereço err
 válido**. Um `sourceRef` pode resolver para um heading que existe e ainda assim apontar para a
 seção errada do livro — por isso os IDs são números de seção, por isso
 `manifests/book-sections.json` existe, e por isso duas fixtures carregam hash próprio.
+
+**A seção de Línguas fica fora deste pipeline, de propósito.** Um texto de leitura não é derivado de
+um livro: é escrito para a plataforma, e a falha típica não é uma fórmula inventada, é um pinyin
+errado ou uma tradução desalinhada. O gate dela é `mandarin-content.spec.ts` (toda chave resolve,
+parágrafo curto, tradução um a um, dicionário sem entrada órfã), não `validate:manifests`.
 
 ## Onde você está
 
@@ -120,6 +135,7 @@ gate no meio existe para você descobrir a fixture defasada antes do teste recla
 | [`src/app/lessons/README.md`](src/app/lessons/README.md) | "como o conteúdo vira tela?" — a decisão da forma **(b)**, o player, o progresso, e o registro da auditoria da lição 01 |
 | [`src/app/lessons/runtime/README.md`](src/app/lessons/runtime/README.md) | "como o aluno é impedido de avançar de graça?" — o protocolo do snapshot, os três tipos de checagem, a fixture de bindings |
 | [`src/app/ml-engine/README.md`](src/app/ml-engine/README.md) | "por que os specs do motor não moram no motor?" — a restrição do Karma que explica a pasta |
+| [`src/app/languages/README.md`](src/app/languages/README.md) | "como funciona a seção de Línguas?" — por que é seção e não curso, o dicionário + parágrafos segmentados, os quatro controles e o gate de conteúdo |
 | [`brand/README.md`](brand/README.md) | "de onde veio o ícone?" — arte de origem, os dois sha256, e por que o PNG não vai para `public/` |
 
 ## O que tem aqui dentro
@@ -141,6 +157,7 @@ projects/ml-platform/
     └── app/
         ├── app.routes.ts   ← liga módulo do catálogo → componente; gera as rotas
         ├── studies/        ← o hub e o catálogo (dados, não código)
+        ├── languages/      ← Línguas: hub de leitura, dicionário e leitor de mandarim
         ├── lessons/        ← lição gerada + runtime escrito à mão + player
         ├── widgets/        ← as widgets que os manifestos contratam
         ├── ml-engine/      ← specs do motor (o motor é lib — ver o README da pasta)
@@ -165,6 +182,12 @@ Medido em **2026-10-09**, pelos comandos acima, não de memória:
 - Só o Curso 1 (Fundamentos) tem lições contratadas. Cálculo está no ar com três módulos; as
   outras três matérias de ML estão em `coming-soon`, e os limites delas estão declarados em
   [`content-source/README.md`](content-source/README.md).
+- A seção de Línguas está no ar em `/linguas`: **10 textos** (2 por nível HSK, de 1 a 5) cobrindo
+  histórias, cultura e humor, com dicionário de 273 palavras (cada entrada com simplificado,
+  tradicional, pinyin e glosa pt-BR) e tema claro/escuro persistido por seção. O gate é
+  `npm run test:headless` — a suíte inteira passou com ela (`149 SUCCESS` em 2026-11-09, mais os
+  specs do tema), e o build de produção gera os dois chunks lazy
+  (`mandarin-reader-component`, `language-hub-component`).
 
 ## O que não é aqui
 
@@ -174,6 +197,10 @@ Medido em **2026-10-09**, pelos comandos acima, não de memória:
   a lib compartilhada, e a nota de escopo de `../../libs/shared-learning/index.ts` registra por
   quê: contrato de lição desenhado do zero em vez de fundir dois engines.
 - **O motor** (`@ml/engine`) e as libs `@shared/*` vivem em `../../libs/`, fora deste app.
+- **A seção de Línguas não é pipeline.** Os textos são autorados, não gerados da fonte; o gate dela
+  são os specs de conteúdo (`src/app/languages/mandarin-content.spec.ts`), e o modelo de dados
+  (dicionário + parágrafos segmentados) não é compartilhado com as lições de ML. Ver
+  [`src/app/languages/README.md`](src/app/languages/README.md).
 - **O portfolio** (`../portfolio/`) é o outro app do workspace.
 
 ## Armadilhas conhecidas

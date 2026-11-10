@@ -1,0 +1,125 @@
+<section class="language-hub">
+  <div class="page-top">
+    <nav class="breadcrumb" aria-label="Navegação">
+      <a class="back" routerLink="/">← VisuaLab</a>
+    </nav>
+
+  <button
+    type="button"
+    class="theme-toggle"
+    [attr.aria-pressed]="theme.light()"
+    title="Alterna entre tema escuro e claro"
+    (click)="theme.toggle()"
+  >
+    <span class="theme-toggle__icon" aria-hidden="true">{{
+      theme.light() ? '☀' : '☾'
+    }}</span>
+    Tema claro
+  </button>
+  </div>
+
+  <header class="hub-head">
+    <p class="eyebrow">Línguas em VisuaLab</p>
+    <h1>Ler chinês, um texto curto por vez</h1>
+    <p class="lead">
+      Textos originais em mandarim com pinyin que liga e desliga, caracteres
+      simplificados ou tradicionais, espaço entre as palavras e o significado de
+      cada uma ao passar o mouse. Filtre por nível HSK e pelo foco do texto.
+    </p>
+  </header>
+
+  @for (track of tracks; track track.id) {
+    <section class="track" [attr.aria-label]="'Textos de ' + track.name">
+      <header class="track-head">
+        <img class="track-icon" [src]="track.icon" alt="" />
+        <div>
+          <h2 class="track-name">
+            {{ track.name }} <span class="track-name-zh" lang="zh-Hans">{{ track.nameZh }}</span>
+          </h2>
+          <p class="track-tagline">{{ track.tagline }}</p>
+        </div>
+      </header>
+
+      <div class="filters">
+        <div class="filter-row" role="group" aria-label="Nível HSK">
+          <span class="filter-label">Nível</span>
+          <button
+            type="button"
+            class="chip filter-level"
+            [class.on]="level() === 0"
+            (click)="setLevel(0)"
+          >
+            Todos
+          </button>
+          @for (lvl of levels; track lvl) {
+            <button
+              type="button"
+              class="chip filter-level"
+              [class.on]="level() === lvl"
+              [attr.data-level]="lvl"
+              (click)="setLevel(lvl)"
+            >
+              HSK {{ lvl }}
+            </button>
+          }
+        </div>
+
+        <div class="filter-row" role="group" aria-label="Foco do texto">
+          <span class="filter-label">Foco</span>
+          <button
+            type="button"
+            class="chip filter-focus"
+            [class.on]="focus() === 'todos'"
+            (click)="setFocus('todos')"
+          >
+            Todos
+          </button>
+          @for (f of focuses; track f) {
+            <button
+              type="button"
+              class="chip filter-focus"
+              [class.on]="focus() === f"
+              [attr.data-focus]="f"
+              (click)="setFocus(f)"
+            >
+              {{ focusName(f) }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <p class="result-count" role="status">
+        {{ texts().length }}
+        {{ texts().length === 1 ? 'texto' : 'textos' }}
+        @if (level() !== 0) {
+          <span> em HSK {{ level() }}</span>
+        }
+        @if (activeFocus(); as label) {
+          <span> · {{ label }}</span>
+        }
+      </p>
+
+      <div class="text-grid">
+        @for (text of texts(); track text.id) {
+          <a class="text-card" [routerLink]="['/linguas', track.id, text.id]">
+            <span class="text-card__badges">
+              <span class="badge badge--level">HSK {{ text.level }}</span>
+              <span class="badge">{{ focusName(text.focus) }}</span>
+            </span>
+            <h3 class="text-card__title">{{ text.title }}</h3>
+            <p class="text-card__title-zh" lang="zh-Hans">{{ text.titleZh }}</p>
+            <p class="text-card__teaser">{{ text.teaser }}</p>
+            <span class="text-card__meta">
+              {{ text.wordCount }} palavras · ≈ {{ text.minutes }} min
+            </span>
+          </a>
+        } @empty {
+          <p class="empty">
+            Nenhum texto com esse nível e foco ainda. A coleção cresce com o
+            tempo — tente outro filtro.
+          </p>
+        }
+      </div>
+    </section>
+  }
+</section>

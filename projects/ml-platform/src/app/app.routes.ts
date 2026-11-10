@@ -74,6 +74,31 @@ const moduleRoutes: Routes = STUDY_SUBJECTS.flatMap((subject) =>
   }),
 );
 
+/**
+ * The languages section's routes, kept out of the catalogue-driven generator
+ * above on purpose: language tracks are not `StudySubject`s (see
+ * `languages/README.md`), so their addresses are written here, once each, and
+ * the reader resolves its `:textId` from the content collection at load.
+ */
+const languageRoutes: Routes = [
+  {
+    path: 'linguas',
+    loadComponent: () =>
+      import('./languages/language-hub.component').then(
+        (m) => m.LanguageHubComponent,
+      ),
+    title: 'VisuaLab — Línguas',
+  },
+  {
+    path: 'linguas/mandarim/:textId',
+    loadComponent: () =>
+      import('./languages/mandarin-reader.component').then(
+        (m) => m.MandarinReaderComponent,
+      ),
+    title: 'Leitura · Mandarim',
+  },
+];
+
 export const routes: Routes = [
   // The hub is eager on purpose: it is the landing surface, and lazy-loading it
   // would only add a round trip before first paint. It pulls in no course
@@ -81,8 +106,9 @@ export const routes: Routes = [
   {
     path: '',
     component: StudiesComponent,
-    title: 'VisuaLab — Aprender exatas visualmente',
+    title: 'VisuaLab — Aprender visualmente',
   },
   ...moduleRoutes,
+  ...languageRoutes,
   { path: '**', redirectTo: '' },
 ];

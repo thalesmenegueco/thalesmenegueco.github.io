@@ -276,6 +276,29 @@ h3 {
   font-size: 0.92rem;
 }
 
+// ---------- Languages section ----------
+//
+// A second kind of learning on the same front door. It reuses the module card
+// (same shape, same CTA) with its own top rule and badge colour, so it reads as
+// part of the hub — while `.subject` stays exactly the exatas catalogue, which
+// is what `studies.component.spec.ts` asserts.
+.languages {
+  margin-top: 54px;
+  padding-top: 40px;
+  border-top: 1px solid var(--color-border);
+}
+
+.languages .subject-header p {
+  max-width: 680px;
+  line-height: 1.6;
+}
+
+.module-kind--language {
+  border-color: rgba(176, 106, 163, 0.55);
+  color: #c98ab9;
+  background: rgba(176, 106, 163, 0.1);
+}
+
 @media (max-width: 720px) {
   .path {
     flex-direction: column;

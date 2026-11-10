@@ -2,19 +2,51 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>VisuaLab — Aprender exatas visualmente</title>
+  <title>VisuaLab — Aprender visualmente</title>
   <base href="/">
+  <!--
+    Applies the languages section's stored reading theme before Angular boots, so
+    a deep link like /linguas/mandarim/hsk1-meu-domingo does not flash dark and
+    then repaint light. It mirrors the preference logic in
+    src/app/languages/language-theme.ts (same storage key, same default): if that
+    file changes its key or default, this inline copy must change with it.
+  -->
+  <script>
+    (function () {
+      if (location.pathname.indexOf('/linguas') !== 0) {
+        return;
+      }
+
+      var mode = null;
+      try {
+        mode = window.localStorage.getItem('visualab:languages-theme');
+      } catch (error) {
+        // Storage blocked: fall through to the platform preference.
+      }
+
+      if (mode !== 'light' && mode !== 'dark') {
+        mode =
+          window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark';
+      }
+
+      if (mode === 'light') {
+        document.documentElement.classList.add('lang-theme-light');
+      }
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <meta
     name="description"
-    content="Cursos interativos de exatas: entenda o conceito explorando, aplique em problemas reais e acompanhe seu progresso."
+    content="Cursos interativos de exatas e uma seção de leitura em chinês mandarim: entenda o conceito explorando, aplique em problemas reais e leia textos curtos com pinyin e glosas."
   >
   <meta property="og:type" content="website">
-  <meta property="og:title" content="VisuaLab — Aprender exatas visualmente">
+  <meta property="og:title" content="VisuaLab — Aprender visualmente">
   <meta
     property="og:description"
-    content="Cursos interativos de exatas: entenda o conceito explorando, aplique em problemas reais e acompanhe seu progresso."
+    content="Cursos interativos de exatas e uma seção de leitura em chinês mandarim: entenda o conceito explorando, aplique em problemas reais e leia textos curtos com pinyin e glosas."
   >
   <!--
     `og:url` and `canonical` were deliberately absent while the domain was
