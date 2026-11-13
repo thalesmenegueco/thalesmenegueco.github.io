@@ -81,6 +81,23 @@ describe('LanguageHubComponent', () => {
     ).toBeTruthy();
   });
 
+  it('fronts each card with its reading cover', () => {
+    const { element } = render();
+    const sample = MANDARIN_TEXTS[0];
+    const cover = cards(element)[0].querySelector('img');
+
+    expect(cover).withContext('card cover').toBeTruthy();
+
+    // The card uses the card-sized file, not the reader's 1280×720 cover, and
+    // declares the 16:9 box up front so the grid does not jump as it loads.
+    expect(cover?.getAttribute('src')).toBe(sample.cover.card);
+    expect(cover?.getAttribute('width')).toBe('640');
+    expect(cover?.getAttribute('height')).toBe('360');
+    expect(cover?.getAttribute('loading')).toBe('lazy');
+    // Decorative: the card's title is the accessible name of the picture.
+    expect(cover?.getAttribute('alt')).toBe('');
+  });
+
   it('filters by HSK level', () => {
     const { fixture, element } = render();
 

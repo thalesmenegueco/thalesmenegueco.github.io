@@ -78,6 +78,20 @@ describe('MandarinReaderComponent', () => {
     expect(element.querySelector('.title-zh')?.textContent).toContain('我的星期天');
   });
 
+  it('opens with the reading cover, at the reader size', () => {
+    const { element } = create(sample.id);
+    const cover = element.querySelector('img.cover');
+
+    expect(cover).withContext('reader cover').toBeTruthy();
+
+    // The reader takes the 1280×720 file; the hub card takes the 640×360 one, so
+    // the gallery does not download reading-sized pictures seventeen times.
+    expect(cover?.getAttribute('src')).toBe(sample.cover.src);
+    expect(cover?.getAttribute('width')).toBe('1280');
+    expect(cover?.getAttribute('height')).toBe('720');
+    expect(cover?.getAttribute('alt')).toBe('');
+  });
+
   it('renders one ruby word per dictionary token and one literal per punctuation token', () => {
     const { element } = create(sample.id);
 

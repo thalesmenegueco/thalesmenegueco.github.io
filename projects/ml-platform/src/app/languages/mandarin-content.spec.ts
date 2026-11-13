@@ -101,6 +101,30 @@ describe('Mandarin reading content', () => {
     }
   });
 
+  it('derives a distinct 16:9 cover pair from every text id', () => {
+    // The cover paths are not authored — they are `mandarinCover(id)` — so this
+    // pins the derivation, not a list of file names: renaming a reading renames
+    // its two images, and nothing else has to be remembered.
+    // What a browser test cannot check is that the files exist: `public/img/
+    // mandarin/` is served, not read, so a text added without its two WebP files
+    // still passes here and shows a broken image. See the cover section in
+    // `./README.md` — the pair is part of adding a reading.
+    const paths: string[] = [];
+
+    for (const text of MANDARIN_TEXTS) {
+      expect(text.cover.src)
+        .withContext(`${text.id}: cover`)
+        .toBe(`img/mandarin/${text.id}.webp`);
+      expect(text.cover.card)
+        .withContext(`${text.id}: card`)
+        .toBe(`img/mandarin/${text.id}-card.webp`);
+
+      paths.push(text.cover.src, text.cover.card);
+    }
+
+    expect(new Set(paths).size).toBe(paths.length);
+  });
+
   it('keeps a pt-BR translation paragraph for every Chinese paragraph', () => {
     for (const text of MANDARIN_TEXTS) {
       expect(text.translation.length).withContext(text.id).toBe(text.paragraphs.length);

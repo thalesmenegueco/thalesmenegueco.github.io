@@ -31,6 +31,20 @@
       </ul>
     </header>
 
+    <!--
+      The text's cover, at the reading size (1280×720) rather than the hub's
+      640×360 thumbnail. Decorative on purpose: the title above already names the
+      reading. The width/height pair reserves the 16:9 box before it loads.
+    -->
+    <img
+      class="cover"
+      [src]="text.cover.src"
+      width="1280"
+      height="720"
+      alt=""
+      decoding="async"
+    />
+
     <div class="toolbar" role="toolbar" aria-label="Opções de leitura">
       <button
         type="button"

@@ -97,6 +97,26 @@ h3 {
   font-weight: 800;
 }
 
+// ---------- Cover ----------
+
+// The illustration that fronts the reading. Same 16:9 frame as the hub card's
+// thumbnail, at the full reader width, so opening a text looks like opening the
+// picture the card promised. No entrance animation: the picture is content, not
+// ornament, and the reading theme is about contrast, not motion.
+.cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  // The 26px breathing room above and below comes from the header's bottom
+  // margin and the toolbar's top margin, which collapse with this one.
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--reader-radius);
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--lang-panel-bg);
+}
+
 // ---------- Toolbar ----------
 
 .toolbar {

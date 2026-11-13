@@ -7,6 +7,9 @@
   min-height: 100vh;
 
   --hub-radius: 16px;
+  // Card padding, named because the cover's negative margins must match it
+  // exactly to sit flush with the border.
+  --hub-card-pad: 22px;
 
   background:
     radial-gradient(circle at 15% 0%, var(--lang-glow-warm), transparent 35%),
@@ -181,7 +184,10 @@ button {
 .text-card {
   display: flex;
   flex-direction: column;
-  padding: 22px;
+  // The cover is full-bleed inside this card, so the card's radius — not the
+  // image's — decides where the picture is cut.
+  overflow: hidden;
+  padding: var(--hub-card-pad);
   border: 1px solid var(--color-border);
   border-radius: var(--hub-radius);
   color: inherit;
@@ -196,6 +202,25 @@ button {
 .text-card:hover {
   border-color: var(--lang-border-teal);
   transform: translateY(-3px);
+}
+
+// The 16:9 thumbnail that fronts the card. Negative margins of exactly one card
+// padding pull it flush with the border on three sides, so the picture reads as
+// the top of the card instead of a thumbnail floating inside it. `object-fit`
+// only matters if a cover ever stops being 16:9 — the frame stays, the picture
+// is cropped.
+.text-card__cover {
+  display: block;
+  width: calc(100% + 2 * var(--hub-card-pad));
+  // The global reset in `src/styles.scss` gives every `img` `max-width: 100%`,
+  // which would cap this picture at the card's *padded* width and leave a 22px
+  // gutter on the right. The card's `overflow: hidden` is what keeps it inside.
+  max-width: none;
+  margin: calc(-1 * var(--hub-card-pad)) calc(-1 * var(--hub-card-pad)) 16px;
+  border-bottom: 1px solid var(--color-border);
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--lang-panel-bg);
 }
 
 .text-card__badges {

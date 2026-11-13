@@ -38,7 +38,7 @@ mandarin-texts.ts    as LEITURAS — parágrafos como chaves separadas por espa�
                      parágrafo e nota de contexto opcional.
         │            tokenização em `mandarin-content.ts`, no load do módulo
         ▼
-MANDARIN_TEXTS       já resolvido: tokens, `wordCount`, `glossary`, `minutes`.
+MANDARIN_TEXTS       já resolvido: tokens, `wordCount`, `glossary`, `minutes`, `cover`.
 ```
 
 Um parágrafo é escrito assim:
@@ -107,6 +107,8 @@ ligado, simplificado e sem espaço é o ponto de partida que um iniciante quer e
 
 Além deles:
 
+- **A capa 16:9** abre a leitura, entre o cabeçalho e a barra de controles — é a mesma ilustração
+  que o card mostrava no hub, no tamanho da página (seção de capas, abaixo).
 - **Hover/Toque numa palavra** mostra um balão com pinyin e significado. Clique fixa (útil no
   celular e para comparar duas palavras); `Enter`/`Espaço` fixam pelo teclado. No teclado, o foco
   visível também abre o balão — `:focus-visible` sem JS extra.
@@ -140,6 +142,46 @@ O que o toggle **não** faz: não altera o tema das lições de exatas (decisão
 limitação técnica), e não anima a troca além do necessário — a preferência é sobre contraste, não
 sobre ornamento.
 
+## As capas: uma ilustração 16:9 por texto (2026-11-12)
+
+Toda leitura tem uma ilustração, e ela aparece **duas vezes**: como miniatura no
+card do hub (`language-hub`) e como capa no topo da leitura (`mandarin-reader`).
+É a mesma imagem em dois tamanhos, não duas imagens que podem divergir.
+
+```
+public/img/mandarin/<id>.webp        1280×720 — capa da leitura
+public/img/mandarin/<id>-card.webp    640×360 — miniatura do card (metade)
+```
+
+O `<id>` é o mesmo `id` do texto em `mandarin-texts.ts` (`hsk1-meu-domingo`), e o
+caminho é **derivado**, não autorado: `mandarinCover(id)` em `mandarin-content.ts`
+monta o par, e `MandarinText.cover` chega ao componente já resolvido. Autorar 17
+caminhos à mão criaria 17 lugares onde o nome do arquivo pode não bater com o
+`id` — e o sintoma seria uma imagem quebrada, que nenhum teste de navegador
+consegue pegar. Assim o nome do arquivo e o id são o mesmo fato.
+
+| Decisão | Por quê |
+| :--- | :--- |
+| **16:9 exato**, sem `background-size` no caminho | todas as imagens nascem 1536×864; a moldura (`aspect-ratio: 16 / 9`) e o `object-fit: cover` existem para o dia em que uma não for — a caixa não muda, a imagem é recortada |
+| **Dois tamanhos** | o card tem ~285–400 px de largura e baixaria uma imagem de 1280 px; a capa tem 920 px e baixaria uma de 640 px borrada. Duas variantes custam 34 arquivos e ~1,35 MB no total |
+| **WebP, não PNG** | as 17 originais em PNG somavam **27 MB** (1,26–2,41 MB cada) para uma galeria que mostra as 17 de uma vez. As mesmas imagens em WebP q82/q80 somam 1,35 MB — 20× menor sem diferença visível na tela |
+| **`alt=""`, decorativo** | em ambos os lugares o título do texto está imediatamente ao lado da imagem; descrever a ilustração em `alt` faria o leitor de tela anunciar a mesma coisa duas vezes |
+| **`width`/`height` declarados** | a caixa 16:9 é reservada antes de a imagem chegar: nenhum salto de layout no grid dos cards |
+| `loading="lazy"` no card, **não** na capa | no hub são 17 imagens abaixo da dobra; na leitura a capa é o topo da página e é o maior elemento visível — adiá-la só atrapalharia |
+
+Os **originais em PNG ficam fora do que é publicado**, em `image-source/mandarin/`
+(1536×864, ~27 MB). `public/` é copiado inteiro para o build; `image-source/` não.
+Eles são o master para regerar outro recorte (por exemplo uma imagem de Open
+Graph 1200×630) e não são versionados — se não interessarem, apagar a pasta não
+quebra nada, e as duas variantes WebP continuam sendo o que a aplicação serve.
+
+O que o gate cobre: `mandarin-content.spec.ts` verifica que **toda** leitura tem o
+par derivado do seu id, que os caminhos são únicos e que a chave é `[a-z0-9-]`
+(logo, nome de arquivo válido). O que ele **não** pode verificar é existência de
+arquivo — o teste roda no navegador, e `public/` é servido, não lido. Por isso
+"adicionar um texto" tem um passo de imagem: esquecê-lo não deixa o teste
+vermelho, deixa a imagem quebrada.
+
 ## O conteúdo é original
 
 As leituras foram escritas para este projeto. A **ideia** vem do [Mandarin Bean](https://mandarinbean.com/)
@@ -158,11 +200,13 @@ lista oficial. Os textos cobrem os cinco níveis e os três focos, e é isso que
 - o dicionário não tem chave duplicada e nenhuma entrada fica sem uso;
 - toda entrada tem as duas formas, pinyin com acentos (sem número de tom) e glosa;
 - toda leitura tem título, chamada, parágrafo e tradução alinhada um a um;
+- toda leitura tem o par de capas derivado do seu `id`, e nenhum caminho se repete;
 - nenhum parágrafo tem mais de `MAX_WORDS_PER_PARAGRAPH` palavras nem mais de três frases;
 - `wordCount`, `glossary` e `minutes` são derivados de fato, não digitados.
 
 O que ele **não** cobre: revisão por falante nativo, avaliação didática da progressão, áudio,
-sandhi e a unicidade de `zh` entre entradas (o caso dos homógrafos, na seção acima). Se um pinyin
+sandhi, a existência dos arquivos de capa (o teste roda no navegador, sem sistema de arquivos) e a
+unicidade de `zh` entre entradas (o caso dos homógrafos, na seção acima). Se um pinyin
 está errado, o spec não sabe — o dicionário é o único lugar onde essa correção entra.
 
 ## Como adicionar um texto
@@ -173,7 +217,11 @@ está errado, o spec não sabe — o dicionário é o único lugar onde essa cor
    pinyin com acentos e glosa curta em pt-BR. Se a leitura precisar de dois significados para os
    mesmos caracteres, leia antes a seção de homógrafos: o `id` só funciona depois que o glossário
    deixar de chavear por `zh`.
-3. Rode da **raiz do monorepo**:
+3. Solte as duas capas em `public/img/mandarin/`, nomeadas pelo `id` do texto:
+   `<id>.webp` (1280×720) e `<id>-card.webp` (640×360). Nada no código muda — o caminho é derivado
+   do `id` — mas **sem os dois arquivos o card e a capa ficam quebrados**, e o teste não acusa isso.
+   O master 1536×864 do qual as duas saem mora em `image-source/mandarin/` (ver a seção de capas).
+4. Rode da **raiz do monorepo**:
 
    ```bash
    npm run test:headless     # o gate de conteúdo e os specs de UI

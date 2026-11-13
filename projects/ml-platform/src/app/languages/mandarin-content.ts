@@ -13,6 +13,7 @@
  * page down. The spec is what makes that state impossible to merge.
  */
 import type {
+  MandarinCover,
   MandarinText,
   MandarinTextSource,
   MandarinToken,
@@ -80,6 +81,25 @@ export function tokenizeMandarinParagraph(paragraph: string): MandarinToken[] {
     });
 }
 
+/** Folder of the reading covers, relative to `<base href="/">` (`public/img/`). */
+export const MANDARIN_COVER_DIR = 'img/mandarin';
+
+/**
+ * The cover pair of a reading, resolved from its `id`.
+ *
+ * Derived, not authored: `id` is already `[a-z0-9-]+` (asserted by
+ * `mandarin-content.spec.ts`), so the two files are `<id>.webp` and
+ * `<id>-card.webp` under `MANDARIN_COVER_DIR`. A hand-written path per reading
+ * could point at a file that does not exist and would only show up as a broken
+ * image; this way the path and the file name are the same fact.
+ */
+export function mandarinCover(id: string): MandarinCover {
+  return {
+    src: `${MANDARIN_COVER_DIR}/${id}.webp`,
+    card: `${MANDARIN_COVER_DIR}/${id}-card.webp`,
+  };
+}
+
 export function tokenizeMandarinText(source: MandarinTextSource): MandarinText {
   const tokens = source.paragraphs.map(tokenizeMandarinParagraph);
 
@@ -107,6 +127,7 @@ export function tokenizeMandarinText(source: MandarinTextSource): MandarinText {
     wordCount,
     glossary,
     minutes: Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE)),
+    cover: mandarinCover(source.id),
   };
 }
 

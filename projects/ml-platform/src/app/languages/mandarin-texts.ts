@@ -16,6 +16,11 @@
  * Keep readings short: `mandarin-content.spec.ts` rejects a paragraph over
  * `MAX_WORDS_PER_PARAGRAPH` words, so a text cannot silently grow into a wall
  * of text. The focus labels are the user-facing ones from `../language-catalog`.
+ *
+ * `id` is also the file name of the reading's two cover images
+ * (`public/img/mandarin/<id>.webp` and `<id>-card.webp`) — renaming a text means
+ * renaming its images. Nothing here points at them: see `mandarinCover()` in
+ * `./mandarin-content.ts` and the cover section of `./README.md`.
  */
 import type { MandarinTextSource } from './mandarin.types';
 

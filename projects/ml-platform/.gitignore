@@ -1,0 +1,7 @@
+# Local-only masters for the language covers: the 1536×864 PNGs the two WebP
+# variants are generated from. They are not needed to build or deploy the app —
+# only `public/` is copied into the bundle — and 27 MB of PNGs in the history
+# would make every clone pay for them. The served files are
+# `public/img/mandarin/<id>.webp` and `<id>-card.webp`; see the cover section of
+# `src/app/languages/README.md`.
+image-source/

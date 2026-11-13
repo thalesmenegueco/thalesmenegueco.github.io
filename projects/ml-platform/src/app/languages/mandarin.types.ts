@@ -44,6 +44,20 @@ export interface MandarinToken {
   literal: string;
 }
 
+/**
+ * The illustration that fronts a reading: the same 16:9 frame at two widths.
+ *
+ * Both paths are **derived** from the text's `id` by `mandarinCover()` — an
+ * author never types them, so a path cannot drift from the file name. See the
+ * cover section of `./README.md`.
+ */
+export interface MandarinCover {
+  /** 1280×720 WebP — the cover of the reading itself. */
+  src: string;
+  /** The same picture at 640×360 — the hub card's thumbnail. */
+  card: string;
+}
+
 /** A reading, as authored. */
 export interface MandarinTextSource {
   /** URL-safe id, unique across the collection. */
@@ -78,4 +92,6 @@ export interface MandarinText extends MandarinTextSource {
   glossary: MandarinWord[];
   /** Rough reading-time estimate in whole minutes, never below 1. */
   minutes: number;
+  /** The 16:9 illustration, resolved from `id` rather than authored. */
+  cover: MandarinCover;
 }

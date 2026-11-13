@@ -102,6 +102,21 @@
       <div class="text-grid">
         @for (text of texts(); track text.id) {
           <a class="text-card" [routerLink]="['/linguas', track.id, text.id]">
+            <!--
+              Decorative: the card's own title says what the text is, so the
+              picture adds nothing a screen reader needs to announce twice. The
+              width/height pair keeps the 16:9 box reserved before the image
+              loads (no layout shift); the 640px file is the card-sized variant.
+            -->
+            <img
+              class="text-card__cover"
+              [src]="text.cover.card"
+              width="640"
+              height="360"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
             <span class="text-card__badges">
               <span class="badge badge--level">HSK {{ text.level }}</span>
               <span class="badge">{{ focusName(text.focus) }}</span>
