@@ -31,11 +31,15 @@ visualmente" para dizer "aprender visualmente".
 ## O modelo de conteúdo: dicionário + parágrafos segmentados
 
 ```
+mandarin-expressions.ts   o BACKLOG — 28 expressões, uma por leitura, com status. Não entra em
+        │                 runtime: é plano, e o `expression-source/` é a origem dele.
+        │                 cobrado por `mandarin-expressions.spec.ts`
+        ▼
 mandarin-words.ts    o DICIONÁRIO — fonte única de pinyin, glosa pt-BR e forma tradicional.
         │
         ▼
 mandarin-texts.ts    as LEITURAS — parágrafos como chaves separadas por espaço, tradução por
-                     parágrafo e nota de contexto opcional.
+                     parágrafo, breakdown literal e nota de contexto opcionais.
         │            tokenização em `mandarin-content.ts`, no load do módulo
         ▼
 MANDARIN_TEXTS       já resolvido: tokens, `wordCount`, `glossary`, `minutes`, `cover`.
@@ -182,6 +186,105 @@ arquivo — o teste roda no navegador, e `public/` é servido, não lido. Por is
 "adicionar um texto" tem um passo de imagem: esquecê-lo não deixa o teste
 vermelho, deixa a imagem quebrada.
 
+## Expressões: o sanduíche, e por que o foco é registro (2026-11-13)
+
+A coleção ganhou uma quarta categoria, `expressoes`, e o texto que a inaugura é
+`hsk3-toco-e-o-coelho` (守株待兔). As quatro decisões que a definem, e o motivo de cada uma:
+
+| Decisão | Por quê |
+| :--- | :--- |
+| **Uma leitura por expressão** | cada 成语 tem a sua imagem, o seu uso e a sua armadilha de tradução; agrupar três num texto devolve o formato de glossário que a plataforma existe para não ser |
+| **Fábula e cena moderna no mesmo texto** | a fábula mostra a imagem, a cena moderna mostra a **fala**. Separá-las em dois textos custaria duas capas e nunca mostraria a passagem de uma para a outra |
+| **`expressoes` é um foco novo, não `cultura`** | os outros três focos são **tópicos**; este é um **registro**. Um 成语 pertence à fala escrita/formal, um 谚语 à fala de conselho, uma expressão moderna à internet |
+| **`literal` é um campo, não um `note` mais comprido** | “守 = vigiar, 株 = toco” e “diz-se a um colega para criticar” são dois trabalhos diferentes; um campo por trabalho, e o spec cobra o primeiro |
+
+A estrutura de cada leitura é um **sanduíche de sete parágrafos**:
+
+1. **1–3 · a fábula.** Os caracteres do 成语 aparecem como palavras normais do dicionário
+   (`农夫`, `兔子`, `树桩`), nunca em bloco. O leitor monta a imagem antes de receber o nome.
+2. **4 · a ponte.** `故事 很 老 。 但是 这样 的 人 今天 也 有 。` — uma frase, e o leitor sabe que
+   o texto vai pular de século.
+3. **5–7 · a cena moderna.** Alguém repete o erro de hoje, e a expressão aparece **inteira, em
+   bloco** (`守株待兔`), na boca de um terceiro. O parágrafo 7 é o mais importante: a **reação** do
+   personagem é onde a expressão deixa de ser etiqueta e vira algo que se diz a alguém.
+
+Isso é "explorar antes de nomear" aplicado ao idioma: o aluno vê a imagem (fábula), vê a
+consequência (cena) e só então a fórmula ganha nome — exatamente o que as lições de exatas fazem com
+uma fórmula.
+
+### O bloco e os caracteres, no mesmo dicionário
+
+Um 成语 entra no dicionário como **uma** entrada (`守株待兔` → `shǒu zhū dài tù`), e os caracteres
+que a fábula usa entram como palavras comuns (`树桩`, `兔子`, `田`). Não é duplicação: são chaves
+diferentes (`zh` distinto), e as duas existem porque as duas são verdade — o bloco é fixo, as
+palavras não são. Efeito colateral bem-vindo: como o pinyin fica no bloco, `一` e `不` podem ser
+escritos com o sandhi que um falante realmente diz (`yì zhī`, `bú yào`) sem a limitação de sandhi
+que o dicionário tem palavra a palavra.
+
+A regra editorial que sobra disso, para as próximas 25:
+
+> **Tem fábula (8): conte a fábula.** 塞翁失马, 画蛇添足, 亡羊补牢, 半途而废, 守株待兔, 对牛弹琴,
+> 掩耳盗铃, 井底之蛙.
+> **Não tem (18): encene a imagem literal.** 一石二鸟 → a pedra e os dois pássaros; 天上不会掉馅饼 →
+> alguém esperando a torta cair do céu; 得寸进尺 → um palmo, depois um metro.
+
+### Calques: os pares ficam, a lição vai na nota
+
+`一石二鸟` e `天下没有免费的午餐` são **calques** — a primeira é moderna (séc. XX, do inglês), a
+segunda traduz o "there is no such thing as a free lunch". A tentação é trocá-las pelas nativas
+(`一举两得`, `天上不会掉馅饼`). **Decisão: ficam as duas**, porque as duas são o que as pessoas
+realmente dizem, e porque o fato interessante não é "é falsa" — é "é jovem". Um 成语 de 30 anos ao
+lado de um de 2.000 ensina que a categoria não é fóssil.
+
+O par é entregue **em notas**, nunca num texto só: uma leitura que compara duas expressões precisaria
+de vocabulário abstrato (`翻译`, `说法`, `借用`) — a mais difícil da coleção — e não tem nem fábula
+nem imagem para explorar. Assim cada expressão continua com o seu texto, e a nota de cada uma aponta
+para a gêmea. As duas gêmeas entram no backlog como pendentes.
+
+### O backlog: uma planilha que virou gate (2026-11-13)
+
+As 26 expressões vivem em [`./mandarin-expressions.ts`](./mandarin-expressions.ts) — uma linha por
+leitura a escrever, 28 no total (26 da planilha + as 2 gêmeas nativas) — e não mais na planilha.
+
+**Por que um `.ts` e não o `.xlsx`.** O gate é `./mandarin-expressions.spec.ts`, que roda no
+navegador, sem sistema de arquivos: um `.xlsx` não pode ser um teste, um módulo TypeScript pode. A
+planilha foi para `../expression-source/` (fora de `public/`, portanto fora do que é servido) e
+ficou **congelada como proveniência** — editá-la não muda nada no app.
+
+A linha é um `MandarinWord` com metadados editoriais, e isso é o que faz o gate valer:
+
+```
+mandarin-expressions.ts          O PLANO — 28 linhas, cada uma com status
+        │
+        ├──► mandarin-content.spec.ts       (o que a leitura tem de cumprir)
+        └──► mandarin-expressions.spec.ts   (o que o plano tem de cumprir)
+```
+
+O spec cobra os dois sentidos:
+
+| Asserção | O que impede |
+| :--- | :--- |
+| `'escrito'` → `textId` existe, é `expressoes`, e o bloco aparece **uma vez, como um token** | uma linha marcada como pronta que nenhuma leitura ensina |
+| a linha `'escrito'` é **idêntica** à entrada do dicionário (`zh`, `traditional`, `pinyin`, `meaning`) | o plano e a leitura descrevendo duas glosas para os mesmos caracteres — quando divergem, **o dicionário ganha**, porque é ele que o aluno lê no balão |
+| `'pendente'` → o bloco **não aparece** em nenhuma leitura | um status que ficou para trás depois da leitura escrita |
+| toda leitura `expressoes` é reivindicada por **exatamente uma** linha | uma leitura de expressão que o backlog não conhece |
+| as gêmeas apontam de volta uma para a outra | uma nota prometendo uma expressão que não existe |
+
+O que ele não cobre: se a fábula está bem contada, se o registro está certo, e o pinyin das linhas
+`'pendente'` (que é o da planilha, e é re-decidido quando a linha vira `'escrito'`, onde aí sim ele
+passa a ser comparado).
+
+### O que esta entrega **não** inclui
+
+- **As capas.** Nenhuma das leituras de expressão tem `<id>.webp` nem `<id>-card.webp` ainda: o card
+  do hub e a capa da leitura ficam quebrados até alguém soltar os dois arquivos em
+  `public/img/mandarin/`. O spec não acusa (ele não lê o sistema de arquivos), como a seção de capas
+  já avisa.
+- **As 25 leituras restantes.** Três escritas (`守株待兔`, `画蛇添足`, `井底之蛙`), 25 pendentes no
+  backlog.
+- **Revisão por falante nativo.** O gate cobre forma, não idiomaticidade: um pinyin errado ou um
+  registro deslocado passam verdes.
+
 ## O conteúdo é original
 
 As leituras foram escritas para este projeto. A **ideia** vem do [Mandarin Bean](https://mandarinbean.com/)
@@ -190,7 +293,12 @@ dele nem de qualquer outro site. A vantagem de escrever em vez de copiar não é
 corrigir, traduzir para pt-BR e ajustar o vocabulário sem pedir licença a ninguém.
 
 O nível (HSK 1–5) é **editorial**: descreve o vocabulário-alvo do texto, não uma certificação por
-lista oficial. Os textos cobrem os cinco níveis e os três focos, e é isso que o spec verifica.
+lista oficial. Os textos cobrem os cinco níveis e os quatro focos, e é isso que o spec verifica.
+
+O nível de uma leitura de `expressoes` descreve a **narração**, não o bloco: 守株待兔 é HSK 3 porque a
+fábula e a cena são HSK 3, e o 成语 — vocabulário de HSK 6 — fica acima do nível de propósito.
+Fingir que o bloco é HSK 3 seria a mentira fácil; o `literal` e a nota existem justamente para o
+leitor esbarrar no bloco sabendo o que ele é.
 
 ## O que o gate cobre
 
@@ -200,6 +308,7 @@ lista oficial. Os textos cobrem os cinco níveis e os três focos, e é isso que
 - o dicionário não tem chave duplicada e nenhuma entrada fica sem uso;
 - toda entrada tem as duas formas, pinyin com acentos (sem número de tom) e glosa;
 - toda leitura tem título, chamada, parágrafo e tradução alinhada um a um;
+- toda leitura em `expressoes` traz o `literal` que decompõe os caracteres da expressão;
 - toda leitura tem o par de capas derivado do seu `id`, e nenhum caminho se repete;
 - nenhum parágrafo tem mais de `MAX_WORDS_PER_PARAGRAPH` palavras nem mais de três frases;
 - `wordCount`, `glossary` e `minutes` são derivados de fato, não digitados.
@@ -208,6 +317,10 @@ O que ele **não** cobre: revisão por falante nativo, avaliação didática da 
 sandhi, a existência dos arquivos de capa (o teste roda no navegador, sem sistema de arquivos) e a
 unicidade de `zh` entre entradas (o caso dos homógrafos, na seção acima). Se um pinyin
 está errado, o spec não sabe — o dicionário é o único lugar onde essa correção entra.
+
+O backlog tem o seu próprio contrato, `mandarin-expressions.spec.ts`: status nos dois sentidos,
+linha `'escrito'` idêntica ao dicionário, toda leitura de expressão reivindicada, gêmeas simétricas.
+A tabela das asserções está na seção do backlog, acima.
 
 ## Como adicionar um texto
 
@@ -221,7 +334,12 @@ está errado, o spec não sabe — o dicionário é o único lugar onde essa cor
    `<id>.webp` (1280×720) e `<id>-card.webp` (640×360). Nada no código muda — o caminho é derivado
    do `id` — mas **sem os dois arquivos o card e a capa ficam quebrados**, e o teste não acusa isso.
    O master 1536×864 do qual as duas saem mora em `image-source/mandarin/` (ver a seção de capas).
-4. Rode da **raiz do monorepo**:
+4. Se a leitura ensina uma expressão (`focus: 'expressoes'`), o `literal` é obrigatório: a
+   decomposição dos caracteres vai nele, e o uso/registro vai no `note`. O spec cobra o primeiro.
+5. A linha correspondente em `mandarin-expressions.ts` muda para `status: 'escrito'`, ganha o
+   `textId` e **passa a ter exatamente os campos do dicionário** (`zh`, `traditional`, `pinyin`,
+   `meaning`). Divergir é teste vermelho — e quando divergem, quem manda é o dicionário.
+6. Rode da **raiz do monorepo**:
 
    ```bash
    npm run test:headless     # o gate de conteúdo e os specs de UI

@@ -510,4 +510,76 @@ export const MANDARIN_WORDS: readonly MandarinWord[] = [
   { zh: '产生', traditional: '產生', pinyin: 'chǎnshēng', meaning: 'gerar; produzir' },
   { zh: '奇妙', traditional: '奇妙', pinyin: 'qímiào', meaning: 'maravilhoso; mágico' },
   { zh: '联系', traditional: '聯繫', pinyin: 'liánxì', meaning: 'ligação; contato' },
+
+  // ---------- Reading 18 · HSK 3 · expressões — 守株待兔 ----------
+  // The fable half needs farm words the collection never used; the modern half
+  // needs office words. Both are shared with the rest of the expression
+  // collection on purpose — 兔子, 撞 and 死 come back in 塞翁失马, and 同事,
+  // 公司 and 广告 in every workplace scene.
+  { zh: '农夫', traditional: '農夫', pinyin: 'nóngfū', meaning: 'agricultor; lavrador' },
+  { zh: '每天', traditional: '每天', pinyin: 'měitiān', meaning: 'todos os dias' },
+  { zh: '田', traditional: '田', pinyin: 'tián', meaning: 'lavoura; campo cultivado' },
+  { zh: '种地', traditional: '種地', pinyin: 'zhòngdì', meaning: 'trabalhar na lavoura' },
+  { zh: '有一天', traditional: '有一天', pinyin: 'yǒu yī tiān', meaning: 'certo dia; um dia' },
+  { zh: '一只', traditional: '一隻', pinyin: 'yì zhī', meaning: 'um/uma (classificador de animal)' },
+  { zh: '兔子', traditional: '兔子', pinyin: 'tùzi', meaning: 'coelho' },
+  { zh: '跑', traditional: '跑', pinyin: 'pǎo', meaning: 'correr' },
+  { zh: '撞', traditional: '撞', pinyin: 'zhuàng', meaning: 'bater contra; chocar-se' },
+  { zh: '树桩', traditional: '樹樁', pinyin: 'shùzhuāng', meaning: 'toco de árvore' },
+  { zh: '旁边', traditional: '旁邊', pinyin: 'pángbiān', meaning: 'ao lado de' },
+  { zh: '故事', traditional: '故事', pinyin: 'gùshi', meaning: 'história; conto' },
+  { zh: '这样', traditional: '這樣', pinyin: 'zhèyàng', meaning: 'assim; deste jeito' },
+  { zh: '小王', traditional: '小王', pinyin: 'Xiǎo Wáng', meaning: 'Xiao Wang (nome)' },
+  { zh: '同事', traditional: '同事', pinyin: 'tóngshì', meaning: 'colega de trabalho' },
+  { zh: '上个月', traditional: '上個月', pinyin: 'shàng ge yuè', meaning: 'no mês passado' },
+  { zh: '广告', traditional: '廣告', pinyin: 'guǎnggào', meaning: 'anúncio; propaganda' },
+  { zh: '公司', traditional: '公司', pinyin: 'gōngsī', meaning: 'empresa; companhia' },
+  { zh: '满意', traditional: '滿意', pinyin: 'mǎnyì', meaning: 'satisfeito; contente com' },
+  { zh: '网上', traditional: '網上', pinyin: 'wǎngshàng', meaning: 'na internet' },
+  { zh: '前面', traditional: '前面', pinyin: 'qiánmiàn', meaning: 'na frente de' },
+  { zh: '一样', traditional: '一樣', pinyin: 'yīyàng', meaning: 'igual; o mesmo' },
+  { zh: '关', traditional: '關', pinyin: 'guān', meaning: 'fechar; desligar' },
+  // A 成语 is one dictionary entry, not four: the reader hovers the block and
+  // gets the whole idiom's pinyin and gloss. Its characters are also in this
+  // dictionary as words of their own (田, 兔子, 树桩…), which is what lets the
+  // fable show the picture and the punchline show the fixed block. The pinyin is
+  // the one a speaker says — 一 and 不 keep their sandhi, which a single
+  // character entry could not express.
+  { zh: '守株待兔', traditional: '守株待兔', pinyin: 'shǒu zhū dài tù', meaning: 'esperar que a sorte se repita, sem fazer nada' },
+
+  // ---------- Reading 19 · HSK 3 · expressões — 画蛇添足 ----------
+  // A fábula é do 战国策, e o detalhe do vinho é o que dá sentido ao desenho: a
+  // 壶 dividida entre 几 个 人. 脚 entra como palavra comum para que o 足 do bloco
+  // apareça como a forma literária que é (o `literal` aponta a diferença).
+  { zh: '几', traditional: '幾', pinyin: 'jǐ', meaning: 'alguns; quantos' },
+  { zh: '酒', traditional: '酒', pinyin: 'jiǔ', meaning: 'bebida alcoólica; vinho' },
+  { zh: '壶', traditional: '壺', pinyin: 'hú', meaning: 'jarra; bule (para líquidos)' },
+  { zh: '比赛', traditional: '比賽', pinyin: 'bǐsài', meaning: 'competição; competir' },
+  { zh: '画', traditional: '畫', pinyin: 'huà', meaning: 'desenhar; pintura' },
+  { zh: '蛇', traditional: '蛇', pinyin: 'shé', meaning: 'serpente; cobra' },
+  { zh: '完', traditional: '完', pinyin: 'wán', meaning: 'terminar; acabar' },
+  { zh: '加', traditional: '加', pinyin: 'jiā', meaning: 'acrescentar; adicionar' },
+  { zh: '脚', traditional: '腳', pinyin: 'jiǎo', meaning: 'pé (de pessoa ou animal)' },
+  { zh: '别人', traditional: '別人', pinyin: 'biéren', meaning: 'outra pessoa; os outros' },
+  { zh: '报告', traditional: '報告', pinyin: 'bàogào', meaning: 'relatório; apresentar um relatório' },
+  { zh: '图', traditional: '圖', pinyin: 'tú', meaning: 'imagem; gráfico' },
+  { zh: '更', traditional: '更', pinyin: 'gèng', meaning: 'mais (comparativo)' },
+  { zh: '画蛇添足', traditional: '畫蛇添足', pinyin: 'huà shé tiān zú', meaning: 'estragar o que já estava bom por acrescentar demais' },
+
+  // ---------- Reading 20 · HSK 4 · expressões — 井底之蛙 ----------
+  // O par 天/海 é o argumento inteiro da fábula, e 世界 é a palavra que o sapo
+  // não tinha. 软件 é o exemplo moderno; a variação 軟件/軟體 fica na nota, porque
+  // o campo `traditional` guarda uma forma só.
+  { zh: '青蛙', traditional: '青蛙', pinyin: 'qīngwā', meaning: 'sapo; rã' },
+  { zh: '住', traditional: '住', pinyin: 'zhù', meaning: 'morar; viver (em)' },
+  { zh: '井', traditional: '井', pinyin: 'jǐng', meaning: 'poço' },
+  { zh: '世界', traditional: '世界', pinyin: 'shìjiè', meaning: 'mundo' },
+  { zh: '乌龟', traditional: '烏龜', pinyin: 'wūguī', meaning: 'tartaruga; cágado' },
+  { zh: '过', traditional: '過', pinyin: 'guo', meaning: 'partícula de experiência (já aconteceu)' },
+  { zh: '海', traditional: '海', pinyin: 'hǎi', meaning: 'mar' },
+  { zh: '软件', traditional: '軟件', pinyin: 'ruǎnjiàn', meaning: 'software (em Taiwan: 軟體)' },
+  { zh: '不行', traditional: '不行', pinyin: 'bù xíng', meaning: 'não servir; não prestar' },
+  { zh: '别的', traditional: '別的', pinyin: 'biéde', meaning: 'outros; outra coisa' },
+  { zh: '试', traditional: '試', pinyin: 'shì', meaning: 'experimentar; tentar' },
+  { zh: '井底之蛙', traditional: '井底之蛙', pinyin: 'jǐng dǐ zhī wā', meaning: 'alguém de visão estreita; quem acha que seu mundo é o mundo' },
 ];

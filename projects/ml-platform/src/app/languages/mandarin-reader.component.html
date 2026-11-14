@@ -141,10 +141,23 @@
       }
     </article>
 
-    @if (text.note) {
+    <!--
+      Two blocks, one card. `literal` is the character-by-character picture of a
+      fixed expression ("守 = guardar, 株 = toco…"); `note` is what the expression
+      does in a conversation. Both are optional and independent — the note exists
+      since the first reading, the literal since the first 成语 — so the card is
+      rendered when either is present.
+    -->
+    @if (text.literal || text.note) {
       <aside class="note">
-        <h2>Nota de contexto</h2>
-        <p>{{ text.note }}</p>
+        @if (text.literal) {
+          <h2>Os caracteres</h2>
+          <p class="note-literal">{{ text.literal }}</p>
+        }
+        @if (text.note) {
+          <h2>Nota de contexto</h2>
+          <p>{{ text.note }}</p>
+        }
       </aside>
     }
 

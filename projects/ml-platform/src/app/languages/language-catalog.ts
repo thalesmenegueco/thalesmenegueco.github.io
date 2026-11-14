@@ -14,8 +14,18 @@
 /** HSK levels the reading collection is organised by. */
 export type HskLevel = 1 | 2 | 3 | 4 | 5;
 
-/** Editorial focus of a reading. */
-export type MandarinFocus = 'historias' | 'cultura' | 'humor';
+/**
+ * Editorial focus of a reading.
+ *
+ * Three of these are **topics**; `expressoes` is a **register**. Readings filed
+ * under it teach one fixed expression — a 成语 (chengyu), a 谚语 (proverb) or a
+ * modern online phrase — and what they teach is less the meaning than *when a
+ * person says it*: a chengyu belongs to written or slightly formal speech, a
+ * proverb to an elder giving advice, a modern phrase to people online. Mixing
+ * the three voices in one reading would teach the wrong thing, which is why
+ * they share a focus value and not a text. See "Expressões" in `./README.md`.
+ */
+export type MandarinFocus = 'historias' | 'cultura' | 'humor' | 'expressoes';
 
 export const HSK_LEVELS: readonly HskLevel[] = [1, 2, 3, 4, 5];
 
@@ -24,12 +34,14 @@ export const MANDARIN_FOCUS_ORDER: readonly MandarinFocus[] = [
   'historias',
   'cultura',
   'humor',
+  'expressoes',
 ];
 
 export const MANDARIN_FOCUS_LABELS: Record<MandarinFocus, string> = {
   historias: 'Histórias',
   cultura: 'Cultura',
   humor: 'Humor',
+  expressoes: 'Expressões',
 };
 
 /** A language track. One entry today; the reader UI is keyed by it. */

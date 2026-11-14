@@ -78,6 +78,14 @@ export interface MandarinTextSource {
   paragraphs: string[];
   /** pt-BR translation, one entry per paragraph — the reader shows it on demand. */
   translation: string[];
+  /**
+   * pt-BR breakdown of the characters of a fixed expression — “守 = guardar,
+   * 株 = toco de árvore…”. Required for `focus: 'expressoes'` readings, asserted
+   * in `./mandarin-content.spec.ts`, because the literal picture is the thing a
+   * reader has to reconstruct before the figurative gloss can mean anything.
+   * It is a different job from `note`, which explains usage and register.
+   */
+  literal?: string;
   /** Optional pt-BR note that explains a cultural point. */
   note?: string;
 }

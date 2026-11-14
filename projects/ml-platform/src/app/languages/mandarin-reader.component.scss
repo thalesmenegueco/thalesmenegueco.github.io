@@ -335,6 +335,12 @@ rt {
   background: var(--lang-warm-tint);
 }
 
+// A second heading in the same card (literal breakdown above the note) needs
+// the gap the first one gets from the card's own padding.
+.note h2:not(:first-of-type) {
+  margin-top: 18px;
+}
+
 .note h2 {
   margin: 0 0 8px;
   color: var(--color-accent-warm);
@@ -348,6 +354,12 @@ rt {
   color: var(--color-text);
   font-size: 0.92rem;
   line-height: 1.6;
+}
+
+// The literal breakdown is a glossary of four characters, not prose: a touch
+// warmer and set slightly apart so it reads as the picture, not as commentary.
+.note-literal {
+  color: var(--color-accent-warm);
 }
 
 .glossary {

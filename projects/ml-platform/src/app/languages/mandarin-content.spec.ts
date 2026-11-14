@@ -91,6 +91,25 @@ describe('Mandarin reading content', () => {
     }
   });
 
+  it('breaks down the characters of every expression reading', () => {
+    // An expression reading without its literal breakdown teaches a label, not
+    // a picture — and the picture is the only reason a 成语 is worth a whole
+    // reading. The field is optional for every other focus on purpose.
+    const expressions = MANDARIN_TEXTS.filter(
+      (text) => text.focus === 'expressoes',
+    );
+
+    expect(expressions.length)
+      .withContext('ao menos uma leitura de expressão')
+      .toBeGreaterThan(0);
+
+    for (const text of expressions) {
+      expect(text.literal?.trim())
+        .withContext(`${text.id}: literal`)
+        .toBeTruthy();
+    }
+  });
+
   it('keeps text ids unique and URL-safe', () => {
     const ids = MANDARIN_TEXTS.map((text) => text.id);
 

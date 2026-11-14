@@ -416,4 +416,109 @@ export const MANDARIN_TEXT_SOURCES: readonly MandarinTextSource[] = [
       'Sinto como se tivesse criado uma ligação mágica com alguém do passado.',
     ],
   },
+  // ---------- Expressões · HSK 3 · 成语 — 守株待兔 ----------
+  // A leitura de expressão é um sanduíche: o primeiro movimento conta a fábula
+  // com os caracteres do 成语 como palavras normais (农夫, 兔子, 树桩), e o
+  // segundo encena a mesma situação hoje, onde a expressão aparece **inteira, em
+  // bloco**, na boca de alguém. O leitor reconstrói a imagem antes de receber o
+  // nome — o mesmo "explorar antes de nomear" das lições de exatas. A regra está
+  // em "Expressões" no `./README.md`.
+  {
+    id: 'hsk3-toco-e-o-coelho',
+    level: 3,
+    focus: 'expressoes',
+    title: 'O toco e o coelho',
+    titleZh: '守株待兔',
+    teaser: 'Um coelho bateu no toco por acaso — e o agricultor largou o trabalho.',
+    paragraphs: [
+      '从前 ， 有 一 个 农夫 。 他 每天 在 田 里 种地 。',
+      '有一天 ， 一只 兔子 跑 过来 ， 撞 在 树桩 上 ， 死 了 。',
+      '农夫 看见 了 ， 他 很 高兴 。 他 不 再 种地 了 。 他 每天 坐 在 树桩 旁边 等 。',
+      '故事 很 老 。 但是 这样 的 人 今天 也 有 。',
+      '小王 是 我 的 同事 。 上个月 他 做 了 一 个 广告 ， 公司 很 满意 。 网上 很多 人 看 这个 广告 。',
+      '现在 他 每天 坐 在 电脑 前面 等 。 他 说 ： “ 我 要 再 做 一 个 一样 的 广告 。 ”',
+      '我 说 ： “ 小王 ， 你 在 守株待兔 。 好 的 广告 不 会 自己 跑 过来 。 ” 他 笑 了 ， 关 上 电脑 ， 做 新 的 广告 去 了 。',
+    ],
+    translation: [
+      'Antigamente havia um agricultor. Todos os dias ele trabalhava na lavoura.',
+      'Um dia, um coelho veio correndo, bateu no toco de uma árvore e morreu.',
+      'O agricultor viu e ficou muito contente. Não trabalhou mais na lavoura. Todos os dias ficava sentado ao lado do toco, esperando.',
+      'A história é velha. Mas hoje também existem pessoas assim.',
+      'O Xiao Wang é meu colega de trabalho. No mês passado ele fez um anúncio e a empresa ficou muito satisfeita. Muita gente viu esse anúncio na internet.',
+      'Agora ele passa o dia sentado na frente do computador, esperando. Ele diz: “Vou fazer outro anúncio igual.”',
+      'Eu digo: “Xiao Wang, você está esperando o coelho bater no toco. Um bom anúncio não vem correndo até você sozinho.” Ele riu, desligou o computador e foi fazer um anúncio novo.',
+    ],
+    literal:
+      '守 = vigiar, guardar · 株 = toco de árvore · 待 = esperar · 兔 = coelho. Ao pé da letra: “ficar de vigia no toco, à espera do coelho”.',
+    note: 'O 成语 vem de uma fábula do 韩非子 (século III a.C.): um lavrador do reino de 宋 viu um coelho morrer ao bater num toco, largou a lavoura para esperar que aquilo se repetisse, e virou motivo de riso. O ponto que a tradução “esperar sentado” perde é este: ele não foi preguiçoso — ele tratou uma sorte única como se fosse um método. Por isso 守株待兔 não elogia a paciência, critica quem trocou o trabalho pela esperança de repetir um acerto casual. Dito a um colega, é um puxão de orelha leve.',
+  },
+  // ---------- Expressões · HSK 3 · 成语 — 画蛇添足 ----------
+  // A ponte do parágrafo 5 repete a do 守株待兔 de propósito: a mesma frase ("a
+  // história é velha, mas hoje também existem pessoas assim") vira uma dobradiça
+  // que o leitor reconhece de uma leitura para a outra, e o vocabulário volta.
+  {
+    id: 'hsk3-cobra-e-os-pes',
+    level: 3,
+    focus: 'expressoes',
+    title: 'Os pés da cobra',
+    titleZh: '画蛇添足',
+    teaser: 'Uma jarra de vinho, um desenho de cobra e dois pés a mais.',
+    paragraphs: [
+      '从前 ， 有 几 个 人 一起 喝 酒 。 可是 只有 一 壶 酒 。',
+      '他们 说 ： “ 我们 比赛 画 蛇 。 谁 先 画 好 ， 这 壶 酒 就 是 谁 的 。 ”',
+      '有 一 个 人 很 快 。 他 画 完 了 蛇 。 他 想 再 加 脚 。',
+      '别人 也 画 完 了 。 他 拿 走 了 酒 ， 说 ： “ 蛇 没有 脚 ， 你 画 的 不 是 蛇 ！ ”',
+      '故事 很 老 。 但是 这样 的 人 今天 也 有 。',
+      '小王 上个月 做 了 一 个 报告 。 报告 已经 很 好 了 ， 老板 也 满意 。',
+      '但是 他 又 加 了 很多 图 。 老板 说 ： “ 你 在 画蛇添足 。 ”',
+      '小王 想 了 想 。 简单 的 报告 更 好 。 他 关 上 电脑 ， 回家 了 。',
+    ],
+    translation: [
+      'Antigamente, algumas pessoas bebiam juntas. Mas havia só uma jarra de vinho.',
+      'Disseram: “Vamos fazer uma competição de desenhar cobra. Quem terminar primeiro fica com esta jarra de vinho.”',
+      'Uma pessoa era muito rápida. Ela terminou de desenhar a cobra e quis acrescentar pés.',
+      'Outra pessoa também terminou o desenho. Pegou a jarra e disse: “Cobra não tem pé — o que você desenhou não é uma cobra!”',
+      'A história é velha. Mas hoje também existem pessoas assim.',
+      'No mês passado, o Xiao Wang fez um relatório. O relatório já estava muito bom e o chefe ficou satisfeito.',
+      'Mas ele acrescentou um monte de gráficos. O chefe disse: “Você está desenhando pés na cobra.”',
+      'O Xiao Wang pensou um pouco. Um relatório simples era melhor. Desligou o computador e foi para casa.',
+    ],
+    literal:
+      '画 = desenhar · 蛇 = serpente · 添 = acrescentar · 足 = pés (forma literária; no dia a dia diz-se 脚). Ao pé da letra: “desenhar uma serpente e acrescentar-lhe pés”.',
+    note: 'O 成语 vem do 战国策 (século III a.C.): um homem de 楚 deu uma jarra de vinho aos criados; era pouco para todos, então combinaram que quem terminasse primeiro o desenho de uma cobra beberia. O primeiro terminou e, para se exibir, acrescentou pés ao desenho — e outro tomou a jarra, dizendo que cobra não tem pés. O detalhe que “estragar por exagerar” não pega é este: o problema não é fazer mais, é fazer algo que não pertence à categoria — uma cobra com pés não é uma cobra melhor, não é uma cobra. Diz-se de trabalho, design e texto que já estavam prontos.',
+  },
+  // ---------- Expressões · HSK 4 · 成语 — 井底之蛙 ----------
+  // A ponte aqui varia ("esta história também é velha") para não virar fórmula —
+  // três leituras com a mesma dobradiça ensinariam a dobradiça, não a expressão.
+  {
+    id: 'hsk4-sapo-no-poco',
+    level: 4,
+    focus: 'expressoes',
+    title: 'O sapo do poço',
+    titleZh: '井底之蛙',
+    teaser: 'Um sapo feliz no fundo do poço descobre que existe mar.',
+    paragraphs: [
+      '从前 ， 有 一只 青蛙 住 在 井 里 。',
+      '它 觉得 自己 的 家 最 好 。 天 很 大 ， 水 也 很 多 。 井 就 是 世界 。',
+      '有一天 ， 一只 乌龟 来 了 。 青蛙 请 乌龟 看 它 的 家 。',
+      '乌龟 太 大 了 ， 进 不 去 。 乌龟 说 ： “ 你 见 过 海 吗 ？ ”',
+      '“ 海 很 大 ， 井 很 小 。 ” 青蛙 不 说话 了 。 它 第一次 知道 ： 世界 很 大 。',
+      '这个 故事 也 很 老 。 今天 也 有 这样 的 人 。',
+      '小李 用 一 个 软件 工作 。 他 说 ： “ 这个 软件 最 好 ， 别的 都 不行 。 ”',
+      '我 说 ： “ 你 是 井底之蛙 。 你 试 别的 软件 吗 ？ ” 他 试 了 一 天 ， 不 说话 了 。',
+    ],
+    translation: [
+      'Antigamente, um sapo morava num poço.',
+      'Ele achava a casa dele a melhor. O céu era grande e a água era muita. O poço era o mundo.',
+      'Um dia apareceu uma tartaruga. O sapo convidou a tartaruga a conhecer a casa dele.',
+      'A tartaruga era grande demais e não conseguiu entrar. A tartaruga disse: “Você já viu o mar?”',
+      '“O mar é muito grande; o poço é pequeno.” O sapo ficou sem palavras. Pela primeira vez ele entendeu: o mundo é grande.',
+      'Essa história também é velha. Hoje também existem pessoas assim.',
+      'O Xiao Li trabalha com um único programa. Ele diz: “Este programa é o melhor; os outros não prestam.”',
+      'Eu disse: “Você é o sapo do fundo do poço. Você já experimentou outros programas?” Ele experimentou por um dia e ficou sem palavras.',
+    ],
+    literal:
+      '井 = poço · 底 = fundo · 之 = partícula literária (= “de”) · 蛙 = sapo. Ao pé da letra: “o sapo do fundo do poço”.',
+    note: 'O 成语 vem do 庄子 (século IV a.C.): um sapo que vive num poço conta a uma tartaruga do mar como o poço dele é maravilhoso; a tartaruga não cabe na entrada e, ao falar do oceano, faz o sapo descobrir que ele tomava o próprio mundo pelo mundo. É um julgamento sobre o horizonte de alguém, então pode soar duro: na fala costuma vir amaciado com 有点 (“有点井底之蛙” — “um pouco sapo de poço”). E o 软件 deste texto é 軟件 no continente e 軟體 em Taiwan: a conversão 简/繁 é feita palavra a palavra e não dá conta dessa variação — ela cabe na nota, não no botão.',
+  },
 ];

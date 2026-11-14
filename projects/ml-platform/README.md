@@ -37,9 +37,12 @@ na tela, e a fonte deles (NNDL) ainda está vazia de propósito. Ver
 
 **A seção de Línguas é a segunda forma de aprender da plataforma** — mesma ideia ("explore antes de
 nomear"), outro material. Em `/linguas` ficam textos curtos em mandarim organizados por nível HSK
-(1–5) e por foco (histórias, cultura, humor), com quatro controles de leitura: pinyin que liga e
-desliga, caracteres simplificados ou tradicionais, espaço entre as palavras e tradução; ao passar o
-mouse (ou tocar) numa palavra aparece o pinyin e o significado. A seção tem tema claro/escuro
+(1–5) e por foco (histórias, cultura, humor, expressões), com quatro controles de leitura: pinyin que
+liga e desliga, caracteres simplificados ou tradicionais, espaço entre as palavras e tradução; ao
+passar o mouse (ou tocar) numa palavra aparece o pinyin e o significado. As leituras de **expressões**
+ensinam um 成语, um 谚语 ou uma expressão moderna dentro de uma história — a fábula mostra a imagem e
+uma cena moderna mostra alguém dizendo a expressão —, e o backlog das 28 que faltam é um contrato
+testado, não uma lista de desejos. A seção tem tema claro/escuro
 próprio (o resto da plataforma continua escuro) e a escolha fica salva neste navegador. O conteúdo é **original e autorado**,
 não gerado — e por isso o gate dele são os specs de conteúdo, não o pipeline de lições. Ver
 [`src/app/languages/README.md`](src/app/languages/README.md).
