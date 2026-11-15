@@ -50,6 +50,27 @@ const VIEWPORTS = [
   { name: 'phone-small', width: 320, height: 568 },
 ];
 
+// The tool pages are separate surfaces: the one-page walk never renders them,
+// so a fixed width inside a calculator or a board is invisible to the pass
+// above. This second pass visits each route at phone sizes — portrait and
+// landscape — because that is where a layout that cannot shrink shows up.
+const ROUTE_VIEWPORTS = [
+  { name: 'phone', width: 390, height: 844, mobile: true },
+  { name: 'phone-small', width: 320, height: 568, mobile: true },
+  { name: 'phone-landscape', width: 667, height: 375, mobile: true },
+];
+
+const ROUTES = [
+  '/tools',
+  '/tools/project-manager',
+  '/tools/measure-it',
+  '/tools/ocr',
+  '/tools/explore-data',
+  '/tools/precificacao-semijoias',
+  '/tools/calcular-hipotenusa',
+  '/estudos',
+];
+
 const CHROME = process.env.CHROME_BIN ?? 'google-chrome';
 const DEBUG_PORT = Number(process.env.AUDIT_DEBUG_PORT ?? 9333);
 const profileDir = mkdtempSync(join(tmpdir(), 'dsh-audit-'));
@@ -170,6 +191,7 @@ async function main() {
   const results = [];
   const deepLinks = {};
   const anchorClicks = {};
+  const routes = {};
 
   for (const viewport of VIEWPORTS) {
     await send('Emulation.setDeviceMetricsOverride', {
@@ -262,12 +284,39 @@ async function main() {
     }
   }
 
+  const origin = new URL(url).origin;
+
+  // The tool-route pass. Each route is loaded cold at each phone size and
+  // audited with `__auditRoute`, which only asks the questions that survive on
+  // a sub-page: sideways scroll, the element causing it, and the field/target
+  // sizes. The one-page pass above covers the shell they share.
+  for (const route of ROUTES) {
+    routes[route] = {};
+    for (const viewport of ROUTE_VIEWPORTS) {
+      await send('Emulation.setDeviceMetricsOverride', {
+        width: viewport.width,
+        height: viewport.height,
+        deviceScaleFactor: 1,
+        mobile: viewport.mobile,
+      });
+      await send('Page.navigate', { url: 'about:blank' });
+      await sleep(250);
+      await send('Page.navigate', { url: `${origin}${route}` });
+      await waitForComplete(send);
+      await evaluate(send, auditSource);
+
+      routes[route][viewport.name] = await evaluate(
+        send,
+        `(async () => { const result = await globalThis.__auditRoute(${viewport.width}); result.route = ${JSON.stringify(route)}; result.viewportName = ${JSON.stringify(viewport.name)}; return result; })()`,
+      );
+    }
+  }
+
   await send('Emulation.clearDeviceMetricsOverride');
 
   // The tab icon is only useful if it is actually delivered: assert the three
   // requests a browser makes land, and that the ICO starts with a valid
   // header (a broken icon silently shows as a generic page glyph).
-  const origin = new URL(url).origin;
   const iconChecks = {};
   for (const path of ['/favicon.ico', '/favicon.svg', '/apple-touch-icon.png']) {
     try {
@@ -298,7 +347,7 @@ async function main() {
   socket.close();
   process.stdout.write(
     `${JSON.stringify(
-      { viewports: results, deepLinks, anchorClicks, icons: iconChecks },
+      { viewports: results, deepLinks, anchorClicks, icons: iconChecks, routes },
       null,
       2,
     )}\n`,
