@@ -26,6 +26,10 @@ continuam páginas próprias, e `/project-gallery` virou redirect para a raiz.
   desligado sob `prefers-reduced-motion`.
 - O conteúdo (projetos, ferramentas, marcos, redes) vive em
   `projects/portfolio/src/app/data/portfolio-content.ts`.
+- **Ícone da aba**: `favicon.ico` (16/32/48/64 px), `favicon.svg` e
+  `apple-touch-icon.png` são gerados por `npm run build:favicon` a partir de um
+  único desenho em `tools/build-favicon.mjs` — o mesmo quadrado arredondado com
+  o gradiente rosa→violeta do logo da barra. Edite o script, não os PNGs.
 
 ### Verificando a UI sem olhar para ela
 

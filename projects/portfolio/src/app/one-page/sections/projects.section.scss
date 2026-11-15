@@ -51,8 +51,18 @@
     box-shadow: inset 0 1px 0 rgba(245, 241, 255, 0.07);
   }
 
-  &:hover {
+}
+
+// Lift is a pointer affordance; the gradient frame and the image zoom read as
+// a hover state on desktop, and as nothing on touch, where tapping opens the
+// product anyway.
+@media (hover: hover) and (pointer: fine) {
+  .project__media:hover {
     transform: translateY(-4px);
+  }
+
+  .project__media:hover .project__shot {
+    transform: scale(1.015);
   }
 }
 
@@ -65,9 +75,6 @@
   transition: transform 600ms var(--ease);
 }
 
-.project__media:hover .project__shot {
-  transform: scale(1.015);
-}
 
 .project__body {
   display: flex;
@@ -124,6 +131,7 @@
 }
 
 .project__cta {
+  min-height: 44px;
   margin-top: 6px;
   padding: 0.78rem 1.2rem;
   font-size: 0.88rem;
@@ -167,5 +175,20 @@
 
   .project__body {
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .project__media {
+    padding: 7px;
+    border-radius: calc(var(--radius-card) + 4px);
+  }
+
+  .project__shot {
+    border-radius: 10px;
+  }
+
+  .project__cta {
+    width: 100%;
   }
 }

@@ -49,9 +49,12 @@
   --radius-image: 14px;
   --radius-pill: 999px;
   --container: 1180px;
-  --gutter: 40px;
+  // Fluid gutter: 16px on a 320px phone, 40px from ~950px up, with no jump at
+  // a breakpoint. `body`, `.full-bleed` and the mobile sheet all read it, so
+  // the full-bleed maths stays honest at every width.
+  --gutter: clamp(16px, 4.2vw, 40px);
   --nav-h: 64px;
-  --section-y: clamp(72px, 11vw, 132px);
+  --section-y: clamp(60px, 10.5vw, 132px);
 
   /* motion */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -83,6 +86,11 @@ html {
   background-color: var(--ink-900);
   color-scheme: dark;
   scroll-behavior: smooth;
+  // iOS inflates text in landscape, and Safari flashes a grey box over tapped
+  // links. Both fight this design, which supplies its own pressed states.
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -102,11 +110,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-@media (max-width: 768px) {
-  body {
-    --gutter: 16px;
-  }
-}
 
 ::selection {
   background-color: var(--rose);
@@ -171,6 +174,14 @@ a {
     color: color-mix(in srgb, var(--rose), white 38%);
     text-decoration: underline;
   }
+}
+
+// Respond on the first tap instead of waiting for double-tap-to-zoom
+// disambiguation on touch screens.
+a,
+button,
+summary {
+  touch-action: manipulation;
 }
 
 :focus-visible {
@@ -269,11 +280,18 @@ ul li {
 
   &:hover {
     text-decoration: none;
-    transform: translateY(-2px);
   }
 
   &:active {
-    transform: translateY(0);
+    transform: translateY(1px);
+  }
+}
+
+// The lift is a pointer affordance: on touch it would stick after a tap and
+// leave the button looking raised until the next tap lands elsewhere.
+@media (hover: hover) and (pointer: fine) {
+  .button:hover {
+    transform: translateY(-2px);
   }
 }
 
@@ -300,13 +318,36 @@ ul li {
 }
 
 .button--quiet {
-  padding: 0;
+  // Text-only, but still a control: the invisible 44px box is what a thumb
+  // actually aims at, and it also clears the WCAG target-size minimum.
+  min-height: 44px;
+  padding: 0 2px;
   color: var(--rose);
   background: none;
 
   &:hover {
     color: color-mix(in srgb, var(--rose), white 38%);
+  }
+
+  &:active {
+    transform: translateX(2px);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button--quiet:hover {
     transform: translateX(3px);
+  }
+}
+
+// iOS zooms into a focused field whose text is smaller than 16px, which
+// leaves the visitor scrolled sideways on a form. The site's forms live in the
+// tool pages, so the floor is global at phone widths.
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
   }
 }
 

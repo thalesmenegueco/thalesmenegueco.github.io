@@ -388,3 +388,20 @@ canvas {
     min-height: 430px;
   }
 }
+
+// The grid/guide switches are 13px boxes wrapped in a label; on touch the label
+// is the real target, so it gets a full row height and the box a size a thumb
+// can see.
+@media (max-width: 768px) {
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+  }
+
+  .check input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+  }
+}

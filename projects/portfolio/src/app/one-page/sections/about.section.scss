@@ -159,11 +159,16 @@
   letter-spacing: 0.02em;
 }
 
-@media (max-width: 900px) {
+// Portrait tablets get the stacked bento, but the stats strip stays three
+// across until there is really no room: on a 768px screen the figures still
+// read as a strip, and only phones turn it into a list.
+@media (max-width: 860px) {
   .about__bento {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 700px) {
   .about__stats {
     grid-template-columns: 1fr;
   }
@@ -171,5 +176,15 @@
   .about__stat + .about__stat {
     border-left: 0;
     border-top: 1px solid var(--hairline);
+  }
+}
+
+@media (max-width: 420px) {
+  .about__card {
+    padding: 22px 20px;
+  }
+
+  .about__quote {
+    font-size: 1.4rem;
   }
 }

@@ -856,3 +856,12 @@
     opacity: 1;
   }
 }
+
+// iOS zooms into a focused field whose text is under 16px, which leaves the
+// visitor scrolled sideways inside the board. The task input is the only text
+// field here, so the floor is scoped to it rather than nudged globally.
+@media (max-width: 768px) {
+  .pm-input {
+    font-size: 16px;
+  }
+}

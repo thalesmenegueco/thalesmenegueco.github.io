@@ -174,6 +174,65 @@ globalThis.__auditPortfolio = async function auditPortfolio() {
     natural: [image.naturalWidth, image.naturalHeight],
   }));
 
+  // What the browser believes about its own input, and the two sizes that
+  // decide whether a phone visitor can hit something.
+  out.media = {
+    hover: matchMedia('(hover: hover)').matches,
+    coarsePointer: matchMedia('(pointer: coarse)').matches,
+    reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+  };
+
+  out.targets = (() => {
+    const under24 = [];
+    const under44 = [];
+    let total = 0;
+
+    for (const el of document.querySelectorAll('a, button, [role="button"]')) {
+      const box = el.getBoundingClientRect();
+      if (box.width < 1 || box.height < 1) continue;
+
+      // WCAG 2.5.8 exempts links that are inline in a paragraph: they are
+      // read as words, not aimed at as targets.
+      const inlineInProse =
+        el.tagName === 'A' &&
+        getComputedStyle(el).display === 'inline' &&
+        (el.closest('p') || el.closest('li'));
+      if (inlineInProse) continue;
+
+      total += 1;
+      const smallest = Math.min(box.width, box.height);
+      const entry = { el: describe(el), w: Math.round(box.width), h: Math.round(box.height) };
+      if (smallest < 24) under24.push(entry);
+      else if (smallest < 44) under44.push(entry);
+    }
+
+    return { total, under24, under44 };
+  })();
+
+  out.minFieldFontPx = (() => {
+    let smallest = Infinity;
+    for (const el of document.querySelectorAll('input, select, textarea')) {
+      if (el.getBoundingClientRect().width < 1) continue;
+      const size = parseFloat(getComputedStyle(el).fontSize);
+      if (Number.isFinite(size)) smallest = Math.min(smallest, size);
+    }
+    return Number.isFinite(smallest) ? smallest : null;
+  })();
+
+  out.headIcons = [
+    ...document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"]'),
+  ].map((link) => ({
+    rel: link.getAttribute('rel'),
+    href: link.getAttribute('href'),
+    sizes: link.getAttribute('sizes'),
+    type: link.getAttribute('type'),
+  }));
+
+  out.heroTitleOverflow = (() => {
+    const title = document.querySelector('.hero__title');
+    return title ? title.scrollWidth <= title.clientWidth + 1 : null;
+  })();
+
   // ---- Horizontal overflow at this width ----
   for (const node of document.querySelectorAll('body *')) {
     const box = node.getBoundingClientRect();

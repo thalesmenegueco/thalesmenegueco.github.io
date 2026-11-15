@@ -12,7 +12,8 @@
     "examples:build": "node tools/build-manifest-examples.mjs",
     "bindings:build": "node tools/build-manifest-bindings.mjs",
     "audit:layout": "node tools/audit/run-layout-audit.mjs http://127.0.0.1:4200/",
-    "audit:images": "node tools/audit/png-stats.mjs"
+    "audit:images": "node tools/audit/png-stats.mjs",
+    "build:favicon": "node tools/build-favicon.mjs"
   },
   "prettier": {
     "overrides": [

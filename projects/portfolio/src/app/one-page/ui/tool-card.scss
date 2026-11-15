@@ -41,18 +41,31 @@
     transition: opacity var(--dur-base) var(--ease);
   }
 
+  // The gradient border and inner glow are the card's "I am a link" tell, so
+  // they stay on every pointer. The physical lift is a pointer affordance and
+  // is gated: on touch the hover state sticks after a tap and leaves the card
+  // floating until the next tap lands elsewhere.
   &:hover {
     background:
       linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
       var(--gradient-aurora) border-box;
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lift);
     color: var(--text);
     text-decoration: none;
   }
 
   &:hover::after {
     opacity: 1;
+  }
+
+  &:active {
+    transform: scale(0.995);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift);
   }
 }
 

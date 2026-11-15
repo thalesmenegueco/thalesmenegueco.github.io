@@ -1,4 +1,16 @@
 <div class="simple-math-container">
+  <!-- The page had no `h1`: its first heading was the calculator card's `h2`,
+       which left the page with no document title for assistive tech and no
+       match with the route's own title. -->
+  <header class="page-head">
+    <p class="eyebrow">Ferramentas · Exatas</p>
+    <h1>Cálculos simples</h1>
+    <p>
+      Encontre a hipotenusa ou um cateto de um triângulo retângulo, com o passo
+      a passo do cálculo.
+    </p>
+  </header>
+
   <div class="tab-bar">
     @for (tab of tabs; track tab.id) {
       <button

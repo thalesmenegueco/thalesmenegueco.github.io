@@ -3,6 +3,10 @@
   isolation: isolate;
   display: grid;
   place-items: center;
+  // `vh` first as the fallback for browsers without dynamic viewport units;
+  // the `svh` line wins where it is supported and keeps the hero from
+  // overflowing under mobile browser chrome.
+  min-height: min(92vh, 860px);
   min-height: min(92svh, 860px);
   padding-block: clamp(96px, 16vh, 168px) clamp(104px, 16vh, 176px);
   overflow: clip;
@@ -20,7 +24,7 @@
 // Tracked down a touch more than the body, so the eyebrow reads as a label
 // rather than as a line of prose.
 .hero__title {
-  font-size: clamp(2.7rem, 7.4vw, 5.4rem);
+  font-size: clamp(2.5rem, 7.4vw, 5.4rem);
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.035em;
@@ -59,6 +63,7 @@
 .hero__cue {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 12px;
   margin-top: clamp(20px, 5vh, 48px);
   color: var(--text-dim);
@@ -112,5 +117,30 @@
 
   .hero__cue {
     margin-top: 32px;
+  }
+}
+
+// Narrow phones: side-by-side buttons stop fitting cleanly once the labels and
+// the icons are counted in, so they become a single full-width stack.
+@media (max-width: 420px) {
+  .hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero__actions .button {
+    width: 100%;
+  }
+}
+
+// Landscape phones: the hero does not get a whole screen to itself, and the
+// scroll cue would sit below the fold. Tighten the frame and drop the cue.
+@media (max-height: 560px) and (orientation: landscape) {
+  .hero {
+    padding-block: 48px 64px;
+  }
+
+  .hero__cue {
+    display: none;
   }
 }

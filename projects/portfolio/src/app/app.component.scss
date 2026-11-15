@@ -15,7 +15,8 @@
 .site-footer {
   margin-top: clamp(48px, 8vw, 96px);
   border-top: 1px solid var(--hairline);
-  padding-block: 40px 40px;
+  // The last strip of the page must clear the iPhone home indicator.
+  padding-block: 40px max(40px, env(safe-area-inset-bottom));
 }
 
 .site-footer__inner {
@@ -45,6 +46,10 @@
   gap: 4px 20px;
 
   a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding-inline: 4px;
     color: var(--text-muted);
     font-size: 0.86rem;
 
@@ -67,6 +72,9 @@
   font-size: 0.8rem;
 
   a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
     color: var(--text-muted);
 
     &:hover {
@@ -82,5 +90,19 @@
 
   .site-footer__links {
     justify-content: flex-start;
+    gap: 0 22px;
+  }
+
+  // Footer links are the one set of small text links a phone visitor has to
+  // aim at precisely; give each a full 44px target without changing the
+  // desktop rhythm.
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .site-footer__note a {
+    min-height: 44px;
   }
 }

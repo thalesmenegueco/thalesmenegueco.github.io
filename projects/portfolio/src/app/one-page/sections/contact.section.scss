@@ -3,6 +3,9 @@
   isolation: isolate;
   scroll-margin-top: calc(var(--nav-h) + 16px);
   padding-block: clamp(88px, 12vw, 150px);
+  // iOS home-indicator room, without adding anything on desktop where the
+  // safe-area value is zero.
+  padding-bottom: calc(clamp(88px, 12vw, 150px) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--hairline);
   background:
     radial-gradient(
@@ -68,11 +71,20 @@
     background-color var(--dur-base) var(--ease);
 
   &:hover {
-    transform: translateY(-2px);
     border-color: color-mix(in srgb, var(--rose), transparent 45%);
     background-color: var(--surface-2);
     color: var(--text);
     text-decoration: none;
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contact__social:hover {
+    transform: translateY(-2px);
   }
 }
 

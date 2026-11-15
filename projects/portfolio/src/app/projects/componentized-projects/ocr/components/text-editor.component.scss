@@ -29,7 +29,7 @@ textarea {
   border-radius: 10px;
   color: var(--color-text);
   padding: 14px;
-  font-family: 'Roboto', Helvetica, sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   line-height: 1.5;
   resize: vertical;
@@ -64,7 +64,7 @@ textarea {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
   padding: 8px 16px;
-  font-family: 'Roboto', Helvetica, sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.2s;
@@ -76,5 +76,12 @@ textarea {
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+}
+
+// Same iOS rule as the board: a transcript field must not summon a zoom.
+@media (max-width: 768px) {
+  textarea {
+    font-size: 16px;
   }
 }

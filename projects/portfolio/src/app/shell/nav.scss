@@ -45,6 +45,7 @@
 .nav__brand {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: 10px;
   margin-right: auto;
   color: var(--text);
@@ -78,6 +79,9 @@
 
 .nav__link {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 8px 12px;
   border-radius: var(--radius-pill);
   color: var(--text-muted);
@@ -121,6 +125,7 @@
 .nav__lab {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 6px;
   padding: 8px 13px;
   border: 1px solid var(--hairline-strong);
@@ -143,8 +148,8 @@
 .nav__toggle {
   display: none;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--hairline-strong);
   border-radius: 12px;
   background: none;
@@ -157,7 +162,7 @@
   border-bottom: 1px solid var(--hairline);
   background-color: color-mix(in srgb, var(--ink-900), transparent 4%);
   backdrop-filter: blur(18px) saturate(140%);
-  padding: 10px var(--gutter) 20px;
+  padding: 10px var(--gutter) max(20px, env(safe-area-inset-bottom));
 }
 
 .nav--open .nav__sheet {
@@ -171,7 +176,10 @@
   margin-inline: auto;
 
   a {
-    padding: 13px 12px;
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0 12px;
     border-radius: 12px;
     color: var(--text-muted);
     font-size: 1rem;
@@ -185,7 +193,21 @@
   }
 }
 
-@media (max-width: 900px) {
+// Tablet: the five anchors still fit down to ~820px if they give up some of
+// their padding, so a 768–1024px tablet keeps the real nav rather than opening
+// a menu that has room not to exist. Below that the sheet takes over.
+@media (max-width: 1024px) {
+  .nav__inner {
+    gap: 12px;
+  }
+
+  .nav__link {
+    padding: 8px 9px;
+    font-size: 0.84rem;
+  }
+}
+
+@media (max-width: 819px) {
   .nav__links,
   .nav__lab {
     display: none;

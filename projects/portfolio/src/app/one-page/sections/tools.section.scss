@@ -20,7 +20,10 @@
   }
 }
 
-@media (max-width: 560px) {
+// One column from 620px down: at 560–620 two 270px cards still fit, but the
+// blurbs and the icon rows read cramped, and a phone in landscape (≈670px
+// wide) keeps its two columns above this line.
+@media (max-width: 620px) {
   .tools__grid {
     grid-template-columns: 1fr;
   }

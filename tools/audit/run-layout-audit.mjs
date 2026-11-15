@@ -42,8 +42,12 @@ const timeoutMs = timeoutArg ? Number(timeoutArg.split('=')[1]) : 180_000;
 
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },
-  { name: 'laptop', width: 1024, height: 768 },
-  { name: 'mobile', width: 390, height: 844 },
+  { name: 'tablet-landscape', width: 1024, height: 768 },
+  { name: 'tablet', width: 834, height: 1112 },
+  { name: 'tablet-portrait', width: 768, height: 1024 },
+  { name: 'phone-wide', width: 414, height: 896 },
+  { name: 'phone', width: 390, height: 844 },
+  { name: 'phone-small', width: 320, height: 568 },
 ];
 
 const CHROME = process.env.CHROME_BIN ?? 'google-chrome';
@@ -260,10 +264,41 @@ async function main() {
 
   await send('Emulation.clearDeviceMetricsOverride');
 
+  // The tab icon is only useful if it is actually delivered: assert the three
+  // requests a browser makes land, and that the ICO starts with a valid
+  // header (a broken icon silently shows as a generic page glyph).
+  const origin = new URL(url).origin;
+  const iconChecks = {};
+  for (const path of ['/favicon.ico', '/favicon.svg', '/apple-touch-icon.png']) {
+    try {
+      const response = await fetch(origin + path);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      iconChecks[path] = {
+        status: response.status,
+        contentType: response.headers.get('content-type'),
+        bytes: bytes.length,
+        icoMagic:
+          path === '/favicon.ico' && bytes.length > 6
+            ? bytes[0] === 0 && bytes[1] === 0 && bytes[2] === 1 && bytes[3] === 0
+            : null,
+        svgMagic:
+          path === '/favicon.svg'
+            ? new TextDecoder().decode(bytes.subarray(0, 80)).includes('<svg')
+            : null,
+        pngMagic:
+          path === '/apple-touch-icon.png'
+            ? bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
+            : null,
+      };
+    } catch (error) {
+      iconChecks[path] = { error: String(error?.message ?? error) };
+    }
+  }
+
   socket.close();
   process.stdout.write(
     `${JSON.stringify(
-      { viewports: results, deepLinks, anchorClicks },
+      { viewports: results, deepLinks, anchorClicks, icons: iconChecks },
       null,
       2,
     )}\n`,
