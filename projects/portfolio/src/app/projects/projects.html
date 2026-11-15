@@ -1,34 +1,20 @@
-<div>
-  <div class="page-header">
-    <div class="welcome">
-      <h3>Bem-vindo(a) ao meu</h3>
-      <br>
-      <h2>🧪 Lab de Ferramentas!</h2>
-    </div>
-  </div>
+<section class="lab">
+  <header class="page-head">
+    <p class="eyebrow">Ferramentas</p>
+    <h1>Lab de ferramentas</h1>
+    <p>
+      Sete experimentos que resolvem problemas reais — todos rodando no seu
+      navegador, sem enviar seus dados para lugar nenhum.
+    </p>
+  </header>
 
-  <section class="top-projects">
-    <h3 class="top-projects__title">⭐ Top Projetos</h3>
-    <div class="flex-cards">
-      @for (item of topProjects; track $index) {
-      <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''"
-        [roundedImage]="item.roundedImage ?? false">
-      </app-card>
-      }
-    </div>
-  </section>
-
-  <div class="flex-cards">
-    @for (item of interests; track $index) {
-    <app-card [image]="item.image" [name]="item.name" [description]="item.description" [link]="item.link ?? ''"
-      [roundedImage]="item.roundedImage ?? false">
-    </app-card>
+  <div class="lab__grid">
+    @for (tool of tools; track tool.slug) {
+      <app-tool-card [tool]="tool" />
     }
   </div>
 
-  <div><strong>Quer me conhecer um pouco mais?</strong></div>
-  <ul>
-    <li>👉 Explore <a href="/learning-gallery">meus interesses</a></li>
-    <li>👉 Me siga no <a href="https://www.linkedin.com/in/thales-menegueco/">Linkedin</a></li>
-  </ul>
-</div>
+  <p class="lab__back">
+    <a class="button button--quiet" routerLink="/">← Voltar ao início</a>
+  </p>
+</section>

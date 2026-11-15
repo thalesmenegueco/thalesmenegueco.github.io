@@ -33,6 +33,8 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
+# Local visual-audit output (tools/audit): screenshots and dumps.
+/shots
 /.angular/cache
 .sass-cache/
 /connect.lock

@@ -1,21 +1,30 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { PROFILE } from './data/portfolio-content';
+import { NavComponent } from './shell/nav';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterLink, NavComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 /**
- * The portfolio's shell: a nav, the routed surface, and a footer.
+ * The portfolio's shell: skip link, sticky nav, the routed surface, footer.
  *
- * It has no `title` field. The generated component carried
- * `title = signal('learning-gallery')`, but nothing ever read it — not this
- * app's template, not any spec — so after Phase 1 renamed the project to
- * `portfolio` it was only a stale string kept alive by a test asserting the
- * placeholder `Hello, learning-gallery` heading. Both are gone now, and
- * `app.spec.ts` asserts the shell that actually renders.
+ * The nav lives here rather than in the one-page component because `/tools`
+ * and `/estudos` are real routes that need the same bar; its section links
+ * are `/#section` targets so they work from anywhere. The footer carries the
+ * outbound links that used to sit under every page's content, which means a
+ * tool page never has to repeat them.
+ *
+ * It has no `title` field: the generated placeholder was never read and is
+ * gone along with the placeholder heading it kept alive.
  */
-export class AppComponent {}
+export class AppComponent {
+  readonly profile = PROFILE;
+  readonly year = new Date().getFullYear();
+  readonly sourceUrl =
+    'https://github.com/thalesmenegueco/thalesmenegueco.github.io';
+}

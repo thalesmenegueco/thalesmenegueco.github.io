@@ -1,0 +1,56 @@
+<section id="sobre" class="section about" aria-labelledby="sobre-title">
+  <div class="container">
+    <app-section-heading
+      eyebrow="Sobre"
+      title="Construir é como eu penso."
+      lead="Não começo pela tecnologia. Começo pela imagem mental de algo que ainda não existe — e vou fatiando até que ela rode, responda e ensine."
+      headingId="sobre-title" />
+
+    <div class="about__bento">
+      <article class="about__card about__card--manifesto" appReveal>
+        <p class="about__quote">
+          Eu construo ferramentas. Não por esporte —
+          <span class="gradient-text">por curiosidade</span>.
+        </p>
+        <p class="about__body">
+          Gosto do caminho entre uma ideia abstrata e uma coisa que a pessoa
+          consegue tocar: um app que ensina Libras, um curso em que a fórmula
+          pode ser arrastada, uma ferramenta que resolve um problema de uma
+          tarde. Se a ideia parece mágica, melhor: o trabalho é mostrar que ela
+          é só construção.
+        </p>
+        <ul class="about__chips" aria-label="Temas que me movem">
+          @for (chip of chips; track chip) {
+            <li class="about__chip">{{ chip }}</li>
+          }
+        </ul>
+      </article>
+
+      <article class="about__card about__card--process" appReveal [appRevealDelay]="80">
+        <h3 class="about__process-title">Como eu construo</h3>
+        <ol class="about__steps">
+          @for (step of steps; track step.title; let i = $index) {
+            <li class="about__step">
+              <span class="about__step-index" aria-hidden="true">
+                {{ (i + 1).toString().padStart(2, '0') }}
+              </span>
+              <div>
+                <h4 class="about__step-title">{{ step.title }}</h4>
+                <p class="about__step-body">{{ step.body }}</p>
+              </div>
+            </li>
+          }
+        </ol>
+      </article>
+
+      <dl class="about__stats" appReveal [appRevealDelay]="160">
+        @for (stat of stats; track stat.label) {
+          <div class="about__stat">
+            <dt class="about__stat-label">{{ stat.label }}</dt>
+            <dd class="about__stat-value">{{ stat.value }}</dd>
+          </div>
+        }
+      </dl>
+    </div>
+  </div>
+</section>

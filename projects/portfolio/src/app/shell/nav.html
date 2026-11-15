@@ -1,0 +1,60 @@
+<header class="nav full-bleed" [class.nav--scrolled]="scrolled()" [class.nav--open]="open()">
+  <span
+    class="nav__progress"
+    aria-hidden="true"
+    [style.transform]="'scaleX(' + progress() + ')'"></span>
+
+  <div class="nav__inner container">
+    <a class="nav__brand" routerLink="/" (click)="toTop()">
+      <span class="nav__mark" aria-hidden="true">
+        <app-icon name="sparkle" [size]="14" />
+      </span>
+      <span class="nav__name">Thales Menegueço</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Seções do portfólio">
+      @for (link of links; track link.id) {
+        <a
+          class="nav__link"
+          [routerLink]="['/']"
+          [fragment]="link.id"
+          [attr.aria-current]="spy.activeId() === link.id ? 'location' : null"
+          (click)="close()">
+          {{ link.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="nav__actions">
+      <a class="nav__lab" routerLink="/tools">
+        Lab
+        <app-icon name="arrow-up-right" [size]="13" />
+      </a>
+      <button
+        #menuToggle
+        class="nav__toggle"
+        type="button"
+        aria-controls="nav-sheet"
+        [attr.aria-expanded]="open()"
+        [attr.aria-label]="open() ? 'Fechar menu' : 'Abrir menu'"
+        (click)="toggle()">
+        <app-icon [name]="open() ? 'close' : 'menu'" [size]="20" />
+      </button>
+    </div>
+  </div>
+
+  <div
+    #sheet
+    id="nav-sheet"
+    class="nav__sheet"
+    [attr.aria-hidden]="!open()">
+    <nav class="nav__sheet-links" aria-label="Seções do portfólio">
+      @for (link of links; track link.id) {
+        <a [routerLink]="['/']" [fragment]="link.id" (click)="close()">
+          {{ link.label }}
+        </a>
+      }
+      <a routerLink="/tools" (click)="close()">Lab de ferramentas</a>
+    </nav>
+  </div>
+</header>

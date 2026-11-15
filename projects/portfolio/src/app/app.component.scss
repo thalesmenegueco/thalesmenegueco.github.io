@@ -1,27 +1,86 @@
-nav {
+// The shell. Keeps the footer at the bottom of short pages (`/estudos` is
+// mostly prose) without giving the page a fixed height that long ones fight.
+
+:host {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.shell-main {
+  flex: 1 0 auto;
+  min-width: 0;
+}
+
+.site-footer {
+  margin-top: clamp(48px, 8vw, 96px);
+  border-top: 1px solid var(--hairline);
+  padding-block: 40px 40px;
+}
+
+.site-footer__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  background-color: var(--color-nav-bg);
-  margin-bottom: 20px;
-  border-radius: 20px;
-  padding: 20px 20px 20px 20px;
+  gap: 20px 40px;
 }
 
-nav ul li {
-  list-style: none;
-  list-style-type: none;
-  white-space: nowrap;
+.site-footer__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
 }
 
-.pages-links {
-  margin-left: 20px;
+.site-footer__line {
+  color: var(--text-dim);
+  font-size: 0.86rem;
+  max-width: 40ch;
 }
 
-footer {
-  text-align: center;
-  padding: 20px 0;
-  background-color: var(--color-nav-bg);
-  color: var(--color-text);
-  margin-top: 20px;
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 20px;
+
+  a {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+
+    &:hover {
+      color: var(--text);
+      text-decoration: none;
+    }
+  }
+}
+
+.site-footer__note {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline);
+  color: var(--text-dim);
+  font-size: 0.8rem;
+
+  a {
+    color: var(--text-muted);
+
+    &:hover {
+      color: var(--rose);
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .site-footer__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .site-footer__links {
+    justify-content: flex-start;
+  }
 }

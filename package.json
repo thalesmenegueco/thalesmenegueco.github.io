@@ -10,7 +10,9 @@
     "test:headless": "ng test ml-platform --watch=false --browsers=ChromeHeadless",
     "validate:manifests": "node tools/validate-manifests.mjs",
     "examples:build": "node tools/build-manifest-examples.mjs",
-    "bindings:build": "node tools/build-manifest-bindings.mjs"
+    "bindings:build": "node tools/build-manifest-bindings.mjs",
+    "audit:layout": "node tools/audit/run-layout-audit.mjs http://127.0.0.1:4200/",
+    "audit:images": "node tools/audit/png-stats.mjs"
   },
   "prettier": {
     "overrides": [

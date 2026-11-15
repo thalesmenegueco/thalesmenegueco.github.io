@@ -1,25 +1,31 @@
-<nav>
-  <h2>Thales Menegueço</h2>
-  <div class="pages-links">
-    <ul>
-      <li>
-        <a href="/project-gallery">
-          🤓 Projetos
-        </a>
-      </li>
-      <li>
-        <a href="/estudos">
-          📐 Exatas em Movimento
-        </a>
-      </li>
-    </ul>
-  </div>
-</nav>
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
-<main>
-  <router-outlet></router-outlet> <!-- component will be rendered here -->
+<app-nav />
+
+<main id="conteudo" class="shell-main" tabindex="-1">
+  <router-outlet />
 </main>
-<footer>
-  <p>Thales Menegueço 👋🧏 📈📊 📚🧩</p>
-  <p>Código fonte disponível no <a href="https://github.com/thalesmenegueco/thalesmenegueco.github.io">Github</a></p>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__brand">
+      <p class="site-footer__name">{{ profile.name }}</p>
+      <p class="site-footer__line">
+        Ferramentas, cursos e experimentos — no navegador.
+      </p>
+    </div>
+
+    <nav class="site-footer__links" aria-label="Links do rodapé">
+      <a routerLink="/">Início</a>
+      <a routerLink="/tools">Lab</a>
+      <a [href]="profile.github" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a [href]="profile.linkedin" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a [href]="profile.sinalFala" target="_blank" rel="noopener noreferrer">Sinal Fala</a>
+    </nav>
+
+    <p class="site-footer__note">
+      <span>© {{ year }} · feito com Angular e um pouco de mágica</span>
+      <a [href]="sourceUrl" target="_blank" rel="noopener noreferrer">código fonte no GitHub</a>
+    </p>
+  </div>
 </footer>

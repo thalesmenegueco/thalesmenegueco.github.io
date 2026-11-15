@@ -1,0 +1,203 @@
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: block;
+}
+
+.nav {
+  position: relative;
+  border-bottom: 1px solid transparent;
+  background-color: transparent;
+  transition:
+    background-color var(--dur-base) var(--ease),
+    border-color var(--dur-base) var(--ease),
+    backdrop-filter var(--dur-base) var(--ease);
+}
+
+// Glass only after the page has moved: at the top of the hero the bar should
+// disappear into the ink, not sit on it as a separate slab.
+.nav--scrolled {
+  border-bottom-color: var(--hairline);
+  background-color: color-mix(in srgb, var(--ink-900), transparent 22%);
+  backdrop-filter: blur(16px) saturate(140%);
+}
+
+.nav__progress {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-aurora);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 80ms linear;
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: var(--nav-h);
+}
+
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--text);
+    text-decoration: none;
+  }
+}
+
+.nav__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--gradient-warm);
+  color: #14061a;
+  box-shadow: 0 8px 24px -10px rgba(255, 92, 216, 0.8);
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.nav__link {
+  position: relative;
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease);
+
+  &:hover {
+    color: var(--text);
+    background-color: rgba(245, 241, 255, 0.04);
+    text-decoration: none;
+  }
+
+  &[aria-current] {
+    color: var(--text);
+  }
+
+  // A gradient underline instead of a filled pill: it marks the section
+  // without adding another surface to the bar.
+  &[aria-current]::after {
+    content: '';
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 3px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--gradient-aurora);
+  }
+}
+
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav__lab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--rose);
+    text-decoration: none;
+  }
+}
+
+.nav__toggle {
+  display: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 12px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.nav__sheet {
+  display: none;
+  border-bottom: 1px solid var(--hairline);
+  background-color: color-mix(in srgb, var(--ink-900), transparent 4%);
+  backdrop-filter: blur(18px) saturate(140%);
+  padding: 10px var(--gutter) 20px;
+}
+
+.nav--open .nav__sheet {
+  display: block;
+}
+
+.nav__sheet-links {
+  display: grid;
+  gap: 2px;
+  max-width: var(--container);
+  margin-inline: auto;
+
+  a {
+    padding: 13px 12px;
+    border-radius: 12px;
+    color: var(--text-muted);
+    font-size: 1rem;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text);
+      background-color: rgba(245, 241, 255, 0.05);
+      text-decoration: none;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .nav__links,
+  .nav__lab {
+    display: none;
+  }
+
+  .nav__toggle {
+    display: grid;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav__name {
+    display: none;
+  }
+}

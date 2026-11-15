@@ -17,26 +17,45 @@ describe('App', () => {
   });
 
   /**
-   * This test used to assert `Hello, learning-gallery` inside an `h1`.
+   * The shell the visitor actually gets: skip link, sticky nav with the five
+   * section anchors, the routed surface and the footer.
    *
-   * Neither exists: that heading was the Angular CLI template's placeholder, and
-   * the shell this app actually renders is a nav, a `router-outlet` and a footer.
-   * It survived Phase 1's rename to `portfolio` as a permanently failing test, so
-   * it is replaced by assertions on the shell a visitor really gets — including
-   * the two nav entry points, since those are the whole reason the shell exists.
+   * The nav targets are asserted as `/#section` because that form is what
+   * makes the nav work from `/tools` too — a bare `#section` would be a jump
+   * to nothing on the tools pages. `app.routes.spec.ts` covers where they land.
    */
-  it('should render the shell: brand, both nav entries and the router outlet', () => {
+  it('should render the shell: skip link, nav anchors, outlet and footer', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('nav h2')?.textContent).toContain('Thales Menegueço');
+    const skipLink = compiled.querySelector('.skip-link');
+    expect(skipLink?.getAttribute('href')).toBe('#conteudo');
 
-    const navTargets = [...compiled.querySelectorAll('nav a')].map((link) =>
-      link.getAttribute('href'),
+    expect(compiled.querySelector('app-nav .nav__name')?.textContent).toContain(
+      'Thales Menegueço',
     );
-    expect(navTargets).toEqual(['/project-gallery', '/estudos']);
+
+    const navTargets = [...compiled.querySelectorAll('app-nav .nav__links a')].map(
+      (link) => link.getAttribute('href'),
+    );
+    expect(navTargets).toEqual([
+      '/#sobre',
+      '/#projetos',
+      '/#ferramentas',
+      '/#trajetoria',
+      '/#contato',
+    ]);
 
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
+
+    // The footer is where the outbound links live now, so every page gets them
+    // without repeating the list inside each template.
+    const footerHrefs = [...compiled.querySelectorAll('footer a')].map((link) =>
+      link.getAttribute('href'),
+    );
+    expect(footerHrefs).toContain('/');
+    expect(footerHrefs).toContain('/tools');
+    expect(footerHrefs).toContain('https://github.com/thalesmenegueco');
   });
 });

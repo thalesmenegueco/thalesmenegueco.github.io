@@ -1,0 +1,39 @@
+<section class="hero full-bleed" aria-labelledby="hero-title">
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="hero__fade" aria-hidden="true"></div>
+
+  <div class="hero__inner container">
+    <p class="eyebrow">{{ profile.eyebrow }}</p>
+
+    <h1 id="hero-title" class="hero__title">
+      <span class="hero__line">{{ profile.heroLine }}</span>
+      <span class="hero__line gradient-text">{{ profile.heroAccent }}</span>
+    </h1>
+
+    <p class="hero__lead">{{ profile.heroLead }}</p>
+
+    <div class="hero__actions">
+      <a
+        class="button button--primary"
+        [routerLink]="['/']"
+        fragment="projetos">
+        Ver os projetos
+        <app-icon name="arrow-down" [size]="16" />
+      </a>
+      <a
+        class="button button--ghost"
+        [href]="profile.github"
+        target="_blank"
+        rel="noopener noreferrer">
+        GitHub
+        <app-icon name="arrow-up-right" [size]="16" />
+      </a>
+    </div>
+
+    <a class="hero__cue" [routerLink]="['/']" fragment="sobre">
+      <span class="hero__cue-line" aria-hidden="true"></span>
+      role para explorar
+    </a>
+  </div>
+</section>

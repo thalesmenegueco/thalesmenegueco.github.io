@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 import { EstudosLandingComponent } from './estudos/estudos-landing.component';
-import { LearningGalleryComponent } from './learning-gallery/learning-gallery.component';
+import { OnePageComponent } from './one-page/one-page.component';
 import { PLATFORM_LINKS } from './platform-links';
-import { ExternalRedirectComponent } from './redirect/external-redirect.component';
 import { ProjectsComponent } from './projects/projects';
+import { ExternalRedirectComponent } from './redirect/external-redirect.component';
 
 import { PrecificacaoPageComponent } from './projects/pages/page-components/precificacao-page-component/precificacao-page-component';
 import { SimpleMath } from './projects/componentized-projects/simple-math/simple-math';
@@ -12,18 +12,16 @@ import { ProjectManager } from './projects/componentized-projects/project-manage
 /**
  * The portfolio's routes.
  *
- * This file was `app-routing.module.ts`, which was a module in name only: it
- * exported a plain `Routes` array, and the `@NgModule` wrapper around that array
- * was never what the app bootstrapped. `main.ts` bootstraps through
- * `bootstrapApplication(AppComponent, appConfig)`, so `app.config.ts` was always
- * the one real consumer — it hands this array to `provideRouter`.
+ * The root is now the scroll portfolio (`OnePageComponent`): six sections,
+ * anchor nav, one page. The old `/project-gallery` gallery it replaced is
+ * gone as a page but kept as a redirect, because older posts and the README
+ * still point at that URL and a 404 there would be the site's own problem.
  *
- * The `estudos` surface — its hub plus the three Cálculo modules — moved to the
- * `ml-platform` app in Phase 3 and its routes left this file in the same commit
- * (hazard H1), because leaving them behind would have made this app fail to
- * compile. Phase 4 puts the path back in two halves: a thin landing page at
- * `/estudos` (step 2), and redirect stubs for the old deep URLs (step 3), since
- * merging is what removes Cálculo from this app's live deploy.
+ * `/tools` and its apps are untouched surfaces with their own layouts; they
+ * keep their routes and inherit the new palette through the legacy token
+ * aliases in `styles.scss`. `/estudos` stays as the VisuaLab hand-off (Phase 4
+ * of the migration), and the retired Cálculo deep links still forward to the
+ * platform.
  *
  * **Order matters in the two blocks below, and it is not incidental.** Angular's
  * default `pathMatch` is `'prefix'`, so `{ path: 'tools' }` also matches
@@ -34,20 +32,28 @@ import { ProjectManager } from './projects/componentized-projects/project-manage
  * suite instead of silently sending visitors to the wrong page.
  */
 export const routes: Routes = [
-  { path: 'project-gallery', component: LearningGalleryComponent },
+  {
+    path: '',
+    component: OnePageComponent,
+    title: 'Thales Menegueço — construo o que imagino',
+  },
 
-  // Phase 4 step 2 — the platform's landing page, keeping the nav entry's
-  // meaning ("Exatas em Movimento") after the hub itself moved away.
+  // Retired page, kept as a URL: the gallery's content now lives in the
+  // one-page root's Projetos and Ferramentas sections.
+  { path: 'project-gallery', redirectTo: '', pathMatch: 'full' },
+
+  // The platform's landing page, keeping the nav entry's meaning
+  // ("Exatas em Movimento") after the hub itself moved away.
   {
     path: 'estudos',
     component: EstudosLandingComponent,
     title: 'VisuaLab — cursos interativos de exatas',
   },
 
-  // Phase 4 step 3 — the retired deep URLs. GitHub Pages cannot issue a real
-  // 301, so these are routes that hand off to the platform from the client.
-  // They work because the deploy workflow copies the built `index.html` over
-  // `404.html`, which means a deep link boots the SPA with its path intact.
+  // Retired deep URLs. GitHub Pages cannot issue a real 301, so these are
+  // routes that hand off to the platform from the client. They work because
+  // the deploy workflow copies the built `index.html` over `404.html`, which
+  // means a deep link boots the SPA with its path intact.
   {
     path: 'estudos/calculo/teoria',
     component: ExternalRedirectComponent,
@@ -71,14 +77,15 @@ export const routes: Routes = [
     data: { redirectTo: PLATFORM_LINKS.calculoTeoria },
   },
 
-  { path: 'tools', component: ProjectsComponent },
-  { path: 'tools/precificacao-semijoias', component: PrecificacaoPageComponent },
-  { path: 'tools/calcular-hipotenusa', component: SimpleMath },
-  { path: 'tools/project-manager', component: ProjectManager },
-  { path: 'tools/ocr', loadComponent: () => import('./projects/componentized-projects/ocr/ocr.component').then(m => m.OcrComponent) },
-  { path: 'tools/test-llms', loadComponent: () => import('./projects/componentized-projects/test-llms/test-llms').then(m => m.TestLlms) },
-  { path: 'tools/explore-data', loadComponent: () => import('./projects/componentized-projects/explore-data/explore-data').then(m => m.ExploreData) },
-  { path: 'tools/measure-it', loadComponent: () => import('./projects/componentized-projects/measure-it/measure-it').then(m => m.MeasureIt) },
-  { path: '', redirectTo: '/project-gallery', pathMatch: 'full' },
-  { path: '**', redirectTo: '/project-gallery' }
+  { path: 'tools', component: ProjectsComponent, title: 'Lab de ferramentas — Thales Menegueço' },
+  // Each tool gets a title of its own: before this, every tool page inherited
+  // the one-page title in the tab, which is invisible on the page and wrong in
+  // a history entry, a bookmark or a shared link.
+  { path: 'tools/precificacao-semijoias', component: PrecificacaoPageComponent, title: 'Precificação de semijoias — Thales Menegueço' },
+  { path: 'tools/calcular-hipotenusa', component: SimpleMath, title: 'Cálculos simples — Thales Menegueço' },
+  { path: 'tools/project-manager', component: ProjectManager, title: 'Gerencie projetos — Thales Menegueço' },
+  { path: 'tools/ocr', title: 'OCR & tradução — Thales Menegueço', loadComponent: () => import('./projects/componentized-projects/ocr/ocr.component').then(m => m.OcrComponent) },
+  { path: 'tools/explore-data', title: 'Explore dados — Thales Menegueço', loadComponent: () => import('./projects/componentized-projects/explore-data/explore-data').then(m => m.ExploreData) },
+  { path: 'tools/measure-it', title: 'Meça isto! — Thales Menegueço', loadComponent: () => import('./projects/componentized-projects/measure-it/measure-it').then(m => m.MeasureIt) },
+  { path: '**', redirectTo: '' }
 ];

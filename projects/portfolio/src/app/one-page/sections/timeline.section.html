@@ -1,0 +1,25 @@
+<section id="trajetoria" class="section timeline" aria-labelledby="trajetoria-title">
+  <div class="container">
+    <app-section-heading
+      eyebrow="Trajetória"
+      title="Do primeiro rascunho até agora."
+      lead="Quatro fases, sem datas — o que importa aqui foi a ordem: curiosidade, comunicação, ensino, e o que vem depois."
+      headingId="trajetoria-title" />
+
+    <ol class="timeline__list">
+      @for (milestone of milestones; track milestone.step; let i = $index) {
+        <li
+          class="timeline__item"
+          [class.timeline__item--current]="milestone.current"
+          appReveal
+          [appRevealDelay]="i * 90">
+          <span class="timeline__node" aria-hidden="true">{{ milestone.step }}</span>
+          <div class="timeline__card">
+            <h3 class="timeline__title">{{ milestone.title }}</h3>
+            <p class="timeline__body">{{ milestone.body }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </div>
+</section>

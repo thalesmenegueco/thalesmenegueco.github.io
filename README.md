@@ -9,6 +9,37 @@ Website available [here](https://thalesmenegueco.github.io).
 
 Figma project: https://www.figma.com/design/znqxvoSCfB5o9nw7ZsatNU/Personal-Website?node-id=0-1&t=MEL5qexmwXE77shC-1
 
+## Interface 🎨
+
+O site é um **portfólio de uma página só**: a raiz (`/`) é um scroll com seis
+seções — hero, sobre, projetos, ferramentas, trajetória e contato — e a barra
+fixa tem âncoras para cada uma. Como as âncoras são `/#secao`, elas também
+funcionam a partir das outras rotas: `/tools/*` (as ferramentas) e `/estudos`
+continuam páginas próprias, e `/project-gallery` virou redirect para a raiz.
+
+- **Paleta "Aurora Arcana"**: preto arroxeado (`--ink-*`), rosa como cor
+  principal (`--rose`), violeta e azul como detalhes. Todo par de texto/fundo
+  passa em WCAG AA, e os tokens antigos (`--color-*`) seguem existindo como
+  aliases para as páginas das ferramentas não precisarem mudar.
+- **Tipografia**: Sora (títulos) + Inter (texto), carregadas em `index.html`.
+- **Movimento**: reveal por `IntersectionObserver`, aurora em CSS puro, tudo
+  desligado sob `prefers-reduced-motion`.
+- O conteúdo (projetos, ferramentas, marcos, redes) vive em
+  `projects/portfolio/src/app/data/portfolio-content.ts`.
+
+### Verificando a UI sem olhar para ela
+
+`tools/audit/` controla um Chrome de verdade pelo DevTools Protocol e mede o que
+dá para medir: overflow horizontal, fontes carregadas, se cada âncora para 80px
+abaixo da barra, CLS, se todos os reveals disparam, e o menu mobile. Com o app
+servido em `:4200`:
+
+```bash
+npx ng serve portfolio --configuration production --port 4200
+npm run audit:layout
+npm run audit:images -- shots/desktop-full.png
+```
+
 ## Good Practices and Patterns - Reminders for myself 👨🏻
 
 ### 🗃️ Convenções de Nomenclatura

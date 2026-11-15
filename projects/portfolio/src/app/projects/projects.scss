@@ -1,12 +1,25 @@
-.top-projects {
-  background: transparent;
-  border: 1px solid #d3d3d3;
-  border-radius: 20px;
-  padding: 20px;
-  margin: 20px 0;
+.lab {
+  padding-block: clamp(28px, 5vw, 48px) var(--section-y);
 }
 
-.top-projects__title {
-  text-align: center;
-  margin-bottom: 10px;
+.lab__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 20px);
+}
+
+.lab__back {
+  margin-top: clamp(28px, 4vw, 44px);
+}
+
+@media (max-width: 980px) {
+  .lab__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .lab__grid {
+    grid-template-columns: 1fr;
+  }
 }

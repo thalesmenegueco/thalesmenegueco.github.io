@@ -1,0 +1,22 @@
+<section id="ferramentas" class="section tools" aria-labelledby="ferramentas-title">
+  <div class="container">
+    <app-section-heading
+      eyebrow="Ferramentas"
+      title="Um lab sempre aberto."
+      lead="Seis ferramentas que nasceram de problemas reais — todas rodando no seu navegador, sem enviar seus dados para lugar nenhum."
+      headingId="ferramentas-title" />
+
+    <div class="tools__grid">
+      @for (tool of tools; track tool.slug; let i = $index) {
+        <app-tool-card appReveal [appRevealDelay]="(i % 3) * 70" [tool]="tool" />
+      }
+    </div>
+
+    <div class="tools__more" appReveal>
+      <a class="button button--quiet" routerLink="/tools">
+        Abrir o lab completo
+        <app-icon name="arrow-right" [size]="16" />
+      </a>
+    </div>
+  </div>
+</section>

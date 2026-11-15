@@ -1,0 +1,64 @@
+<section id="projetos" class="section projects" aria-labelledby="projetos-title">
+  <div class="container">
+    <app-section-heading
+      eyebrow="Projetos"
+      title="Coisas que saíram do rascunho."
+      lead="Dois produtos no ar, feitos do zero — um para acesso à língua, outro para ver a matemática acontecer antes de decorá-la."
+      headingId="projetos-title" />
+
+    <div class="projects__list">
+      @for (project of projects; track project.id; let i = $index) {
+        <article
+          class="project"
+          [class.project--flip]="i % 2 === 1"
+          appReveal
+          [appRevealDelay]="i * 120">
+          <a
+            class="project__media"
+            [href]="project.href"
+            target="_blank"
+            rel="noopener noreferrer"
+            tabindex="-1"
+            aria-hidden="true">
+            <img
+              class="project__shot"
+              [src]="project.image"
+              [alt]="project.imageAlt"
+              [width]="project.imageWidth"
+              [height]="project.imageHeight"
+              loading="lazy"
+              decoding="async" />
+          </a>
+
+          <div class="project__body">
+            <div class="project__meta">
+              <span class="project__index" aria-hidden="true">{{ project.index }}</span>
+              <span class="project__kicker">{{ project.kicker }}</span>
+            </div>
+            <h3 class="project__name">{{ project.name }}</h3>
+            <p class="project__desc">{{ project.description }}</p>
+            <ul class="project__tags" aria-label="Temas do projeto">
+              @for (tag of project.tags; track tag) {
+                <li class="project__tag">{{ tag }}</li>
+              }
+            </ul>
+            <a
+              class="button button--ghost project__cta"
+              [href]="project.href"
+              target="_blank"
+              rel="noopener noreferrer">
+              {{ project.cta }}
+              <app-icon name="arrow-up-right" [size]="15" />
+            </a>
+          </div>
+        </article>
+      }
+    </div>
+
+    <p class="projects__aside" appReveal>
+      <strong>Sinal Fala</strong> — idiomas, cultura surda, tradução e
+      neurodivergências no TikTok:
+      <a [href]="sinalFala" target="_blank" rel="noopener noreferrer">&#64;sinal.fala</a>
+    </p>
+  </div>
+</section>

@@ -1,0 +1,116 @@
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: min(92svh, 860px);
+  padding-block: clamp(96px, 16vh, 168px) clamp(104px, 16vh, 176px);
+  overflow: clip;
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: clamp(18px, 2.4vh, 26px);
+  max-width: 880px;
+  padding-block: 12px;
+}
+
+// Tracked down a touch more than the body, so the eyebrow reads as a label
+// rather than as a line of prose.
+.hero__title {
+  font-size: clamp(2.7rem, 7.4vw, 5.4rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.hero__line {
+  display: block;
+}
+
+.hero__lead {
+  max-width: 54ch;
+  color: var(--text-muted);
+  font-size: clamp(1rem, 1.35vw, 1.18rem);
+  line-height: 1.65;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+// The fade hands the eye from the aurora to the flat page underneath, so the
+// hero does not end in a hard band where the glow was clipped.
+.hero__fade {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 1;
+  height: clamp(120px, 18vh, 220px);
+  background: linear-gradient(to bottom, transparent, var(--ink-900));
+  pointer-events: none;
+}
+
+.hero__cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: clamp(20px, 5vh, 48px);
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+}
+
+// A short line that runs a light down itself, pointing the way to the first
+// section. Pure CSS, one element, and it stops under reduced motion.
+.hero__cue-line {
+  position: relative;
+  width: 1px;
+  height: 42px;
+  background: linear-gradient(to bottom, var(--rose), transparent);
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: -60%;
+    height: 60%;
+    background: linear-gradient(to bottom, transparent, var(--text));
+    animation: cue-run 2.4s var(--ease) infinite;
+  }
+}
+
+@keyframes cue-run {
+  0% {
+    top: -60%;
+  }
+  70%,
+  100% {
+    top: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: auto;
+    padding-block: 72px 96px;
+  }
+
+  .hero__cue {
+    margin-top: 32px;
+  }
+}

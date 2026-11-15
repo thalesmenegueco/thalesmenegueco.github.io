@@ -1,0 +1,27 @@
+.tools {
+  scroll-margin-top: calc(var(--nav-h) + 16px);
+}
+
+.tools__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 20px);
+}
+
+.tools__more {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(24px, 4vw, 40px);
+}
+
+@media (max-width: 980px) {
+  .tools__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .tools__grid {
+    grid-template-columns: 1fr;
+  }
+}

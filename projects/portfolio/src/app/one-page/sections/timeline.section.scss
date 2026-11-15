@@ -1,0 +1,129 @@
+.timeline {
+  scroll-margin-top: calc(var(--nav-h) + 16px);
+}
+
+// The rail hangs off the list's left padding, and the node centres are
+// aligned to it arithmetically: node `left: -52px` + half of 32px = 16px,
+// which is where the 2px line sits (`left: 15px`).
+.timeline__list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.6vw, 26px);
+  max-width: 780px;
+  padding-left: 52px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 15px;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 92, 216, 0.75),
+      rgba(167, 139, 250, 0.5) 52%,
+      rgba(92, 200, 255, 0.55)
+    );
+    opacity: 0.45;
+  }
+}
+
+.timeline__item {
+  position: relative;
+}
+
+.timeline__node {
+  position: absolute;
+  left: -52px;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 50%;
+  background-color: var(--ink-900);
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline__card {
+  padding: 18px 22px;
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  background-color: var(--surface-1);
+}
+
+.timeline__title {
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+.timeline__body {
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  max-width: 58ch;
+}
+
+// "Agora" is the only lit node: gradient fill plus a slow ripple, so the
+// timeline points at the present instead of just ending.
+.timeline__item--current .timeline__node {
+  position: absolute;
+  border-color: transparent;
+  background: var(--gradient-warm);
+  color: #14061a;
+  box-shadow: 0 0 0 4px rgba(255, 92, 216, 0.12);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -7px;
+    border: 1px solid rgba(255, 92, 216, 0.45);
+    border-radius: 50%;
+    animation: node-pulse 2.8s ease-out infinite;
+  }
+}
+
+.timeline__item--current .timeline__card {
+  border-color: color-mix(in srgb, var(--rose), transparent 68%);
+  background:
+    radial-gradient(
+      120% 140% at 0% 0%,
+      rgba(255, 92, 216, 0.08),
+      transparent 55%
+    ),
+    var(--surface-1);
+}
+
+@keyframes node-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.85;
+  }
+  70%,
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .timeline__list {
+    padding-left: 44px;
+  }
+
+  .timeline__node {
+    left: -44px;
+  }
+
+  .timeline__card {
+    padding: 16px 18px;
+  }
+}

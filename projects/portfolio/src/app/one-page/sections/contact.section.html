@@ -1,0 +1,38 @@
+<section id="contato" class="section contact full-bleed" aria-labelledby="contato-title">
+  <div class="aurora contact__aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="container contact__inner">
+    <p class="eyebrow">Contato</p>
+
+    <h2 id="contato-title" class="contact__title">
+      Tem uma ideia que ainda
+      <span class="gradient-text">não existe</span>? Vamos conversar.
+    </h2>
+
+    <p class="contact__lead">
+      Aberto a colaborações, a conversas sobre acessibilidade e exatas, e a
+      qualquer projeto que precise de um protótipo feito à mão.
+    </p>
+
+    <ul class="contact__socials" aria-label="Onde me encontrar">
+      @for (social of socials; track social.icon) {
+        <li>
+          <a
+            class="contact__social"
+            [href]="social.href"
+            target="_blank"
+            rel="noopener noreferrer">
+            <span class="contact__social-icon" aria-hidden="true">
+              <app-icon [name]="social.icon" [size]="18" />
+            </span>
+            <span class="contact__social-text">
+              <span class="contact__social-name">{{ social.name }}</span>
+              <span class="contact__social-handle">{{ social.handle }}</span>
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

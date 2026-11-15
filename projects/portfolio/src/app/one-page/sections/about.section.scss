@@ -1,0 +1,175 @@
+.about {
+  scroll-margin-top: calc(var(--nav-h) + 16px);
+}
+
+.about__bento {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: clamp(16px, 2vw, 22px);
+}
+
+.about__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: clamp(24px, 3vw, 38px);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background-color: var(--surface-1);
+  overflow: hidden;
+
+  // A slow, off-centre rose glow that only shows on the surface, so the
+  // tiles read as lit rather than as flat rectangles.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -40% 40% 40% -30%;
+    background: radial-gradient(
+      circle at 20% 20%,
+      rgba(255, 92, 216, 0.16),
+      transparent 62%
+    );
+    pointer-events: none;
+  }
+}
+
+.about__quote {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.5vw, 2.05rem);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+}
+
+.about__body {
+  position: relative;
+  color: var(--text-muted);
+  max-width: 52ch;
+}
+
+.about__chips {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.about__chip {
+  padding: 0.42rem 0.75rem;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  background-color: rgba(245, 241, 255, 0.02);
+}
+
+.about__process-title {
+  position: relative;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.about__steps {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.about__step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.about__step-index {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid color-mix(in srgb, var(--violet), transparent 62%);
+  border-radius: 9px;
+  background-color: color-mix(in srgb, var(--violet), transparent 90%);
+  color: var(--violet);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.about__step-title {
+  font-size: 0.98rem;
+  margin-bottom: 2px;
+}
+
+.about__step-body {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+// The stats strip runs under both tiles: three figures separated by hairlines
+// instead of three more cards, so it closes the section with a beat.
+.about__stats {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background-color: rgba(22, 16, 38, 0.6);
+  overflow: hidden;
+}
+
+.about__stat {
+  padding: clamp(18px, 2.4vw, 28px);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+
+  & + & {
+    border-left: 1px solid var(--hairline);
+  }
+}
+
+.about__stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1;
+  background: var(--gradient-aurora);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.about__stat-label {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 900px) {
+  .about__bento {
+    grid-template-columns: 1fr;
+  }
+
+  .about__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .about__stat + .about__stat {
+    border-left: 0;
+    border-top: 1px solid var(--hairline);
+  }
+}

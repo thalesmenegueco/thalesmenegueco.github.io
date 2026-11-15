@@ -1,0 +1,13 @@
+<a class="tool-card" [routerLink]="tool().href">
+  <span class="tool-card__icon" aria-hidden="true">
+    <app-icon [name]="tool().icon" [size]="20" />
+  </span>
+  <h3 class="tool-card__name">{{ tool().name }}</h3>
+  <p class="tool-card__blurb">{{ tool().blurb }}</p>
+  <span class="tool-card__foot">
+    <span class="tool-card__tag">{{ tool().tag }}</span>
+    <span class="tool-card__arrow" aria-hidden="true">
+      <app-icon name="arrow-right" [size]="16" />
+    </span>
+  </span>
+</a>

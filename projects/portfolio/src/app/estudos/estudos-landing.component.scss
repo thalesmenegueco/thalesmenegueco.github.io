@@ -1,72 +1,54 @@
-// The `/estudos` landing page. Uses only the design tokens the portfolio's
-// global stylesheet already defines, so it needs no new colour decisions.
+// The `/estudos` landing page. It uses the design system's tokens and the
+// global `.page-head` / `.button` atoms, so it stays a thin page with no
+// colour decisions of its own.
 
 .estudos {
-  max-width: 860px;
-}
-
-.estudos__lead {
-  margin-top: 8px;
-  margin-bottom: 28px;
-  font-size: 1.05rem;
-  line-height: 1.6;
+  max-width: 780px;
+  padding-block: clamp(28px, 5vw, 48px) 24px;
 }
 
 .estudos__cta {
-  margin-bottom: 40px;
-}
-
-.estudos__cta-link {
-  display: inline-block;
-  padding: 14px 26px;
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-card);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font-weight: 700;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-
-  &:hover {
-    color: var(--color-text);
-    text-decoration: none;
-    box-shadow: var(--shadow-card-hover) var(--color-text-accent);
-    transform: translate(-2px, -2px);
-  }
+  margin-bottom: clamp(32px, 5vw, 48px);
 }
 
 .estudos__heading {
-  margin-top: 32px;
-  margin-bottom: 12px;
-  font-size: 1.15rem;
+  margin-top: 36px;
+  margin-bottom: 14px;
+  font-size: 1.1rem;
 }
 
 .estudos__courses {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .estudos__course {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px 20px;
-  border: 1px solid var(--color-border);
-  border-radius: 20px;
+  gap: 6px;
+  padding: 18px 22px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background-color: var(--surface-1);
 
   a {
-    font-size: 1.05rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
   }
 
   span {
-    color: var(--color-text);
-    line-height: 1.5;
-    opacity: 0.85;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.55;
   }
 }
 
 .estudos__note {
-  line-height: 1.6;
-  opacity: 0.9;
+  color: var(--text-muted);
+  line-height: 1.7;
+
+  strong {
+    color: var(--text);
+  }
 }
