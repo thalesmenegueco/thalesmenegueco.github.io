@@ -53,7 +53,7 @@ export class AboutSectionComponent {
   ];
 
   readonly stats: readonly Stat[] = [
-    { value: '7', label: 'ferramentas no lab' },
+    { value: '6', label: 'ferramentas no lab' },
     { value: '2', label: 'produtos no ar' },
     { value: '1', label: 'canal sobre cultura surda' },
   ];
