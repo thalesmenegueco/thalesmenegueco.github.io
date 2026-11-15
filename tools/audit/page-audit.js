@@ -267,3 +267,108 @@ globalThis.__auditPortfolio = async function auditPortfolio() {
   scrollTo({ top: 0, behavior: 'instant' });
   return out;
 };
+
+/**
+ * The route-scoped audit: the same overflow question the one-page audit asks,
+ * but for the tool pages the one-page walk never visits.
+ *
+ * The tool pages are separate surfaces with their own layouts, so a fixed
+ * width buried inside a calculator or a board is invisible to `__auditPortfolio`
+ * — it only shows up on the route that renders it. This measures the things a
+ * phone visitor would actually feel: does the page scroll sideways, which
+ * element is to blame, is any text field small enough to make iOS zoom on
+ * focus, and is any control below the WCAG 24px target floor.
+ *
+ * `expectedWidth` is the device width the runner asked for. The comparison is
+ * against it rather than `innerWidth` on purpose: Chrome's mobile emulation
+ * widens the layout viewport to fit content that cannot shrink, so a page that
+ * overflows a 320px phone reports `innerWidth === 323` and would otherwise look
+ * clean to a check that trusts the page's own idea of its width.
+ */
+globalThis.__auditRoute = async function auditRoute(expectedWidth) {
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const width = innerWidth;
+  const expected = Number.isFinite(expectedWidth) ? expectedWidth : width;
+
+  const describe = (node) => {
+    const id = node.id ? `#${node.id}` : '';
+    const cls =
+      typeof node.className === 'string' && node.className.trim()
+        ? `.${node.className.trim().split(/\s+/).slice(0, 2).join('.')}`
+        : '';
+    return `${node.tagName.toLowerCase()}${id}${cls}`;
+  };
+
+  await Promise.race([document.fonts.ready, sleep(3000)]);
+  await new Promise((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve)),
+  );
+
+  const out = {
+    viewport: [width, innerHeight],
+    expectedWidth: expected,
+    documentWidth: document.documentElement.scrollWidth,
+    bodyWidth: document.body.scrollWidth,
+    // Overflow is measured against the device width, not the (possibly
+    // widened) layout viewport: content wider than the screen is what makes
+    // the page scroll sideways, and that is the bug worth failing on.
+    horizontalOverflow: document.documentElement.scrollWidth > expected + 1,
+    overflowElements: [],
+  };
+
+  for (const node of document.querySelectorAll('body *')) {
+    const box = node.getBoundingClientRect();
+    if (box.width < 1 || box.height < 1) continue;
+    if (getComputedStyle(node).position === 'fixed') continue;
+    if (node.closest('.aurora, .grain, .hero__fade')) continue;
+    // Only the right edge matters here: content pushed off the left edge is
+    // the off-canvas drawer trick (a closed mobile sidebar), not a scrollbar.
+    if (box.right > expected + 1.5) {
+      out.overflowElements.push({
+        el: describe(node),
+        left: Math.round(box.left),
+        right: Math.round(box.right),
+      });
+    }
+  }
+  out.overflowElements = out.overflowElements.slice(0, 10);
+
+  // Checkbox and radio font-size is meaningless (the glyph is drawn by the
+  // engine, not by text), so only text fields are measured. That is what iOS's
+  // focus-zoom actually keys on.
+  out.minFieldFontPx = (() => {
+    let smallest = Infinity;
+    for (const el of document.querySelectorAll('input, select, textarea')) {
+      if (el.getBoundingClientRect().width < 1) continue;
+      if (el.type === 'checkbox' || el.type === 'radio') continue;
+      const size = parseFloat(getComputedStyle(el).fontSize);
+      if (Number.isFinite(size)) smallest = Math.min(smallest, size);
+    }
+    return Number.isFinite(smallest) ? smallest : null;
+  })();
+
+  out.targets = (() => {
+    const under24 = [];
+    let total = 0;
+    for (const el of document.querySelectorAll('a, button, [role="button"]')) {
+      const box = el.getBoundingClientRect();
+      if (box.width < 1 || box.height < 1) continue;
+      const inlineInProse =
+        el.tagName === 'A' &&
+        getComputedStyle(el).display === 'inline' &&
+        (el.closest('p') || el.closest('li'));
+      if (inlineInProse) continue;
+      total += 1;
+      if (Math.min(box.width, box.height) < 24) {
+        under24.push({
+          el: describe(el),
+          w: Math.round(box.width),
+          h: Math.round(box.height),
+        });
+      }
+    }
+    return { total, under24 };
+  })();
+
+  return out;
+};

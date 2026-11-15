@@ -117,6 +117,10 @@ label {
 
 input[type='number'] {
   flex: 1;
+  // A flex item defaults to `min-width: auto`, so the field refuses to shrink
+  // below its intrinsic width (~234px). Inside the card's padding that floors
+  // the page at ~334px, which overflows a 320px phone. Let it shrink instead.
+  min-width: 0;
   background: transparent;
   border: none;
   outline: none;

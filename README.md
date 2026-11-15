@@ -35,8 +35,10 @@ continuam páginas próprias, e `/project-gallery` virou redirect para a raiz.
 
 `tools/audit/` controla um Chrome de verdade pelo DevTools Protocol e mede o que
 dá para medir: overflow horizontal, fontes carregadas, se cada âncora para 80px
-abaixo da barra, CLS, se todos os reveals disparam, e o menu mobile. Com o app
-servido em `:4200`:
+abaixo da barra, CLS, se todos os reveals disparam, e o menu mobile. Na mesma
+passada ele visita cada rota de ferramenta (`/tools/*`, `/estudos`) em telas de
+telefone — retrato e paisagem — porque essas páginas têm layouts próprios que o
+scroll da raiz nunca renderiza. Com o app servido em `:4200`:
 
 ```bash
 npx ng serve portfolio --configuration production --port 4200
