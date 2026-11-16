@@ -7,11 +7,14 @@ import {
 } from '@angular/core';
 
 /**
- * A subtle, decorative "math in movement" emblem for the studies hero.
+ * A subtle, decorative "two scripts, one curve" emblem for the studies hero.
  *
  * A point traces a sine curve while its tangent line slides along with it —
- * the derivative made visible. It loops slowly, pauses when scrolled out of
- * view, and renders a static frame under `prefers-reduced-motion`.
+ * the derivative made visible. Above the curve sits 学习 ("to study"), the
+ * platform's other lab in the same frame: the character is a drawing and the
+ * curve is a drawing, and the same method reads both. It loops slowly, pauses
+ * when scrolled out of view, and renders a static frame under
+ * `prefers-reduced-motion`.
  *
  * Palette values derive from `DEFAULT_PLOT_THEME` (`@shared/plotting`), with
  * the axis and tangent strokes given extra transparency for this decorative
@@ -21,11 +24,23 @@ import {
 const LOOP_SECONDS = 9;
 const CYCLES = 1.5;
 
+/**
+ * The hero word. Rendered with the same serif CJK stack the languages section
+ * uses, so the platform's one decorative Chinese glyph and its 20 readings are
+ * set in the same face. No webfont is loaded for it — these are system faces,
+ * and `Noto Serif CJK SC` is listed because that, not `Noto Serif SC`, is the
+ * family name the Linux `fonts-noto-cjk` package installs.
+ */
+const HERO_WORD = '学习';
+const CJK_FONT =
+  "'Noto Serif SC', 'Songti SC', 'SimSun', 'Source Han Serif SC', 'Noto Serif CJK SC', serif";
+
 const PALETTE = {
   axis: 'rgba(151, 166, 161, 0.22)',
   curve: '#4fb3a6',
   tangent: 'rgba(255, 163, 0, 0.55)',
   point: '#ffa300',
+  word: 'rgba(79, 179, 166, 0.8)',
 } as const;
 
 @Component({
@@ -139,9 +154,28 @@ export class HeroMotionComponent implements AfterViewInit, OnDestroy {
 
     ctx.clearRect(0, 0, width, height);
 
-    const centerY = height / 2;
-    const amplitude = height * 0.3;
+    // The band is split: the word owns the top third, the curve the rest. The
+    // two must never touch — the glyphs are decoration, but a collision reads
+    // as a rendering bug, so the wave's envelope is derived from `centerY`
+    // rather than from the full height.
+    const centerY = height * 0.68;
+    const amplitude = height * 0.19;
     const k = (2 * Math.PI * CYCLES) / width;
+
+    // The word. It drifts a couple of pixels on its own slower period, so the
+    // emblem breathes without competing with the point's 9s loop.
+    //
+    // The size is capped by width as well as height: on a 320px phone a
+    // height-only rule makes two characters fill a third of the band and
+    // shoulder into the first crest, while on desktop the same rule leaves the
+    // mark too small to register.
+    const wordSize = Math.round(Math.min(height * 0.28, width * 0.11));
+    const drift = this.reducedMotion ? 0 : Math.sin(this.time * 0.7) * height * 0.012;
+    ctx.font = `${wordSize}px ${CJK_FONT}`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = PALETTE.word;
+    ctx.fillText(HERO_WORD, 0, height * 0.31 + drift);
 
     // Horizontal axis.
     ctx.strokeStyle = PALETTE.axis;
