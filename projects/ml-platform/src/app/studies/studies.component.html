@@ -1,10 +1,11 @@
 <div class="studies-shell">
   <header class="hero">
-    <p class="hero-kicker">Exatas em Movimento</p>
-    <h1>Aprender fazendo, no seu ritmo</h1>
+    <p class="hero-kicker">VisuaLab · Lab das Formas</p>
+    <h1>Primeiro você vê. Depois você nomeia.</h1>
     <p class="hero-lead">
-      Cada disciplina tem dois momentos: primeiro você entende a teoria
-      explorando problemas, depois aplica a ideia em situações reais.
+      Um gráfico que se move, um caractere que se monta: nos dois casos existe um
+      símbolo e existe um significado. Aqui você entende o significado primeiro —
+      em matemática e em idiomas, pelo mesmo método.
     </p>
   </header>
 
@@ -89,12 +90,13 @@
     }
   </main>
 
-  <section class="languages" aria-label="Línguas">
+  <section class="languages" aria-label="Lab das Palavras">
     <header class="subject-header">
-      <h2>Línguas</h2>
+      <h2>Lab das Palavras</h2>
       <p>
-        A mesma ideia de aprender explorando, aplicada à leitura: textos curtos
-        em mandarim, com o significado de cada palavra ao alcance do mouse.
+        Um caractere chinês é um desenho que carrega sentido. Aqui você aprende a
+        ler o desenho — traço por traço, palavra por palavra — antes de decorar o
+        som.
       </p>
     </header>
 
@@ -111,9 +113,9 @@
           <p class="module-desc">{{ track.description }}</p>
 
           <ul class="module-meta">
-            <li>Textos curtos</li>
+            <li>20 textos</li>
             <li>HSK 1–5</li>
-            <li>3 focos</li>
+            <li>{{ focusCount }} focos</li>
           </ul>
 
           <a class="module-cta" [routerLink]="track.route">Ler textos →</a>

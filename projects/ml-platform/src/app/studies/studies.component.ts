@@ -5,7 +5,10 @@ import {
   moduleKindLabel as labelForModuleKind,
 } from '@shared/learning';
 import { PROGRESS_KEYS, ProgressStore, type ProgressKey } from '@shared/progress';
-import { LANGUAGE_TRACKS } from '../languages/language-catalog';
+import {
+  LANGUAGE_TRACKS,
+  MANDARIN_FOCUS_ORDER,
+} from '../languages/language-catalog';
 import { HeroMotionComponent } from './hero-motion.component';
 import { STUDY_SUBJECTS } from './study-catalog';
 
@@ -35,7 +38,8 @@ export class StudiesComponent {
   readonly subjects = STUDY_SUBJECTS;
 
   /**
-   * The languages section, rendered after the exatas catalogue.
+   * The languages section — the hub's second lab, rendered after the Formas
+   * catalogue.
    *
    * It is a second **kind** of learning on the same hub, so it is not a
    * `StudySubject` — different module vocabulary, different content model, and
@@ -43,8 +47,16 @@ export class StudiesComponent {
    * front door, so it links there with a card of its own — and it imports only
    * the track metadata, never the readings: the collection stays in the lazily
    * loaded `/linguas` chunk, exactly like a course's widgets do.
+   *
+   * Because the readings are not imported here, the card cannot count them:
+   * "20 textos" is editorial and has to be revised when a reading is added.
+   * The focus count *is* derived, from the same list the languages hub filters
+   * by, so the two pages cannot disagree.
    */
   readonly languageTracks = LANGUAGE_TRACKS;
+
+  /** How many focus filters the languages hub offers. */
+  readonly focusCount = MANDARIN_FOCUS_ORDER.length;
 
   private readonly progress = inject(ProgressStore);
 

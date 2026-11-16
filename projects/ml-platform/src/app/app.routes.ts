@@ -87,7 +87,7 @@ const languageRoutes: Routes = [
       import('./languages/language-hub.component').then(
         (m) => m.LanguageHubComponent,
       ),
-    title: 'VisuaLab — Línguas',
+    title: 'VisuaLab — Lab das Palavras',
   },
   {
     path: 'linguas/mandarim/:textId',
