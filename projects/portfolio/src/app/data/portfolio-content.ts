@@ -92,16 +92,16 @@ export const FLAGSHIP_PROJECTS: readonly FlagshipProject[] = [
     id: 'visualab',
     index: '02',
     name: 'VisuaLab',
-    kicker: 'Exatas · cursos interativos',
+    kicker: 'Matemática · Mandarim · interativo',
     description:
-      'Cursos de exatas em que se entende o conceito explorando — arrastando um ponto, movendo um parâmetro — antes de decorar a fórmula.',
+      'Dois laboratórios de leitura visual: no de matemática o gráfico se move antes de virar fórmula, no de mandarim o caractere se monta antes de virar som.',
     image: 'images/visualab-preview.png',
-    imageAlt: 'Tela inicial da VisuaLab, plataforma de cursos de exatas',
+    imageAlt: 'Tela inicial da VisuaLab, plataforma de matemática e mandarim',
     imageWidth: 407,
     imageHeight: 437,
     href: PLATFORM_LINKS.hub,
     cta: 'Abrir a VisuaLab',
-    tags: ['Cálculo', 'Machine Learning', 'Interativo'],
+    tags: ['Cálculo', 'Machine Learning', 'Mandarim'],
   },
 ];
 
@@ -211,7 +211,7 @@ export const MILESTONES: readonly Milestone[] = [
   {
     step: '03',
     title: 'Ensino',
-    body: 'A VisuaLab levou a mesma lógica para as exatas: primeiro fazer o conceito ser visível e tocável, depois a notação.',
+    body: 'A VisuaLab levou a mesma lógica para a matemática e para o mandarim: primeiro fazer o conceito ser visível e tocável, depois a notação.',
   },
   {
     step: '04',

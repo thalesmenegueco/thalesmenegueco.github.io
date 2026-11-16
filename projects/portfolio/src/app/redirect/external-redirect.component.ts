@@ -24,7 +24,7 @@ import { ExternalNavigator } from './external-navigator';
       <h2>Este endereço mudou de casa 🏡</h2>
       <p>
         O Cálculo que ficava aqui agora vive na <strong>VisuaLab</strong>, a
-        plataforma de cursos interativos de exatas.
+        plataforma de matemática e mandarim.
       </p>
       <p>
         Se você não for redirecionado automaticamente,

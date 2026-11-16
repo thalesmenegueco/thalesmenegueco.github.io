@@ -28,6 +28,12 @@ export class EstudosLandingComponent {
   readonly platformHub = PLATFORM_LINKS.hub;
 
   /**
+   * The other lab on the platform. The list below is about the Cálculo
+   * migration, so without this the page would promise two labs and show one.
+   */
+  readonly languagesHub = PLATFORM_LINKS.languagesHub;
+
+  /**
    * The three courses that are live today. These are the ones a visitor arriving
    * from an old `/estudos/calculo/*` URL is looking for, which is why they get
    * named links rather than a single "go to the platform" button.

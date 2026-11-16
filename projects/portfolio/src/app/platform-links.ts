@@ -28,6 +28,7 @@ export const PLATFORM_BASE_URL = 'https://www.visualab.dev';
  */
 export const PLATFORM_LINKS = {
   hub: `${PLATFORM_BASE_URL}/`,
+  languagesHub: `${PLATFORM_BASE_URL}/linguas`,
   calculoTeoria: `${PLATFORM_BASE_URL}/calculo/teoria`,
   calculoAplicada: `${PLATFORM_BASE_URL}/calculo/aplicada`,
   calculoProcesso: `${PLATFORM_BASE_URL}/calculo/processo`,

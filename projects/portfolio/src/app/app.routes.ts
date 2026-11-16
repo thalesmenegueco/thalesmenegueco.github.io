@@ -42,12 +42,13 @@ export const routes: Routes = [
   // one-page root's Projetos and Ferramentas sections.
   { path: 'project-gallery', redirectTo: '', pathMatch: 'full' },
 
-  // The platform's landing page, keeping the nav entry's meaning
-  // ("Exatas em Movimento") after the hub itself moved away.
+  // The platform's landing page. The nav entry used to be "Exatas em
+  // Movimento"; the platform now presents two labs (Lab das Formas and Lab das
+  // Palavras), so this page promises both and links to both.
   {
     path: 'estudos',
     component: EstudosLandingComponent,
-    title: 'VisuaLab — cursos interativos de exatas',
+    title: 'VisuaLab — matemática e mandarim',
   },
 
   // Retired deep URLs. GitHub Pages cannot issue a real 301, so these are
