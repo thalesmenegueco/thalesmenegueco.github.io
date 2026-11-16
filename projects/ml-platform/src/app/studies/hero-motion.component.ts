@@ -10,11 +10,11 @@ import {
  * A subtle, decorative "two scripts, one curve" emblem for the studies hero.
  *
  * A point traces a sine curve while its tangent line slides along with it —
- * the derivative made visible. Above the curve sits 学习 ("to study"), the
+ * the derivative made visible. Riding that same curve is 学习 ("to study"), the
  * platform's other lab in the same frame: the character is a drawing and the
- * curve is a drawing, and the same method reads both. It loops slowly, pauses
- * when scrolled out of view, and renders a static frame under
- * `prefers-reduced-motion`.
+ * curve is a drawing, and the same method reads both. The word slides along the
+ * wave like a sled, tilting with it. It loops slowly, pauses when scrolled out
+ * of view, and renders a static frame under `prefers-reduced-motion`.
  *
  * Palette values derive from `DEFAULT_PLOT_THEME` (`@shared/plotting`), with
  * the axis and tangent strokes given extra transparency for this decorative
@@ -23,6 +23,13 @@ import {
 
 const LOOP_SECONDS = 9;
 const CYCLES = 1.5;
+
+/**
+ * The sled's own period, deliberately not a multiple of `LOOP_SECONDS`: the
+ * word overtakes the point and is overtaken by it, which reads as two objects
+ * on the same curve rather than one machine.
+ */
+const SLED_SECONDS = 13;
 
 /**
  * The hero word. Rendered with the same serif CJK stack the languages section
@@ -40,7 +47,7 @@ const PALETTE = {
   curve: '#4fb3a6',
   tangent: 'rgba(255, 163, 0, 0.55)',
   point: '#ffa300',
-  word: 'rgba(79, 179, 166, 0.8)',
+  word: '#7cc9bd',
 } as const;
 
 @Component({
@@ -154,28 +161,12 @@ export class HeroMotionComponent implements AfterViewInit, OnDestroy {
 
     ctx.clearRect(0, 0, width, height);
 
-    // The band is split: the word owns the top third, the curve the rest. The
-    // two must never touch — the glyphs are decoration, but a collision reads
-    // as a rendering bug, so the wave's envelope is derived from `centerY`
-    // rather than from the full height.
-    const centerY = height * 0.68;
-    const amplitude = height * 0.19;
+    // Envelope. The crests have to leave room for the word that rides them —
+    // `centerY - amplitude` must exceed the glyph height — but no more than
+    // that, or the bottom half of the band would be empty air.
+    const centerY = height * 0.58;
+    const amplitude = height * 0.22;
     const k = (2 * Math.PI * CYCLES) / width;
-
-    // The word. It drifts a couple of pixels on its own slower period, so the
-    // emblem breathes without competing with the point's 9s loop.
-    //
-    // The size is capped by width as well as height: on a 320px phone a
-    // height-only rule makes two characters fill a third of the band and
-    // shoulder into the first crest, while on desktop the same rule leaves the
-    // mark too small to register.
-    const wordSize = Math.round(Math.min(height * 0.28, width * 0.11));
-    const drift = this.reducedMotion ? 0 : Math.sin(this.time * 0.7) * height * 0.012;
-    ctx.font = `${wordSize}px ${CJK_FONT}`;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = PALETTE.word;
-    ctx.fillText(HERO_WORD, 0, height * 0.31 + drift);
 
     // Horizontal axis.
     ctx.strokeStyle = PALETTE.axis;
@@ -225,5 +216,56 @@ export class HeroMotionComponent implements AfterViewInit, OnDestroy {
     ctx.beginPath();
     ctx.arc(xp, yp, 5, 0, Math.PI * 2);
     ctx.fill();
+
+    // The word, drawn last so it sits on the stroke rather than under it.
+    //
+    // It rides the curve like a sled with two runners. A rigid word cannot
+    // follow a curve that bends 30px across its own width — on a 320px canvas
+    // the wave's radius is comparable to the word's length, so a tangent-aligned
+    // label cuts straight through the line. Instead the word spans the chord
+    // between its two ends, tilts with that chord, and is lifted by the curve's
+    // bulge so both ends clear the surface at once.
+    //
+    // Its own slower period means it overtakes the point and is overtaken by
+    // it; the fade at both edges hides the wrap from right to left, which would
+    // otherwise read as a teleport.
+    const wordSize = Math.round(Math.min(height * 0.28, width * 0.11));
+    const sledU = this.reducedMotion
+      ? 1 / 6
+      : (this.time % SLED_SECONDS) / SLED_SECONDS;
+    const sx = sledU * width;
+
+    ctx.font = `${wordSize}px ${CJK_FONT}`;
+    const halfLength = ctx.measureText(HERO_WORD).width / 2;
+    const yAt = (x: number): number => centerY - amplitude * Math.sin(k * x);
+    const x0 = Math.max(0, sx - halfLength);
+    const x1 = Math.min(width, sx + halfLength);
+    const span = Math.max(1, x1 - x0);
+    const y0 = yAt(x0);
+    const y1 = yAt(x1);
+
+    const chordSlope = (y1 - y0) / span;
+    const chordY = (y0 + y1) / 2;
+    const bulge = Math.abs(yAt((x0 + x1) / 2) - chordY);
+    const gap = wordSize * 0.03;
+    const normal = Math.hypot(1, chordSlope);
+
+    const tilt = Math.atan(chordSlope);
+    const anchorX = (x0 + x1) / 2 + (chordSlope / normal) * (bulge + gap);
+    const anchorY = chordY - (bulge + gap) / normal;
+
+    const fade = this.reducedMotion
+      ? 1
+      : Math.max(0, Math.min(1, Math.min(sledU, 1 - sledU) / 0.1));
+
+    ctx.save();
+    ctx.globalAlpha = 0.8 * fade;
+    ctx.translate(anchorX, anchorY);
+    ctx.rotate(tilt);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = PALETTE.word;
+    ctx.fillText(HERO_WORD, 0, 0);
+    ctx.restore();
   }
 }
