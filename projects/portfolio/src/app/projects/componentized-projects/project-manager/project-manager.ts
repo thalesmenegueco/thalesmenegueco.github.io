@@ -5,6 +5,9 @@ import { TimelineViewComponent } from './timeline/timeline-view.component';
 import { adaptToTimelineItems, GENERAL_TASKS_GROUP_ID } from './timeline/timeline.adapter';
 import type { TimelineItem } from './timeline/timeline.types';
 
+/** Priority of a task, rendered as an icon in the task row. */
+export type TaskPriority = 'backlog' | 'low' | 'medium' | 'urgent' | 'quick';
+
 export interface Task {
   id: string;
   text: string;
@@ -16,6 +19,8 @@ export interface Task {
   endDate: string | null;
   /** ID of the task that must finish before this task starts (finish-to-start). */
   dependsOn: string | null;
+  /** Urgency level of the task. */
+  priority: TaskPriority;
 }
 
 export interface Project {
@@ -35,6 +40,8 @@ interface StoredData {
 interface TemplateTask {
   text: string;
   subtasks: TemplateTask[];
+  /** Kept so templates remember the priority chosen for each task. */
+  priority?: TaskPriority;
 }
 
 interface ProjectTemplate {
@@ -52,6 +59,23 @@ interface TaskLike {
 const STORAGE_KEY = 'project-manager-data';
 const TEMPLATES_STORAGE_KEY = 'project-manager-templates';
 
+/** Sentinel used by the "move task" picker to target the general tasks list. */
+export const GENERAL_TASKS_DESTINATION = '__general-tasks__';
+
+export interface PriorityOption {
+  value: TaskPriority;
+  icon: string;
+  label: string;
+}
+
+export const TASK_PRIORITIES: readonly PriorityOption[] = [
+  { value: 'backlog', icon: '⚪', label: 'Backlog' },
+  { value: 'low', icon: '🔵', label: 'Baixa Pri.' },
+  { value: 'medium', icon: '🟣', label: 'Média Pri.' },
+  { value: 'urgent', icon: '🟠', label: 'Urgente' },
+  { value: 'quick', icon: '⚡', label: '5-10 min para fazer' },
+];
+
 @Component({
   selector: 'app-project-manager',
   imports: [FormsModule, NgTemplateOutlet, TimelineViewComponent],
@@ -68,6 +92,12 @@ export class ProjectManager implements OnInit {
   editingTaskId: string | null = null;
   editingTaskText = '';
   schedulingTaskId: string | null = null;
+  /** Task whose priority picker is expanded, if any. */
+  priorityMenuTaskId: string | null = null;
+  /** Task whose "move to another project" picker is expanded, if any. */
+  moveMenuTaskId: string | null = null;
+
+  readonly priorities: readonly PriorityOption[] = TASK_PRIORITIES;
 
   templates: ProjectTemplate[] = [];
   showTemplates = false;
@@ -140,9 +170,11 @@ export class ProjectManager implements OnInit {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const data: StoredData = JSON.parse(raw);
-        this.projects = data.projects ?? [];
-        this.standaloneTasks = data.standaloneTasks ?? [];
+        // Normalizing on load backfills fields added after older saves
+        // (e.g. task priority) instead of leaving them undefined.
+        const data = this.normalizeData(JSON.parse(raw));
+        this.projects = data.projects;
+        this.standaloneTasks = data.standaloneTasks;
       }
     } catch {
       this.projects = [];
@@ -435,6 +467,7 @@ export class ProjectManager implements OnInit {
     return tasks.map((task) => ({
       text: task.text,
       subtasks: this.toTemplateTasks(task.subtasks),
+      priority: task.priority,
     }));
   }
 
@@ -447,6 +480,7 @@ export class ProjectManager implements OnInit {
       startDate: null,
       endDate: null,
       dependsOn: null,
+      priority: task.priority ?? 'backlog',
     }));
   }
 
@@ -463,6 +497,7 @@ export class ProjectManager implements OnInit {
       startDate: null,
       endDate: null,
       dependsOn: null,
+      priority: 'backlog',
     });
 
     this.addTaskText = '';
@@ -501,6 +536,7 @@ export class ProjectManager implements OnInit {
       startDate: null,
       endDate: null,
       dependsOn: null,
+      priority: 'backlog',
     });
 
     this.saveToStorage();
@@ -525,6 +561,137 @@ export class ProjectManager implements OnInit {
     if (task) {
       task.done = !task.done;
       this.saveToStorage();
+    }
+  }
+
+  // --- tasks: priority ---
+
+  priorityOf(value: TaskPriority): PriorityOption {
+    return TASK_PRIORITIES.find((p) => p.value === value) ?? TASK_PRIORITIES[0];
+  }
+
+  togglePriorityMenu(task: Task, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.priorityMenuTaskId = this.priorityMenuTaskId === task.id ? null : task.id;
+    this.moveMenuTaskId = null;
+  }
+
+  setTaskPriority(task: Task, priority: TaskPriority, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    task.priority = priority;
+    this.priorityMenuTaskId = null;
+    this.saveToStorage();
+  }
+
+  // --- tasks: move between projects ---
+
+  /** Destinations offered when moving a task out of the current view. */
+  get moveDestinations(): Array<{ key: string; label: string }> {
+    const projects = this.projects
+      .filter((project) => project.id !== this.selectedProjectId)
+      .map((project) => ({ key: project.id, label: project.name }));
+
+    if (this.selectedProjectId !== null) {
+      return [
+        { key: GENERAL_TASKS_DESTINATION, label: '📋 Tarefas Gerais' },
+        ...projects,
+      ];
+    }
+    return projects;
+  }
+
+  toggleMoveMenu(task: Task, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.moveMenuTaskId = this.moveMenuTaskId === task.id ? null : task.id;
+    this.priorityMenuTaskId = null;
+  }
+
+  closeTaskMenus(): void {
+    this.priorityMenuTaskId = null;
+    this.moveMenuTaskId = null;
+  }
+
+  /**
+   * Moves a task (with its whole subtree of subtasks) to another project or to
+   * the general tasks list. Use `GENERAL_TASKS_DESTINATION` to target the
+   * general list; any other key must be a project id.
+   */
+  moveTask(task: Task, sourceList: Task[], destinationKey: string): void {
+    const index = sourceList.findIndex((t) => t.id === task.id);
+    if (index === -1) return;
+
+    let destination: Task[] | null = null;
+    if (destinationKey === GENERAL_TASKS_DESTINATION) {
+      destination = this.standaloneTasks;
+    } else {
+      destination = this.projects.find((p) => p.id === destinationKey)?.tasks ?? null;
+    }
+    if (!destination || destination === sourceList) return;
+
+    const [moved] = sourceList.splice(index, 1);
+    destination.push(moved);
+
+    // Dependencies are scoped to a project/group: references that now point
+    // outside their group are dropped so the timeline never dangles.
+    this.pruneDependencies();
+
+    if (this.editingTaskId === task.id) {
+      this.cancelEditTask();
+    }
+    this.closeTaskMenus();
+    this.saveToStorage();
+  }
+
+  // --- tasks: duplicate ---
+
+  /** Deep-copies a task (and its subtasks) right below it in the same list. */
+  duplicateTask(list: Task[], task: Task, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    const index = list.findIndex((t) => t.id === task.id);
+    if (index === -1) return;
+
+    const idMap = new Map<string, string>();
+    const copy = this.cloneTaskTree(task, idMap);
+    this.remapClonedDependencies(copy, idMap);
+    list.splice(index + 1, 0, copy);
+    this.closeTaskMenus();
+    this.saveToStorage();
+  }
+
+  private cloneTaskTree(task: Task, idMap: Map<string, string>): Task {
+    const copy: Task = {
+      id: crypto.randomUUID(),
+      text: task.text,
+      done: task.done,
+      subtasks: [],
+      startDate: task.startDate,
+      endDate: task.endDate,
+      dependsOn: task.dependsOn,
+      priority: task.priority,
+    };
+    idMap.set(task.id, copy.id);
+    copy.subtasks = task.subtasks.map((subtask) => this.cloneTaskTree(subtask, idMap));
+    return copy;
+  }
+
+  /** Keeps dependencies internal to the copied subtree and drops the rest. */
+  private remapClonedDependencies(copy: Task, idMap: Map<string, string>): void {
+    for (const task of this.flattenTasks([copy])) {
+      task.dependsOn = task.dependsOn ? idMap.get(task.dependsOn) ?? null : null;
+    }
+  }
+
+  /** Clears `dependsOn` references that point outside their own project/group. */
+  private pruneDependencies(): void {
+    const groups = [this.standaloneTasks, ...this.projects.map((p) => p.tasks)];
+    for (const group of groups) {
+      const tasks = this.flattenTasks(group);
+      const ids = new Set(tasks.map((t) => t.id));
+      for (const task of tasks) {
+        if (task.dependsOn && !ids.has(task.dependsOn)) {
+          task.dependsOn = null;
+        }
+      }
     }
   }
 
@@ -874,6 +1041,7 @@ export class ProjectManager implements OnInit {
       .map((item) => ({
         text: this.toString(item['text']),
         subtasks: this.normalizeTemplateTasks(item['subtasks']),
+        priority: this.toPriority(item['priority']),
       }));
   }
 
@@ -907,6 +1075,7 @@ export class ProjectManager implements OnInit {
         startDate: this.toNullableString(item['startDate']),
         endDate: this.toNullableString(item['endDate']),
         dependsOn: this.toNullableString(item['dependsOn']),
+        priority: this.toPriority(item['priority']),
       }));
   }
 
@@ -925,6 +1094,12 @@ export class ProjectManager implements OnInit {
 
   private toDeadline(value: unknown): string | null {
     return typeof value === 'string' && value ? value : null;
+  }
+
+  private toPriority(value: unknown): TaskPriority {
+    return TASK_PRIORITIES.some((priority) => priority.value === value)
+      ? (value as TaskPriority)
+      : 'backlog';
   }
 
   private toStatus(value: unknown): Project['status'] {
