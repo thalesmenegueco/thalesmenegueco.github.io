@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectManager, Task } from './project-manager';
+import { GENERAL_TASKS_DESTINATION, ProjectManager, Task } from './project-manager';
 
 describe('ProjectManager', () => {
   let component: ProjectManager;
@@ -34,7 +34,7 @@ describe('ProjectManager', () => {
         { id: 'p1', name: 'Projeto', description: '', status: 'Pendente', deadline: null, tasks: [] },
       ];
       component.standaloneTasks = [
-        { id: 't1', text: 'Tarefa', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+        { id: 't1', text: 'Tarefa', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
       ];
 
       const parsed = JSON.parse(component.exportData());
@@ -156,14 +156,15 @@ describe('ProjectManager', () => {
               text: 'A',
               done: false,
               subtasks: [
-                { id: 'a1', text: 'A1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
-                { id: 'a2', text: 'A2', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+                { id: 'a1', text: 'A1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
+                { id: 'a2', text: 'A2', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
               ],
               startDate: null,
               endDate: null,
               dependsOn: null,
+              priority: 'backlog',
             },
-            { id: 'b', text: 'B', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+            { id: 'b', text: 'B', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
           ],
         },
       ];
@@ -188,10 +189,11 @@ describe('ProjectManager', () => {
               id: 't1',
               text: 'T1',
               done: true,
-              subtasks: [{ id: 't2', text: 'T1.1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null }],
+              subtasks: [{ id: 't2', text: 'T1.1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' }],
               startDate: null,
               endDate: null,
               dependsOn: null,
+              priority: 'backlog',
             },
           ],
         },
@@ -397,7 +399,7 @@ describe('ProjectManager', () => {
 
   describe('task editing', () => {
     it('startEditTask should record the task id and current text', () => {
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' as const };
 
       component.startEditTask(task);
 
@@ -407,7 +409,7 @@ describe('ProjectManager', () => {
 
     it('saveEditTask should trim and update the text, clear state and persist', () => {
       const setItem = spyOn(localStorage, 'setItem');
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' as const };
 
       component.startEditTask(task);
       component.editingTaskText = '  Editado  ';
@@ -421,7 +423,7 @@ describe('ProjectManager', () => {
     });
 
     it('saveEditTask should keep the original text when the edit is blank', () => {
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' as const };
 
       component.startEditTask(task);
       component.editingTaskText = '   ';
@@ -434,7 +436,7 @@ describe('ProjectManager', () => {
 
     it('saveEditTask should be a no-op for a different task id', () => {
       const setItem = spyOn(localStorage, 'setItem');
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' as const };
       component.editingTaskId = 'other';
       component.editingTaskText = 'Lixo';
 
@@ -445,7 +447,7 @@ describe('ProjectManager', () => {
     });
 
     it('cancelEditTask should clear state without changing the task', () => {
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' as const };
 
       component.startEditTask(task);
       component.editingTaskText = 'Alterado';
@@ -458,7 +460,7 @@ describe('ProjectManager', () => {
     });
 
     it('onTaskEditKeydown should save on Enter and cancel on Escape', () => {
-      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null };
+      const task = { id: 't1', text: 'Original', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' as const };
 
       component.startEditTask(task);
       component.editingTaskText = 'Novo';
@@ -486,6 +488,7 @@ describe('ProjectManager', () => {
       startDate: null,
       endDate: null,
       dependsOn: null,
+      priority: 'backlog',
     });
 
     it('moveTaskBy should move a task up and persist', () => {
@@ -714,6 +717,7 @@ describe('ProjectManager', () => {
       startDate: null,
       endDate: null,
       dependsOn: null,
+      priority: 'backlog',
       ...overrides,
     });
 
@@ -770,13 +774,14 @@ describe('ProjectManager', () => {
           text: 'A',
           done: false,
           subtasks: [
-            { id: 'a1', text: 'A1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+            { id: 'a1', text: 'A1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
           ],
           startDate: null,
           endDate: null,
           dependsOn: null,
+          priority: 'backlog',
         },
-        { id: 'b', text: 'B', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+        { id: 'b', text: 'B', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
       ];
 
       const flat = component.flattenTasks(nested);
@@ -793,13 +798,13 @@ describe('ProjectManager', () => {
           status: 'Pendente',
           deadline: null,
           tasks: [
-            { id: 't1', text: 'T1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
-            { id: 't2', text: 'T2', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+            { id: 't1', text: 'T1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
+            { id: 't2', text: 'T2', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
           ],
         },
       ];
       component.standaloneTasks = [
-        { id: 's1', text: 'S1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null },
+        { id: 's1', text: 'S1', done: false, subtasks: [], startDate: null, endDate: null, dependsOn: null, priority: 'backlog' },
       ];
       component.selectedProjectId = 'p1';
 
@@ -824,6 +829,382 @@ describe('ProjectManager', () => {
       expect(data.standaloneTasks[0].startDate).toBe('2026-01-01');
       expect(data.standaloneTasks[0].endDate).toBe('2026-01-02');
       expect(data.standaloneTasks[0].dependsOn).toBe('x');
+    });
+  });
+
+  describe('task priority', () => {
+    const makeTask = (overrides: Partial<Task> = {}): Task => ({
+      id: 't1',
+      text: 'Tarefa',
+      done: false,
+      subtasks: [],
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
+      priority: 'backlog',
+      ...overrides,
+    });
+
+    it('addTask should create tasks with backlog priority', () => {
+      spyOn(localStorage, 'setItem');
+      component.addTaskText = 'Nova tarefa';
+      const list: Task[] = [];
+
+      component.addTask(list);
+
+      expect(list.length).toBe(1);
+      expect(list[0].priority).toBe('backlog');
+    });
+
+    it('priorityOf should resolve the option and fall back to backlog', () => {
+      expect(component.priorityOf('backlog').icon).toBe('⚪');
+      expect(component.priorityOf('low').icon).toBe('🔵');
+      expect(component.priorityOf('medium').icon).toBe('🟣');
+      expect(component.priorityOf('urgent').icon).toBe('🟠');
+      expect(component.priorityOf('quick').label).toBe('5-10 min para fazer');
+    });
+
+    it('setTaskPriority should store the level, close the picker and persist', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const task = makeTask();
+      component.priorityMenuTaskId = 't1';
+
+      component.setTaskPriority(task, 'urgent');
+
+      expect(task.priority).toBe('urgent');
+      expect(component.priorityMenuTaskId).toBeNull();
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('togglePriorityMenu should open/close and close the move picker', () => {
+      const task = makeTask();
+      component.moveMenuTaskId = 'other';
+
+      component.togglePriorityMenu(task);
+      expect(component.priorityMenuTaskId).toBe('t1');
+      expect(component.moveMenuTaskId).toBeNull();
+
+      component.togglePriorityMenu(task);
+      expect(component.priorityMenuTaskId).toBeNull();
+    });
+
+    it('loadFromStorage should backfill priorities saved before this feature', () => {
+      spyOn(localStorage, 'getItem').and.returnValue(
+        JSON.stringify({
+          projects: [],
+          standaloneTasks: [{ id: 'old', text: 'Antiga', done: false, subtasks: [] }],
+        })
+      );
+
+      component.loadFromStorage();
+
+      expect(component.standaloneTasks[0].priority).toBe('backlog');
+    });
+
+    it('normalizeData should keep known priorities and default the rest', () => {
+      const data = component.normalizeData({
+        standaloneTasks: [
+          { id: 't1', text: 'A', priority: 'quick' },
+          { id: 't2', text: 'B', priority: 'nope' },
+          { id: 't3', text: 'C' },
+        ],
+      });
+
+      expect(data.standaloneTasks[0].priority).toBe('quick');
+      expect(data.standaloneTasks[1].priority).toBe('backlog');
+      expect(data.standaloneTasks[2].priority).toBe('backlog');
+    });
+
+    it('should keep priority when saving a template and recreating the project', () => {
+      spyOn(localStorage, 'setItem');
+      component.templates = [];
+      component.projects = [
+        {
+          id: 'p1',
+          name: 'P',
+          description: '',
+          status: 'Pendente',
+          deadline: null,
+          tasks: [makeTask({ id: 'a', text: 'T', priority: 'medium' })],
+        },
+      ];
+      component.selectedProjectId = 'p1';
+      component.templateName = 'Tpl';
+      component.templateDescription = '';
+
+      component.saveTemplateFromProject();
+      component.createProjectFromTemplate(component.templates[0]);
+
+      expect(component.templates[0].tasks[0].priority).toBe('medium');
+      expect(component.projects[1].tasks[0].priority).toBe('medium');
+    });
+
+    it('should change the priority through the row picker', () => {
+      spyOn(localStorage, 'setItem');
+      component.selectedProjectId = null;
+      component.showTemplates = false;
+      component.showTimeline = false;
+      component.standaloneTasks = [makeTask({ id: 'r1', text: 'Primeira' })];
+      fixture.detectChanges();
+
+      const row = fixture.nativeElement.querySelector('.pm-task-row') as HTMLElement;
+      const trigger = row.querySelector('.pm-priority-btn') as HTMLButtonElement;
+      expect(trigger.textContent).toContain('⚪');
+
+      trigger.click();
+      fixture.detectChanges();
+
+      const options = Array.from(
+        fixture.nativeElement.querySelectorAll('.pm-priority-option')
+      ) as HTMLButtonElement[];
+      expect(options.length).toBe(5);
+
+      options.find((option) => option.textContent?.includes('Urgente'))!.click();
+      fixture.detectChanges();
+
+      expect(component.standaloneTasks[0].priority).toBe('urgent');
+      expect(fixture.nativeElement.querySelector('.pm-priority-option')).toBeNull();
+      expect(row.querySelector('.pm-priority-btn')?.textContent).toContain('🟠');
+    });
+  });
+
+  describe('moving tasks between projects', () => {
+    const makeTask = (overrides: Partial<Task> = {}): Task => ({
+      id: 't1',
+      text: 'Tarefa',
+      done: false,
+      subtasks: [],
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
+      priority: 'backlog',
+      ...overrides,
+    });
+
+    const makeProject = (id: string, tasks: Task[] = []) => ({
+      id,
+      name: id.toUpperCase(),
+      description: '',
+      status: 'Pendente' as const,
+      deadline: null,
+      tasks,
+    });
+
+    it('should move a parent task together with its subtasks', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const child = makeTask({ id: 'a1' });
+      const parent = makeTask({ id: 'a', subtasks: [child] });
+      component.projects = [
+        makeProject('p1', [parent, makeTask({ id: 'b' })]),
+        makeProject('p2'),
+      ];
+      component.selectedProjectId = 'p1';
+      component.moveMenuTaskId = 'a';
+
+      component.moveTask(parent, component.projects[0].tasks, 'p2');
+
+      expect(component.projects[0].tasks.map((t) => t.id)).toEqual(['b']);
+      expect(component.projects[1].tasks.map((t) => t.id)).toEqual(['a']);
+      expect(component.projects[1].tasks[0].subtasks.map((t) => t.id)).toEqual(['a1']);
+      expect(component.moveMenuTaskId).toBeNull();
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('should move a task to the general tasks list', () => {
+      const task = makeTask({ id: 'a' });
+      component.projects = [makeProject('p1', [task])];
+      component.standaloneTasks = [];
+      component.selectedProjectId = 'p1';
+
+      component.moveTask(task, component.projects[0].tasks, GENERAL_TASKS_DESTINATION);
+
+      expect(component.standaloneTasks.map((t) => t.id)).toEqual(['a']);
+      expect(component.projects[0].tasks).toEqual([]);
+    });
+
+    it('should ignore unknown destinations', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const task = makeTask({ id: 'a' });
+      component.projects = [makeProject('p1', [task])];
+
+      component.moveTask(task, component.projects[0].tasks, 'missing');
+
+      expect(component.projects[0].tasks.map((t) => t.id)).toEqual(['a']);
+      expect(setItem).not.toHaveBeenCalled();
+    });
+
+    it('moveDestinations should offer the other projects and the general list', () => {
+      component.projects = [makeProject('p1'), makeProject('p2')];
+      component.selectedProjectId = 'p1';
+
+      expect(component.moveDestinations.map((d) => d.key)).toEqual([
+        GENERAL_TASKS_DESTINATION,
+        'p2',
+      ]);
+
+      component.selectedProjectId = null;
+      expect(component.moveDestinations.map((d) => d.key)).toEqual(['p1', 'p2']);
+    });
+
+    it('should drop dependencies that point outside the destination group', () => {
+      const a = makeTask({ id: 'a' });
+      const b = makeTask({ id: 'b', dependsOn: 'a' });
+      component.projects = [makeProject('p1', [a, b]), makeProject('p2')];
+      component.selectedProjectId = 'p1';
+
+      component.moveTask(b, component.projects[0].tasks, 'p2');
+
+      expect(b.dependsOn).toBeNull();
+    });
+
+    it('should keep dependencies whose predecessor also lands in the destination', () => {
+      const a = makeTask({ id: 'a' });
+      const d = makeTask({ id: 'd', dependsOn: 'a' });
+      const c = makeTask({ id: 'c', dependsOn: 'a' });
+      component.projects = [makeProject('p1', [a, d]), makeProject('p2', [c])];
+
+      component.moveTask(a, component.projects[0].tasks, 'p2');
+
+      expect(component.projects[1].tasks.map((t) => t.id)).toEqual(['c', 'a']);
+      expect(c.dependsOn).toBe('a');
+      expect(d.dependsOn).toBeNull();
+    });
+
+    it('should move a task through the row picker', () => {
+      spyOn(localStorage, 'setItem');
+      const task = makeTask({ id: 'a', text: 'Mover' });
+      component.projects = [makeProject('p1', [task]), makeProject('p2')];
+      component.selectedProjectId = 'p1';
+      component.showTemplates = false;
+      component.showTimeline = false;
+      fixture.detectChanges();
+
+      const row = fixture.nativeElement.querySelector(
+        '.pm-task-list .pm-task-row'
+      ) as HTMLElement;
+      const trigger = row.querySelector(
+        '[title="Mover para outro projeto"]'
+      ) as HTMLButtonElement;
+      trigger.click();
+      fixture.detectChanges();
+
+      const select = fixture.nativeElement.querySelector(
+        '.pm-task-panel select'
+      ) as HTMLSelectElement;
+      expect(Array.from(select.options).map((option) => option.value)).toEqual([
+        '',
+        GENERAL_TASKS_DESTINATION,
+        'p2',
+      ]);
+
+      select.value = 'p2';
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+
+      expect(component.projects[0].tasks).toEqual([]);
+      expect(component.projects[1].tasks.map((t) => t.id)).toEqual(['a']);
+    });
+  });
+
+  describe('duplicating tasks', () => {
+    const makeTask = (overrides: Partial<Task> = {}): Task => ({
+      id: 't1',
+      text: 'Tarefa',
+      done: false,
+      subtasks: [],
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
+      priority: 'backlog',
+      ...overrides,
+    });
+
+    it('should insert a deep copy right after the original with fresh ids', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const original = makeTask({
+        id: 'a',
+        text: 'Pai',
+        done: true,
+        subtasks: [makeTask({ id: 'a1', text: 'Filha' })],
+        startDate: '2026-01-01',
+        endDate: '2026-01-02',
+        priority: 'quick',
+      });
+      const list = [original, makeTask({ id: 'b' })];
+
+      component.duplicateTask(list, original);
+
+      expect(list.length).toBe(3);
+      expect(list[0]).toBe(original);
+      expect(list[2].id).toBe('b');
+
+      const copy = list[1];
+      expect(copy.id).not.toBe('a');
+      expect(copy.text).toBe('Pai');
+      expect(copy.done).toBeTrue();
+      expect(copy.startDate).toBe('2026-01-01');
+      expect(copy.endDate).toBe('2026-01-02');
+      expect(copy.priority).toBe('quick');
+      expect(copy.subtasks.length).toBe(1);
+      expect(copy.subtasks[0].id).not.toBe('a1');
+      expect(copy.subtasks[0].text).toBe('Filha');
+      expect(setItem).toHaveBeenCalled();
+    });
+
+    it('should remap internal dependencies and drop external ones', () => {
+      const original = makeTask({
+        id: 'a',
+        dependsOn: 'x',
+        subtasks: [makeTask({ id: 'a1', dependsOn: 'a' })],
+      });
+      const external = makeTask({ id: 'x' });
+      const list = [original, external];
+
+      component.duplicateTask(list, original);
+
+      const copy = list[1];
+      expect(copy.dependsOn).toBeNull();
+      expect(copy.subtasks[0].dependsOn).toBe(copy.id);
+      expect(original.dependsOn).toBe('x');
+    });
+
+    it('should be a no-op when the task is not in the list', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const list = [makeTask({ id: 'a' })];
+
+      component.duplicateTask(list, makeTask({ id: 'missing' }));
+
+      expect(list.map((t) => t.id)).toEqual(['a']);
+      expect(setItem).not.toHaveBeenCalled();
+    });
+
+    it('should duplicate a task through the row button', () => {
+      spyOn(localStorage, 'setItem');
+      const original = makeTask({ id: 'a', text: 'Original' });
+      component.projects = [
+        {
+          id: 'p1',
+          name: 'P1',
+          description: '',
+          status: 'Pendente',
+          deadline: null,
+          tasks: [original],
+        },
+      ];
+      component.selectedProjectId = 'p1';
+      component.showTemplates = false;
+      component.showTimeline = false;
+      fixture.detectChanges();
+
+      const button = fixture.nativeElement.querySelector(
+        '[title="Duplicar tarefa"]'
+      ) as HTMLButtonElement;
+      button.click();
+      fixture.detectChanges();
+
+      expect(component.projects[0].tasks.length).toBe(2);
+      expect(component.projects[0].tasks[1].text).toBe('Original');
+      expect(component.projects[0].tasks[1].id).not.toBe('a');
     });
   });
 });

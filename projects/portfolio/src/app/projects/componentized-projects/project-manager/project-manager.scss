@@ -402,6 +402,39 @@
   font-size: 0.9rem;
 }
 
+.pm-task-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 6px 0 10px 28px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+
+  .pm-select {
+    width: 100%;
+    margin-top: 4px;
+  }
+}
+
+.pm-priority-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pm-priority-option.active {
+  color: var(--pm-text);
+  box-shadow: inset 0 0 0 1px var(--pm-accent);
+}
+
+.pm-move-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--pm-text-muted);
+}
+
 .pm-task-actions {
   display: flex;
   gap: 4px;

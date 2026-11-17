@@ -9,6 +9,7 @@ const task = (overrides: Partial<Task>): Task => ({
   startDate: null,
   endDate: null,
   dependsOn: null,
+  priority: 'backlog',
   ...overrides,
 });
 

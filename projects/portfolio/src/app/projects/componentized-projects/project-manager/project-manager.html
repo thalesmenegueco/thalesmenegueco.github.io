@@ -437,6 +437,14 @@
         [ngModel]="task.done"
         (ngModelChange)="toggleTaskById(parentList, task.id)"
       />
+      <button
+        type="button"
+        class="pm-btn pm-btn-ghost pm-btn-small pm-priority-btn"
+        [class.pm-btn-schedule-active]="priorityMenuTaskId === task.id"
+        (click)="togglePriorityMenu(task, $event)"
+        [title]="'Prioridade: ' + priorityOf(task.priority).label"
+        [attr.aria-label]="'Prioridade: ' + priorityOf(task.priority).label"
+        aria-haspopup="true">{{ priorityOf(task.priority).icon }}</button>
       @if (editingTaskId === task.id) {
         <input
           type="text"
@@ -473,6 +481,17 @@
         }
         <button
           class="pm-btn pm-btn-ghost pm-btn-small"
+          (click)="duplicateTask(parentList, task, $event)"
+          title="Duplicar tarefa"
+          aria-label="Duplicar tarefa">📄</button>
+        <button
+          class="pm-btn pm-btn-ghost pm-btn-small"
+          [class.pm-btn-schedule-active]="moveMenuTaskId === task.id"
+          (click)="toggleMoveMenu(task, $event)"
+          title="Mover para outro projeto"
+          aria-label="Mover para outro projeto">📂</button>
+        <button
+          class="pm-btn pm-btn-ghost pm-btn-small"
           [class.pm-btn-schedule-active]="schedulingTaskId === task.id"
           (click)="toggleTaskSchedule(task, $event)"
           title="Agendar (datas e dependência)">🗓</button>
@@ -482,6 +501,44 @@
           title="Deletar to-do">🗑</button>
       </div>
     </div>
+    @if (priorityMenuTaskId === task.id) {
+      <div class="pm-task-panel">
+        <span class="pm-field-label">Prioridade</span>
+        <div class="pm-priority-options">
+          @for (priority of priorities; track priority.value) {
+            <button
+              type="button"
+              class="pm-btn pm-btn-ghost pm-btn-small pm-priority-option"
+              [class.active]="task.priority === priority.value"
+              (click)="setTaskPriority(task, priority.value, $event)">
+              <span>{{ priority.icon }} {{ priority.label }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+    @if (moveMenuTaskId === task.id) {
+      <div class="pm-task-panel">
+        <label class="pm-field-label">
+          Mover para
+          <select
+            class="pm-select"
+            [ngModel]="''"
+            (ngModelChange)="moveTask(task, parentList, $event)">
+            <option value="" disabled>Selecione o destino…</option>
+            @for (destination of moveDestinations; track destination.key) {
+              <option [value]="destination.key">{{ destination.label }}</option>
+            }
+          </select>
+        </label>
+        @if (moveDestinations.length === 0) {
+          <p class="pm-move-empty">Nenhum outro projeto disponível.</p>
+        }
+        <button type="button" class="pm-btn pm-btn-ghost pm-btn-small" (click)="closeTaskMenus()">
+          Cancelar
+        </button>
+      </div>
+    }
     @if (schedulingTaskId === task.id) {
       <div class="pm-task-schedule">
         <label class="pm-field-label">
