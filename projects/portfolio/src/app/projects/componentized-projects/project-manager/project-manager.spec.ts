@@ -1207,4 +1207,252 @@ describe('ProjectManager', () => {
       expect(component.projects[0].tasks[1].id).not.toBe('a');
     });
   });
+
+  describe('subtask visibility', () => {
+    const makeTask = (id: string, subtasks: Task[] = []): Task => ({
+      id,
+      text: id.toUpperCase(),
+      done: false,
+      subtasks,
+      startDate: null,
+      endDate: null,
+      dependsOn: null,
+      priority: 'backlog',
+    });
+
+    const makeProject = (tasks: Task[]) => ({
+      id: 'p1',
+      name: 'Projeto',
+      description: '',
+      status: 'Pendente' as const,
+      deadline: null,
+      tasks,
+    });
+
+    beforeEach(() => {
+      localStorage.removeItem('project-manager-collapsed-tasks');
+      component.collapsedTaskIds = new Set();
+    });
+
+    it('toggleSubtasks should hide and show a subtree, persisting the preference', () => {
+      const setItem = spyOn(localStorage, 'setItem');
+      const task = makeTask('a', [makeTask('a1')]);
+
+      expect(component.hasSubtasks(task)).toBeTrue();
+      expect(component.isCollapsed(task)).toBeFalse();
+
+      component.toggleSubtasks(task);
+
+      expect(component.isCollapsed(task)).toBeTrue();
+      expect(setItem).toHaveBeenCalledWith(
+        'project-manager-collapsed-tasks',
+        jasmine.any(String)
+      );
+
+      component.toggleSubtasks(task);
+
+      expect(component.isCollapsed(task)).toBeFalse();
+    });
+
+    it('loadCollapsedFromStorage should restore ids and ignore invalid entries', () => {
+      localStorage.setItem(
+        'project-manager-collapsed-tasks',
+        JSON.stringify({ ids: ['a', '', 7, 'b'] })
+      );
+
+      component.loadCollapsedFromStorage();
+
+      expect([...component.collapsedTaskIds]).toEqual(['a', 'b']);
+    });
+
+    it('loadCollapsedFromStorage should fall back to an empty set on bad data', () => {
+      component.collapsedTaskIds = new Set(['keep']);
+      localStorage.setItem('project-manager-collapsed-tasks', 'not json');
+
+      component.loadCollapsedFromStorage();
+
+      expect(component.collapsedTaskIds.size).toBe(0);
+    });
+
+    it('toggleAllSubtasks should collapse and expand the general tasks view', () => {
+      component.selectedProjectId = null;
+      component.standaloneTasks = [
+        makeTask('a', [makeTask('a1'), makeTask('a2')]),
+        makeTask('b', [makeTask('b1')]),
+        makeTask('c'),
+      ];
+
+      expect(component.hasAnySubtasks).toBeTrue();
+      expect(component.allSubtasksCollapsed).toBeFalse();
+
+      component.toggleAllSubtasks();
+
+      expect(component.allSubtasksCollapsed).toBeTrue();
+      expect([...component.collapsedTaskIds].sort()).toEqual(['a', 'b']);
+
+      component.toggleAllSubtasks();
+
+      expect(component.allSubtasksCollapsed).toBeFalse();
+      expect(component.collapsedTaskIds.size).toBe(0);
+    });
+
+    it('toggleAllSubtasks should only touch the current view', () => {
+      const projectTask = makeTask('p', [makeTask('p1')]);
+      const generalTask = makeTask('g', [makeTask('g1')]);
+      component.projects = [makeProject([projectTask])];
+      component.standaloneTasks = [generalTask];
+
+      component.selectedProjectId = 'p1';
+      component.toggleAllSubtasks();
+
+      expect(component.isCollapsed(projectTask)).toBeTrue();
+      expect(component.isCollapsed(generalTask)).toBeFalse();
+    });
+
+    it('hasAnySubtasks should be false for flat lists', () => {
+      component.selectedProjectId = null;
+      component.standaloneTasks = [makeTask('a'), makeTask('b')];
+
+      expect(component.hasAnySubtasks).toBeFalse();
+      expect(component.allSubtasksCollapsed).toBeFalse();
+
+      component.toggleAllSubtasks();
+
+      expect(component.collapsedTaskIds.size).toBe(0);
+    });
+
+    it('addSubtask should expand a collapsed parent so the new subtask shows', () => {
+      spyOn(window, 'prompt').and.returnValue('Nova subtarefa');
+      const parent = makeTask('a', [makeTask('a1')]);
+      component.standaloneTasks = [parent];
+      component.toggleSubtasks(parent);
+
+      component.addSubtask(parent);
+
+      expect(parent.subtasks.length).toBe(2);
+      expect(component.isCollapsed(parent)).toBeFalse();
+    });
+
+    it('duplicateTask should keep the copy collapsed when the original is', () => {
+      spyOn(localStorage, 'setItem');
+      const original = makeTask('a', [makeTask('a1')]);
+      const list = [original];
+      component.toggleSubtasks(original);
+
+      component.duplicateTask(list, original);
+
+      expect(list.length).toBe(2);
+      expect(component.isCollapsed(list[1])).toBeTrue();
+    });
+
+    describe('rendered list', () => {
+      const rows = (): HTMLElement[] =>
+        Array.from(fixture.nativeElement.querySelectorAll('.pm-task-row')) as HTMLElement[];
+
+      const headerSubtasksButton = (): HTMLButtonElement | null =>
+        (Array.from(
+          fixture.nativeElement.querySelectorAll('.pm-content-actions button')
+        ) as HTMLButtonElement[]).find(
+          (button) => button.textContent?.includes('subtarefas')
+        ) ?? null;
+
+      const renderGeneral = (tasks: Task[]): void => {
+        component.selectedProjectId = null;
+        component.showTemplates = false;
+        component.showTimeline = false;
+        component.standaloneTasks = tasks;
+        fixture.detectChanges();
+      };
+
+      it('should hide and reveal nested rows through the row caret', () => {
+        renderGeneral([makeTask('a', [makeTask('a1'), makeTask('a2')]), makeTask('b')]);
+        expect(rows().length).toBe(4);
+
+        const caret = fixture.nativeElement.querySelector(
+          'button.pm-subtask-toggle[aria-expanded="true"]'
+        ) as HTMLButtonElement;
+        expect(caret).toBeTruthy();
+        expect(caret.textContent?.trim()).toBe('▾');
+
+        caret.click();
+        fixture.detectChanges();
+
+        expect(rows().length).toBe(2);
+        const collapsed = fixture.nativeElement.querySelector(
+          'button.pm-subtask-toggle[aria-expanded="false"]'
+        ) as HTMLButtonElement;
+        expect(collapsed.textContent?.trim()).toBe('▸');
+        expect(
+          fixture.nativeElement.querySelector('.pm-subtask-badge').textContent?.trim()
+        ).toBe('+2');
+
+        collapsed.click();
+        fixture.detectChanges();
+
+        expect(rows().length).toBe(4);
+        expect(fixture.nativeElement.querySelector('.pm-subtask-badge')).toBeNull();
+      });
+
+      it('should not render a caret for tasks without subtasks', () => {
+        renderGeneral([makeTask('a'), makeTask('b')]);
+
+        expect(fixture.nativeElement.querySelector('button.pm-subtask-toggle')).toBeNull();
+        expect(
+          fixture.nativeElement.querySelectorAll('.pm-subtask-toggle-empty').length
+        ).toBe(2);
+      });
+
+      it('should hide and show every subtree from the general tasks header', () => {
+        renderGeneral([
+          makeTask('a', [makeTask('a1')]),
+          makeTask('b', [makeTask('b1')]),
+        ]);
+
+        const button = headerSubtasksButton();
+        expect(button?.textContent).toContain('Ocultar subtarefas');
+
+        button?.click();
+        fixture.detectChanges();
+
+        expect(rows().length).toBe(2);
+        expect(headerSubtasksButton()?.textContent).toContain('Mostrar subtarefas');
+
+        headerSubtasksButton()?.click();
+        fixture.detectChanges();
+
+        expect(rows().length).toBe(4);
+        expect(headerSubtasksButton()?.textContent).toContain('Ocultar subtarefas');
+      });
+
+      it('should hide and show every subtree inside a project', () => {
+        component.projects = [
+          makeProject([makeTask('p', [makeTask('p1')]), makeTask('q', [makeTask('q1')])]),
+        ];
+        component.selectedProjectId = 'p1';
+        component.showTemplates = false;
+        component.showTimeline = false;
+        fixture.detectChanges();
+
+        expect(rows().length).toBe(4);
+
+        headerSubtasksButton()?.click();
+        fixture.detectChanges();
+
+        expect(rows().length).toBe(2);
+        expect(headerSubtasksButton()?.textContent).toContain('Mostrar subtarefas');
+
+        headerSubtasksButton()?.click();
+        fixture.detectChanges();
+
+        expect(rows().length).toBe(4);
+      });
+
+      it('should not offer the header toggle when nothing has subtasks', () => {
+        renderGeneral([makeTask('a')]);
+
+        expect(headerSubtasksButton()).toBeNull();
+      });
+    });
+  });
 });
+

@@ -248,6 +248,16 @@
         <div class="pm-content">
           <div class="pm-content-header">
             <h2 class="pm-content-title">📋 Tarefas Gerais</h2>
+            @if (hasAnySubtasks) {
+              <div class="pm-content-actions">
+                <button
+                  class="pm-btn pm-btn-secondary pm-btn-small"
+                  (click)="toggleAllSubtasks()"
+                  [attr.aria-pressed]="allSubtasksCollapsed">
+                  {{ allSubtasksCollapsed ? '▾ Mostrar subtarefas' : '▸ Ocultar subtarefas' }}
+                </button>
+              </div>
+            }
           </div>
 
           <div class="pm-add-task-row">
@@ -291,6 +301,14 @@
                 title="Click para editar">{{ selectedProject.name }}</h2>
             }
             <div class="pm-content-actions">
+              @if (hasAnySubtasks) {
+                <button
+                  class="pm-btn pm-btn-secondary pm-btn-small"
+                  (click)="toggleAllSubtasks()"
+                  [attr.aria-pressed]="allSubtasksCollapsed">
+                  {{ allSubtasksCollapsed ? '▾ Mostrar subtarefas' : '▸ Ocultar subtarefas' }}
+                </button>
+              }
               <button
                 class="pm-btn pm-btn-secondary pm-btn-small"
                 (click)="openSaveTemplateForm()"
@@ -431,6 +449,16 @@
         (dragend)="onTaskDragEnd()"
         title="Arraste para reordenar"
         aria-hidden="true">⠿</span>
+      @if (hasSubtasks(task)) {
+        <button
+          type="button"
+          class="pm-subtask-toggle"
+          [attr.aria-expanded]="!isCollapsed(task)"
+          [title]="(isCollapsed(task) ? 'Mostrar' : 'Ocultar') + ' subtarefas (' + task.subtasks.length + ')'"
+          (click)="toggleSubtasks(task, $event)">{{ isCollapsed(task) ? '▸' : '▾' }}</button>
+      } @else {
+        <span class="pm-subtask-toggle pm-subtask-toggle-empty" aria-hidden="true"></span>
+      }
       <input
         type="checkbox"
         class="pm-checkbox"
@@ -459,6 +487,11 @@
           class="pm-task-text pm-editable"
           (click)="startEditTask(task, $event)"
           title="Clique para editar">{{ task.text }}</span>
+      }
+      @if (hasSubtasks(task) && isCollapsed(task)) {
+        <span class="pm-subtask-badge" [title]="task.subtasks.length + ' subtarefa(s) ocultas'">
+          +{{ task.subtasks.length }}
+        </span>
       }
       <div class="pm-task-actions">
         <button
@@ -575,7 +608,7 @@
         </label>
       </div>
     }
-    @if (task.subtasks.length > 0) {
+    @if (task.subtasks.length > 0 && !isCollapsed(task)) {
       <div class="pm-subtasks">
         @for (subtask of task.subtasks; track subtask.id) {
           <ng-container

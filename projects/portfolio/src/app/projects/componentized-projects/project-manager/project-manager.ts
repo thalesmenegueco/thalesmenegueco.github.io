@@ -58,6 +58,8 @@ interface TaskLike {
 
 const STORAGE_KEY = 'project-manager-data';
 const TEMPLATES_STORAGE_KEY = 'project-manager-templates';
+/** UI preference only: which tasks have their subtasks hidden. */
+const COLLAPSED_STORAGE_KEY = 'project-manager-collapsed-tasks';
 
 /** Sentinel used by the "move task" picker to target the general tasks list. */
 export const GENERAL_TASKS_DESTINATION = '__general-tasks__';
@@ -110,6 +112,9 @@ export class ProjectManager implements OnInit {
   dropTargetId: string | null = null;
   /** Sibling list the drag started from; drops are only allowed inside it. */
   private draggedList: Task[] | null = null;
+
+  /** Ids of the tasks whose subtasks are currently hidden. */
+  collapsedTaskIds = new Set<string>();
 
   newProjectName = '';
   newProjectDescription = '';
@@ -164,6 +169,7 @@ export class ProjectManager implements OnInit {
   ngOnInit(): void {
     this.loadFromStorage();
     this.loadTemplatesFromStorage();
+    this.loadCollapsedFromStorage();
   }
 
   loadFromStorage(): void {
@@ -539,6 +545,8 @@ export class ProjectManager implements OnInit {
       priority: 'backlog',
     });
 
+    // A hidden new subtask would look like nothing happened: reveal it.
+    this.expandTask(parentTask);
     this.saveToStorage();
   }
 
@@ -654,6 +662,11 @@ export class ProjectManager implements OnInit {
     const copy = this.cloneTaskTree(task, idMap);
     this.remapClonedDependencies(copy, idMap);
     list.splice(index + 1, 0, copy);
+    // The copy mirrors the original's visibility: collapsed stays collapsed.
+    if (this.collapsedTaskIds.has(task.id)) {
+      this.collapsedTaskIds.add(copy.id);
+      this.saveCollapsed();
+    }
     this.closeTaskMenus();
     this.saveToStorage();
   }
@@ -693,6 +706,95 @@ export class ProjectManager implements OnInit {
         }
       }
     }
+  }
+
+  // --- tasks: subtask visibility ---
+
+  loadCollapsedFromStorage(): void {
+    try {
+      const raw = localStorage.getItem(COLLAPSED_STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw) as { ids?: unknown };
+      const ids = Array.isArray(data?.ids) ? data.ids : [];
+      this.collapsedTaskIds = new Set(
+        ids.filter((id): id is string => typeof id === 'string' && id !== '')
+      );
+    } catch {
+      this.collapsedTaskIds = new Set();
+    }
+  }
+
+  private saveCollapsed(): void {
+    try {
+      localStorage.setItem(
+        COLLAPSED_STORAGE_KEY,
+        JSON.stringify({ ids: [...this.collapsedTaskIds] })
+      );
+    } catch {
+      // Collapsing is cosmetic: never break the tool when storage is unavailable.
+    }
+  }
+
+  /** Root list of the current view (general tasks or the selected project). */
+  private get currentRootTasks(): Task[] {
+    return this.selectedProject?.tasks ?? this.standaloneTasks;
+  }
+
+  hasSubtasks(task: Task): boolean {
+    return task.subtasks.length > 0;
+  }
+
+  isCollapsed(task: Task): boolean {
+    return this.collapsedTaskIds.has(task.id);
+  }
+
+  toggleSubtasks(task: Task, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+
+    if (this.collapsedTaskIds.has(task.id)) {
+      this.collapsedTaskIds.delete(task.id);
+    } else {
+      this.collapsedTaskIds.add(task.id);
+    }
+    this.saveCollapsed();
+  }
+
+  /** Expands `task` so a freshly added or duplicated subtask is visible. */
+  private expandTask(task: Task): void {
+    if (this.collapsedTaskIds.delete(task.id)) {
+      this.saveCollapsed();
+    }
+  }
+
+  /** True when the current view has at least one task with subtasks. */
+  get hasAnySubtasks(): boolean {
+    return this.flattenTasks(this.currentRootTasks).some((task) => task.subtasks.length > 0);
+  }
+
+  /** True when every task with subtasks in the current view is collapsed. */
+  get allSubtasksCollapsed(): boolean {
+    const parents = this.flattenTasks(this.currentRootTasks).filter(
+      (task) => task.subtasks.length > 0
+    );
+    return parents.length > 0 && parents.every((task) => this.collapsedTaskIds.has(task.id));
+  }
+
+  /** Collapses (or expands) every subtask tree in the current view. */
+  toggleAllSubtasks(): void {
+    const parents = this.flattenTasks(this.currentRootTasks).filter(
+      (task) => task.subtasks.length > 0
+    );
+    if (parents.length === 0) return;
+
+    const collapse = !this.allSubtasksCollapsed;
+    for (const parent of parents) {
+      if (collapse) {
+        this.collapsedTaskIds.add(parent.id);
+      } else {
+        this.collapsedTaskIds.delete(parent.id);
+      }
+    }
+    this.saveCollapsed();
   }
 
   // --- tasks: reorder ---

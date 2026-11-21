@@ -13,7 +13,6 @@
   --pm-border: rgba(200, 195, 210, 0.25);
   --pm-radius: 12px;
   --pm-danger: #d48a8a;
-  --pm-danger-hover: #{color-mix(in srgb, #d48a8a, white 15%)};
 
   background: var(--pm-bg);
   color: var(--pm-text);
@@ -38,13 +37,17 @@
   color: var(--pm-accent);
 }
 
+.pm-hamburger,
+.pm-subtask-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 .pm-hamburger {
   display: none;
   flex-direction: column;
   gap: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
   padding: 6px;
 
   span {
@@ -200,12 +203,9 @@
   margin: 4px 0 0;
 }
 
+.pm-project-card-footer,
 .pm-project-card-footer {
-  display: flex;
-  justify-content: space-between;
   margin-top: 6px;
-  font-size: 0.7rem;
-  color: var(--pm-text-muted);
 }
 
 .pm-status-pill {
@@ -256,11 +256,7 @@
   color: var(--pm-accent);
 }
 
-.pm-content-actions {
-  display: flex;
-  gap: 8px;
-}
-
+.pm-content-actions,
 .pm-editable {
   cursor: pointer;
   border-bottom: 2px dashed transparent;
@@ -357,28 +353,32 @@
     box-shadow: inset 0 2px 0 var(--pm-accent);
   }
 
-  &.drop-target.drop-below {
+  /* Marker flips to the bottom edge while dragging downwards. */
+  &.drop-below {
     box-shadow: inset 0 -2px 0 var(--pm-accent);
   }
+}
 
-  &.drop-target.drop-above {
-    box-shadow: inset 0 2px 0 var(--pm-accent);
+.pm-drag-handle,
+.pm-subtask-toggle {
+  flex-shrink: 0;
+  color: var(--pm-text-muted);
+  transition: color 0.15s, opacity 0.15s;
+
+  &:hover {
+    color: var(--pm-accent);
   }
 }
 
 .pm-drag-handle {
-  flex-shrink: 0;
   font-size: 0.9rem;
   line-height: 1;
   padding: 0 2px;
-  color: var(--pm-text-muted);
   opacity: 0.35;
   cursor: grab;
   user-select: none;
-  transition: opacity 0.15s, color 0.15s;
 
   &:hover {
-    color: var(--pm-accent);
     opacity: 1;
   }
 
@@ -402,15 +402,47 @@
   font-size: 0.9rem;
 }
 
-.pm-task-panel {
+.pm-subtask-toggle {
+  min-width: 18px;
+  padding: 2px 0;
+  font-size: 0.7rem;
+  line-height: 1;
+  text-align: center;
+
+  &[aria-expanded='false'] {
+    color: var(--pm-accent);
+  }
+
+  &-empty {
+    display: inline-block;
+    cursor: default;
+  }
+}
+
+.pm-subtask-badge {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 0.65rem;
+  color: var(--pm-text-muted);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: default;
+}
+
+.pm-task-panel,
+.pm-task-schedule {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin: 6px 0 10px 28px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--pm-border);
   border-radius: var(--pm-radius);
+}
+
+.pm-task-panel {
+  flex-direction: column;
+  gap: 10px;
 
   .pm-select {
     width: 100%;
@@ -449,14 +481,7 @@
 }
 
 .pm-task-schedule {
-  display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin: 6px 0 10px 28px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--pm-border);
-  border-radius: var(--pm-radius);
 
   .pm-field-label {
     flex: 1 1 160px;
@@ -508,18 +533,13 @@
   }
 }
 
-.pm-form-actions {
-  display: flex;
-  gap: 8px;
-}
-
 .pm-inline-edit {
   width: 100%;
   font-size: 1.2rem;
 }
 
-.pm-input {
-  width: 100%;
+/* Shared skeleton of the text field and the select. */
+%pm-field {
   padding: 10px 14px;
   background: var(--pm-surface);
   border: 1px solid var(--pm-border);
@@ -527,6 +547,11 @@
   color: var(--pm-text);
   font-size: 0.9rem;
   outline: none;
+}
+
+.pm-input {
+  @extend %pm-field;
+  width: 100%;
   transition: border-color 0.15s;
   box-sizing: border-box;
 
@@ -551,13 +576,7 @@
 }
 
 .pm-select {
-  padding: 10px 14px;
-  background: var(--pm-surface);
-  border: 1px solid var(--pm-border);
-  border-radius: var(--pm-radius);
-  color: var(--pm-text);
-  font-size: 0.9rem;
-  outline: none;
+  @extend %pm-field;
   cursor: pointer;
 
   &:focus {
@@ -741,14 +760,18 @@
   gap: 16px;
 }
 
-.pm-template-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.pm-template-card,
+.pm-save-template-form {
   background: var(--pm-surface);
   border: 1px solid var(--pm-border);
   border-radius: var(--pm-radius);
   padding: 16px;
+}
+
+.pm-template-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .pm-template-card-header {
@@ -773,13 +796,6 @@
   font-size: 0.8rem;
   color: var(--pm-text-muted);
   margin: 0;
-}
-
-.pm-template-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.7rem;
-  color: var(--pm-text-muted);
 }
 
 .pm-template-preview {
@@ -810,14 +826,10 @@
 }
 
 .pm-save-template-form {
-  background: var(--pm-surface);
-  border: 1px solid var(--pm-border);
-  border-radius: var(--pm-radius);
-  padding: 16px;
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 20px;
 }
 
 .pm-save-template-title {
@@ -876,15 +888,11 @@
     align-items: flex-start;
     gap: 8px;
   }
-
-  .pm-task-actions {
-    opacity: 1;
-  }
 }
 
 /* Touch devices cannot hover, and native drag-and-drop is unreliable there:
    keep the action buttons (including the move arrows) always reachable. */
-@media (hover: none) {
+@media (max-width: 767px), (hover: none) {
   .pm-task-actions {
     opacity: 1;
   }
